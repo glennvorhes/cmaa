@@ -1,5 +1,8 @@
 # CMAA
 
+
+Out of date --- will update to README for CMAA
+
 Demonstration application to show how React, Redux, and OpenLayers
 work together.
 
