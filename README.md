@@ -1,6 +1,6 @@
-# openlayers-react-example
+# CMAA
 
-Demonstion application to show how React, Redux, and OpenLayers
+Demonstration application to show how React, Redux, and OpenLayers
 work together.
 
 Setup
