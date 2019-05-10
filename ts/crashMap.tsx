@@ -117,16 +117,7 @@ class _CrashMap extends React.Component<{}, null> {
 
     componentDidMount() {
 
-        let $accordion = $('#accordion')
-        $accordion.accordion({heightStyle: 'fill'});
-        // $accordion.accordion();
-
-        // setTimeout(() => {
-        //     $accordion.accordion("resize");
-        //     // jQuery( "#accordion" ).accordion( "resize" );
-        //     // console.log('here');
-        // }, 500)
-
+        $('#accordion').accordion({heightStyle: 'fill'});
 
         this.map = new Map({
             target: document.getElementById('map'),
