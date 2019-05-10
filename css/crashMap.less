@@ -1,44 +1,89 @@
 //@import (inline ) "./ol.css";
 @headerHeight: 110px;
 
+header {
+  display: flex;
+  background: rgb(206, 206, 206);
+  background: linear-gradient(90deg, rgba(203, 32, 40, 1) 0%, rgba(203, 32, 40, 1) 49%, rgb(246, 246, 246) 100%);
+  img {
+    margin: 4px;
+  }
 
-body, html{
+  #title-bar {
+    flex: 1;
+    padding-left: 15px;
+
+    h2 {
+      margin: 10px 0;
+      color: white;
+    }
+
+  }
+}
+
+html, body, #root, #app-container {
   height: 100%;
   width: 100%;
   margin: 0;
   padding: 0;
-  //font-size: xx-large;
 }
 
 header {
   height: @headerHeight;
 }
 
-#root {
-  height: calc(100% - @headerHeight);
-}
-
 #app-container {
-  height: 100%;
-  display: flex;
 
+  #map-container {
+    height: ~"calc(100% - 110px)";;
+    display: flex;
 
-  > div {
-    height: 100%;
+    > div {
+      height: 100%;
+    }
   }
 }
 
-#accordion {
+#accordion-container {
   width: 300px;
 
-  > h3 {
-    margin: 0;
+  #accordion {
+    > h3 {
+      margin: 0;
+      padding: 6px;
+      border-bottom: none;
+    }
+
+    > div {
+      padding: 10px;
+      border-bottom: none;
+    }
+
+    .ui-state-active, .ui-widget-content .ui-state-active, .ui-widget-header .ui-state-active, a.ui-button:active, .ui-button:active, .ui-button.ui-state-active:hover{
+      background-color: #CB2028;
+      border-color: #9c1d22;
+    }
   }
 }
 
 #map {
+  height: 100%;
   flex: 1;
+  position: relative;
+
+  #crash-info {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    z-index: 5;
+    height: 200px;
+    width: 300px;
+    background-color: white;
+    overflow: auto
+  }
 }
+
+
 
 
 

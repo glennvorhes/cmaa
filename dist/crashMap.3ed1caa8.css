@@ -1,5 +1,23 @@
+header {
+  display: flex;
+  background: #cecece;
+  background: linear-gradient(90deg, #cb2028 0%, #cb2028 49%, #f6f6f6 100%);
+}
+header img {
+  margin: 4px;
+}
+header #title-bar {
+  flex: 1;
+  padding-left: 15px;
+}
+header #title-bar h2 {
+  margin: 10px 0;
+  color: white;
+}
+html,
 body,
-html {
+#root,
+#app-container {
   height: 100%;
   width: 100%;
   margin: 0;
@@ -8,24 +26,48 @@ html {
 header {
   height: 110px;
 }
-#root {
+#app-container #map-container {
   height: calc(100% - 110px);
-}
-#app-container {
-  height: 100%;
   display: flex;
 }
-#app-container > div {
+#app-container #map-container > div {
   height: 100%;
 }
-#accordion {
+#accordion-container {
   width: 300px;
 }
-#accordion > h3 {
+#accordion-container #accordion > h3 {
   margin: 0;
+  padding: 6px;
+  border-bottom: none;
+}
+#accordion-container #accordion > div {
+  padding: 10px;
+  border-bottom: none;
+}
+#accordion-container #accordion .ui-state-active,
+#accordion-container #accordion .ui-widget-content .ui-state-active,
+#accordion-container #accordion .ui-widget-header .ui-state-active,
+#accordion-container #accordion a.ui-button:active,
+#accordion-container #accordion .ui-button:active,
+#accordion-container #accordion .ui-button.ui-state-active:hover {
+  background-color: #CB2028;
+  border-color: #9c1d22;
 }
 #map {
+  height: 100%;
   flex: 1;
+  position: relative;
+}
+#map #crash-info {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  z-index: 5;
+  height: 200px;
+  width: 300px;
+  background-color: white;
+  overflow: auto;
 }
 
 

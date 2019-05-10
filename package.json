@@ -11,11 +11,13 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@types/jqueryui": "^1.12.7",
     "@types/ol": "^4.6.4",
     "@types/react": "^15.0.15",
     "@types/react-dom": "^0.14.23",
     "@types/react-redux": "^4.4.38",
     "jquery": "^3.4.1",
+    "jqueryui": "^1.11.1",
     "less": "^3.9.0",
     "ol": "^5.3.2",
     "parcel": "^1.12.3",
