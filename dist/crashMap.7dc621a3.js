@@ -2179,7 +2179,7 @@ module.exports = ReactPropTypeLocationNames;
 
 var ReactPropTypesSecret = 'SECRET_DO_NOT_PASS_THIS_OR_YOU_WILL_BE_FIRED';
 module.exports = ReactPropTypesSecret;
-},{}],"../../AppData/Roaming/npm/node_modules/parcel/node_modules/process/browser.js":[function(require,module,exports) {
+},{}],"node_modules/process/browser.js":[function(require,module,exports) {
 
 // shim for using process in browser
 var process = module.exports = {}; // cached from whatever global is present so that test runners that stub it
@@ -2477,7 +2477,7 @@ function checkReactTypeSpec(typeSpecs, values, location, componentName, element,
 }
 
 module.exports = checkReactTypeSpec;
-},{"./reactProdInvariant":"node_modules/react/lib/reactProdInvariant.js","./ReactPropTypeLocationNames":"node_modules/react/lib/ReactPropTypeLocationNames.js","./ReactPropTypesSecret":"node_modules/react/lib/ReactPropTypesSecret.js","fbjs/lib/invariant":"node_modules/fbjs/lib/invariant.js","fbjs/lib/warning":"node_modules/fbjs/lib/warning.js","./ReactComponentTreeHook":"node_modules/react/lib/ReactComponentTreeHook.js","process":"../../AppData/Roaming/npm/node_modules/parcel/node_modules/process/browser.js"}],"node_modules/react/lib/ReactElementValidator.js":[function(require,module,exports) {
+},{"./reactProdInvariant":"node_modules/react/lib/reactProdInvariant.js","./ReactPropTypeLocationNames":"node_modules/react/lib/ReactPropTypeLocationNames.js","./ReactPropTypesSecret":"node_modules/react/lib/ReactPropTypesSecret.js","fbjs/lib/invariant":"node_modules/fbjs/lib/invariant.js","fbjs/lib/warning":"node_modules/fbjs/lib/warning.js","./ReactComponentTreeHook":"node_modules/react/lib/ReactComponentTreeHook.js","process":"node_modules/process/browser.js"}],"node_modules/react/lib/ReactElementValidator.js":[function(require,module,exports) {
 /**
  * Copyright (c) 2014-present, Facebook, Inc.
  *
@@ -13881,7 +13881,7 @@ function checkReactTypeSpec(typeSpecs, values, location, componentName, element,
 }
 
 module.exports = checkReactTypeSpec;
-},{"./reactProdInvariant":"node_modules/react-dom/lib/reactProdInvariant.js","./ReactPropTypeLocationNames":"node_modules/react-dom/lib/ReactPropTypeLocationNames.js","./ReactPropTypesSecret":"node_modules/react-dom/lib/ReactPropTypesSecret.js","fbjs/lib/invariant":"node_modules/fbjs/lib/invariant.js","fbjs/lib/warning":"node_modules/fbjs/lib/warning.js","react/lib/ReactComponentTreeHook":"node_modules/react/lib/ReactComponentTreeHook.js","process":"../../AppData/Roaming/npm/node_modules/parcel/node_modules/process/browser.js"}],"node_modules/fbjs/lib/shallowEqual.js":[function(require,module,exports) {
+},{"./reactProdInvariant":"node_modules/react-dom/lib/reactProdInvariant.js","./ReactPropTypeLocationNames":"node_modules/react-dom/lib/ReactPropTypeLocationNames.js","./ReactPropTypesSecret":"node_modules/react-dom/lib/ReactPropTypesSecret.js","fbjs/lib/invariant":"node_modules/fbjs/lib/invariant.js","fbjs/lib/warning":"node_modules/fbjs/lib/warning.js","react/lib/ReactComponentTreeHook":"node_modules/react/lib/ReactComponentTreeHook.js","process":"node_modules/process/browser.js"}],"node_modules/fbjs/lib/shallowEqual.js":[function(require,module,exports) {
 /**
  * Copyright (c) 2013-present, Facebook, Inc.
  *
@@ -15625,7 +15625,7 @@ var ReactChildReconciler = {
   }
 };
 module.exports = ReactChildReconciler;
-},{"./ReactReconciler":"node_modules/react-dom/lib/ReactReconciler.js","./instantiateReactComponent":"node_modules/react-dom/lib/instantiateReactComponent.js","./KeyEscapeUtils":"node_modules/react-dom/lib/KeyEscapeUtils.js","./shouldUpdateReactComponent":"node_modules/react-dom/lib/shouldUpdateReactComponent.js","./traverseAllChildren":"node_modules/react-dom/lib/traverseAllChildren.js","fbjs/lib/warning":"node_modules/fbjs/lib/warning.js","react/lib/ReactComponentTreeHook":"node_modules/react/lib/ReactComponentTreeHook.js","process":"../../AppData/Roaming/npm/node_modules/parcel/node_modules/process/browser.js"}],"node_modules/react-dom/lib/flattenChildren.js":[function(require,module,exports) {
+},{"./ReactReconciler":"node_modules/react-dom/lib/ReactReconciler.js","./instantiateReactComponent":"node_modules/react-dom/lib/instantiateReactComponent.js","./KeyEscapeUtils":"node_modules/react-dom/lib/KeyEscapeUtils.js","./shouldUpdateReactComponent":"node_modules/react-dom/lib/shouldUpdateReactComponent.js","./traverseAllChildren":"node_modules/react-dom/lib/traverseAllChildren.js","fbjs/lib/warning":"node_modules/fbjs/lib/warning.js","react/lib/ReactComponentTreeHook":"node_modules/react/lib/ReactComponentTreeHook.js","process":"node_modules/process/browser.js"}],"node_modules/react-dom/lib/flattenChildren.js":[function(require,module,exports) {
 var process = require("process");
 /**
  * Copyright (c) 2013-present, Facebook, Inc.
@@ -15708,7 +15708,7 @@ function flattenChildren(children, selfDebugID) {
 }
 
 module.exports = flattenChildren;
-},{"./KeyEscapeUtils":"node_modules/react-dom/lib/KeyEscapeUtils.js","./traverseAllChildren":"node_modules/react-dom/lib/traverseAllChildren.js","fbjs/lib/warning":"node_modules/fbjs/lib/warning.js","react/lib/ReactComponentTreeHook":"node_modules/react/lib/ReactComponentTreeHook.js","process":"../../AppData/Roaming/npm/node_modules/parcel/node_modules/process/browser.js"}],"node_modules/react-dom/lib/ReactMultiChild.js":[function(require,module,exports) {
+},{"./KeyEscapeUtils":"node_modules/react-dom/lib/KeyEscapeUtils.js","./traverseAllChildren":"node_modules/react-dom/lib/traverseAllChildren.js","fbjs/lib/warning":"node_modules/fbjs/lib/warning.js","react/lib/ReactComponentTreeHook":"node_modules/react/lib/ReactComponentTreeHook.js","process":"node_modules/process/browser.js"}],"node_modules/react-dom/lib/ReactMultiChild.js":[function(require,module,exports) {
 /**
  * Copyright (c) 2013-present, Facebook, Inc.
  *
@@ -35175,7 +35175,7 @@ if ( !noGlobal ) {
 return jQuery;
 } );
 
-},{"process":"../../AppData/Roaming/npm/node_modules/parcel/node_modules/process/browser.js"}],"node_modules/jqueryui/jquery-ui.js":[function(require,module,exports) {
+},{"process":"node_modules/process/browser.js"}],"node_modules/jqueryui/jquery-ui.js":[function(require,module,exports) {
 var define;
 /*! jQuery UI - v1.11.1 - 2014-08-13
 * http://jqueryui.com
@@ -113469,7 +113469,7 @@ var CrashMap = connect(function (s) {
 ReactDom.render(React.createElement(Provider, {
   store: store.store
 }, React.createElement(CrashMap, null)), document.getElementById('root'));
-},{"react":"node_modules/react/react.js","react-dom":"node_modules/react-dom/index.js","react-redux":"node_modules/react-redux/es/index.js","jquery":"node_modules/jquery/dist/jquery.js","webmapsjs/dist/import-queryui":"node_modules/webmapsjs/dist/import-queryui.js","./store":"ts/store.ts","ol/WebGLMap.js":"node_modules/ol/WebGLMap.js","./layerSwitcher":"ts/layerSwitcher.tsx","ol/View":"node_modules/ol/View.js","ol/format/EsriJSON":"node_modules/ol/format/EsriJSON.js","./layers":"ts/layers.ts"}],"../../AppData/Roaming/npm/node_modules/parcel/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+},{"react":"node_modules/react/react.js","react-dom":"node_modules/react-dom/index.js","react-redux":"node_modules/react-redux/es/index.js","jquery":"node_modules/jquery/dist/jquery.js","webmapsjs/dist/import-queryui":"node_modules/webmapsjs/dist/import-queryui.js","./store":"ts/store.ts","ol/WebGLMap.js":"node_modules/ol/WebGLMap.js","./layerSwitcher":"ts/layerSwitcher.tsx","ol/View":"node_modules/ol/View.js","ol/format/EsriJSON":"node_modules/ol/format/EsriJSON.js","./layers":"ts/layers.ts"}],"node_modules/parcel/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -113497,7 +113497,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "61215" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "49683" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
@@ -113672,5 +113672,5 @@ function hmrAcceptRun(bundle, id) {
     return true;
   }
 }
-},{}]},{},["../../AppData/Roaming/npm/node_modules/parcel/src/builtins/hmr-runtime.js","ts/crashMap.tsx"], null)
+},{}]},{},["node_modules/parcel/src/builtins/hmr-runtime.js","ts/crashMap.tsx"], null)
 //# sourceMappingURL=/crashMap.7dc621a3.js.map
