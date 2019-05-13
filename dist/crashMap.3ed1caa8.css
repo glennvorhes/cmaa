@@ -11,7 +11,7 @@ header #title-bar {
   padding-left: 15px;
 }
 header #title-bar h2 {
-  margin: 10px 0;
+  margin: 7px 0;
   color: white;
 }
 html,
@@ -24,17 +24,33 @@ body,
   padding: 0;
 }
 header {
-  height: 110px;
+  height: 80px;
 }
 #app-container #map-container {
-  height: calc(100% - 110px);
+  height: calc(100% - 80px);
   display: flex;
 }
 #app-container #map-container > div {
   height: 100%;
 }
 #accordion-container {
+  display: none;
   width: 300px;
+  position: relative;
+}
+#accordion-container #hider {
+  position: absolute;
+  right: -51px;
+  z-index: 5;
+  transform: rotate(90deg);
+  top: 96px;
+  background-color: #CB2028;
+  border: solid #9c1d22 1px;
+  padding: 5px 12px;
+  border-top-left-radius: 7px;
+  border-top-right-radius: 7px;
+  color: white;
+  cursor: pointer;
 }
 #accordion-container #accordion > h3 {
   margin: 0;
@@ -53,6 +69,15 @@ header {
 #accordion-container #accordion .ui-button.ui-state-active:hover {
   background-color: #CB2028;
   border-color: #9c1d22;
+}
+#accordion-container-collapsed {
+  background-color: #CB2028;
+}
+#accordion-container-collapsed #shower {
+  border: solid #9c1d22 2px;
+  color: white;
+  padding: 4px 10px;
+  cursor: pointer;
 }
 #map {
   height: 100%;

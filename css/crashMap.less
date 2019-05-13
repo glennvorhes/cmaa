@@ -1,5 +1,5 @@
 //@import (inline ) "./ol.css";
-@headerHeight: 110px;
+@headerHeight: 80px;
 
 header {
   display: flex;
@@ -14,7 +14,7 @@ header {
     padding-left: 15px;
 
     h2 {
-      margin: 10px 0;
+      margin: 7px 0;
       color: white;
     }
 
@@ -35,7 +35,7 @@ header {
 #app-container {
 
   #map-container {
-    height: ~"calc(100% - 110px)";;
+    height: ~"calc(100% - 80px)";;
     display: flex;
 
     > div {
@@ -45,9 +45,31 @@ header {
 }
 
 #accordion-container {
+  display: none;
   width: 300px;
+  position: relative;
+  //display: flex;
+
+  #hider {
+    position: absolute;
+    right: -51px;
+    z-index: 5;
+    transform: rotate(90deg);
+    top: 96px;
+    //width: 50px;
+    //height: 50px;
+    background-color: #CB2028;
+    border: solid #9c1d22 1px;
+    padding: 5px 12px;
+    border-top-left-radius: 7px;
+    border-top-right-radius: 7px;
+    color: white;
+    cursor: pointer;
+
+  }
 
   #accordion {
+
     > h3 {
       margin: 0;
       padding: 6px;
@@ -59,11 +81,25 @@ header {
       border-bottom: none;
     }
 
-    .ui-state-active, .ui-widget-content .ui-state-active, .ui-widget-header .ui-state-active, a.ui-button:active, .ui-button:active, .ui-button.ui-state-active:hover{
+    .ui-state-active, .ui-widget-content .ui-state-active, .ui-widget-header .ui-state-active, a.ui-button:active, .ui-button:active, .ui-button.ui-state-active:hover {
       background-color: #CB2028;
       border-color: #9c1d22;
     }
   }
+}
+
+#accordion-container-collapsed {
+  //display: none;
+  background-color: #CB2028;
+
+  #shower {
+    border: solid #9c1d22 2px;
+    color: white;
+    padding: 4px 10px;
+    cursor: pointer;
+  }
+  //display: flex;
+  //width: 40px;
 }
 
 #map {

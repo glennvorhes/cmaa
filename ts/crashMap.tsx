@@ -16,6 +16,7 @@ import View from "ol/View";
 import VectorLayer from 'ol/layer/Vector.js';
 import EsriJSON from 'ol/format/EsriJSON';
 import * as lyr from './layers';
+import {accordionSetup} from './accordionSetup';
 
 import * as constEls from './staticElements';
 
@@ -116,8 +117,44 @@ class _CrashMap extends React.Component<{}, null> {
     }
 
     componentDidMount() {
+        //
+        // let duration = 100;
+        //
+        // let $accordion = $('#accordion');
+        //
+        // $accordion.accordion({heightStyle: 'fill'});
+        //
+        // window.onresize = () => {
+        //     $accordion.accordion('refresh');
+        // };
+        //
+        // let hider = document.getElementById("hider");
+        // let shower = document.getElementById("shower");
+        // let $accordionContainer = $('#accordion-container');
+        // let $accordionContainerCollapsed = $('#accordion-container-collapsed');
+        // // let $hider = $('#hider');
+        //
+        // hider.onclick = () => {
+        //     $accordionContainer.hide(
+        //         "slide",
+        //         {direction: "left"},
+        //         duration,
+        //         () => {
+        //             $accordionContainerCollapsed.show(
+        //                 "slide",
+        //                 {direction: "left"},
+        //                 duration)
+        //         });
+        // };
 
-        $('#accordion').accordion({heightStyle: 'fill'});
+
+
+
+        // $('#accordion-container').hide("slide", {direction: "left"}, 100);
+        //
+        // setTimeout(() => {
+        //     $('#accordion-container').show("slide", {direction: "left"}, 100);
+        // }, 2000);
 
         this.map = new Map({
             target: document.getElementById('map'),
@@ -126,6 +163,8 @@ class _CrashMap extends React.Component<{}, null> {
                 zoom: 7
             })
         });
+
+        accordionSetup(this.map);
 
         this.map.addLayer(this.allPointLayer);
         this.map.addLayer(this.crashPointsK);
@@ -235,7 +274,11 @@ class _CrashMap extends React.Component<{}, null> {
         return <div id="app-container">
             {constEls.header}
             <div id="map-container">
+                <div id="accordion-container-collapsed">
+                    <div id="shower">Show&nbsp;&#9658;</div>
+                </div>
                 <div id="accordion-container">
+                    <div id="hider">Hide&#9660;</div>
                     <div id="accordion">
                         <h3>Legend</h3>
                         <div>
