@@ -51566,6 +51566,15 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.DUMMY = 'dummy action';
+exports.SET_QUERY_RESULTS = 'SET_QUERY_RESULTS';
+exports.SET_LYR_CHECKED = 'SET_LYR_CHECKED';
+},{}],"ts/interfaces.ts":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.crashSevList = ['K', 'A', 'B', 'C', 'P', 'O'];
 },{}],"ts/store.ts":[function(require,module,exports) {
 "use strict";
 /**
@@ -51586,27 +51595,69 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var actions = __importStar(require("./actions"));
+var act = __importStar(require("./actions"));
 
 var Redux = require("redux");
 
-var createStore = Redux.createStore;
-var combineReducers = Redux.combineReducers;
+var intf = __importStar(require("./interfaces"));
 
-function dummy(state, action) {
+function queryResults(state, action) {
   if (state === void 0) {
-    state = 'dummy';
+    state = {};
   }
 
-  if (action.type == actions.DUMMY) {
-    return action.dummy;
+  if (action.type === act.SET_QUERY_RESULTS) {
+    for (var _i = 0, _a = intf.crashSevList; _i < _a.length; _i++) {
+      var s = _a[_i];
+
+      if (!action.results[s]) {
+        action.results[s] = {
+          queried: 0,
+          mapped: 0
+        };
+      }
+    }
+
+    return action.results;
   } else {
     return state;
   }
 }
 
-exports.store = createStore(combineReducers({
-  dummy: dummy
+var _lyrChecked = {};
+
+for (var _i = 0, _a = intf.crashSevList; _i < _a.length; _i++) {
+  var s = _a[_i];
+  _lyrChecked[s] = true;
+}
+
+function layerChecked(state, action) {
+  if (state === void 0) {
+    state = _lyrChecked;
+  }
+
+  if (action.type === act.SET_LYR_CHECKED) {
+    var retObj = {};
+
+    for (var _i = 0, _a = intf.crashSevList; _i < _a.length; _i++) {
+      var s = _a[_i];
+
+      if (action.sev === s) {
+        retObj[s] = action.checked;
+      } else {
+        retObj[s] = state[s];
+      }
+    }
+
+    return retObj;
+  } else {
+    return state;
+  }
+}
+
+exports.store = Redux.createStore(Redux.combineReducers({
+  queryResults: queryResults,
+  layerChecked: layerChecked
 }));
 
 function getState() {
@@ -51615,7 +51666,7 @@ function getState() {
 
 exports.getState = getState;
 exports.default = exports.store;
-},{"./actions":"ts/actions.ts","redux":"node_modules/redux/es/index.js"}],"node_modules/ol/util.js":[function(require,module,exports) {
+},{"./actions":"ts/actions.ts","redux":"node_modules/redux/es/index.js","./interfaces":"ts/interfaces.ts"}],"node_modules/ol/util.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -113006,7 +113057,7 @@ var colors = {
   B: '#fbea5b',
   C: '#5858ff',
   P: '#61d961',
-  O: '#b6b6b6'
+  O: '#61d961'
 };
 var styleCache = {};
 
@@ -113226,7 +113277,125 @@ exports.disclamerDiv = React.createElement("div", null, "The WISLR crash map is 
 }, "WISLR Crash Mapping Update"), " summary document for additional information about the crash mapping data source.");
 exports.aboutH3 = React.createElement("h3", null, "About");
 exports.aboutDiv = React.createElement("div", null, React.createElement("b", null, "About the WisTransPortal Crash Database"), React.createElement("p", null, "The WisTransPortal system contains a complete database of Wisconsin crash data from 1994 through the current year. This database contains information on all police reported crashes in Wisconsin, including the location of each crash, vehicles involved, and general crash attributes. Personal data have been removed. The TOPS Lab maintains this database for research purposes and as a service to the Wisconsin Department of Transportation (WisDOT)."), React.createElement("p", null, React.createElement("b", null, "\"Preliminary\" and \"Final\" Crash Data")), React.createElement("p", null, "Crash records for all police reported crashes from 1994 through the current year are available. The WisTransPortal crash database is updated on a nightly basis from extracts provided by WisDOT Division of State Patrol (DSP) Bureau of Transportation Safety (BOTS). The database includes both \"preliminary\" and \"final year\" crash data. Preliminary data represents the latest set of available crash records for the current year and generally includes crash reports transmitted by law enforcement as recently as the previous day. All preliminary data are subject to ongoing review and editing and may not be suitable for analysis purposes. Final year data represents the official closed WisDOT crash file for a given year."), React.createElement("p", null, React.createElement("b", null, "Wisconsin \"Reportable\" Crashes")), React.createElement("p", null, "A reportable crash is defined as a crash resulting in injury or death of any person, any damage to government-owned non-vehicle property to an apparent extent of $200 or more, or total damage to property owned by any one person to an apparent extent of $1000 or more. (This definition went into effect 1/1/96). It is important to note, however, that not all reportable crashes are reported. In order for a crash to be in the database, a crash report must have been completed by a police officer."), React.createElement("p", null, React.createElement("b", null, "Differences Between WisTransPortal and WisDOT Crash Statistics")), "This facility provides a user interface to query and retrieve crash records based on high level attributes such as date range, location, and first harmful event. Often there may be more than one way to formulate a query selection, especially for intersection based queries. ", React.createElement("b", null, "Based on the particular search criteria, your results may differ from official crash counts reported by WisDOT."));
-},{"react":"node_modules/react/react.js"}],"ts/crashMap.tsx":[function(require,module,exports) {
+},{"react":"node_modules/react/react.js"}],"ts/Legend.tsx":[function(require,module,exports) {
+"use strict";
+
+var __extends = this && this.__extends || function () {
+  var _extendStatics = function extendStatics(d, b) {
+    _extendStatics = Object.setPrototypeOf || {
+      __proto__: []
+    } instanceof Array && function (d, b) {
+      d.__proto__ = b;
+    } || function (d, b) {
+      for (var p in b) {
+        if (b.hasOwnProperty(p)) d[p] = b[p];
+      }
+    };
+
+    return _extendStatics(d, b);
+  };
+
+  return function (d, b) {
+    _extendStatics(d, b);
+
+    function __() {
+      this.constructor = d;
+    }
+
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+  };
+}();
+
+var __importStar = this && this.__importStar || function (mod) {
+  if (mod && mod.__esModule) return mod;
+  var result = {};
+  if (mod != null) for (var k in mod) {
+    if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+  }
+  result["default"] = mod;
+  return result;
+};
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var React = require("react");
+
+var react_redux_1 = require("react-redux");
+
+var intf = __importStar(require("./interfaces"));
+
+var act = __importStar(require("./actions"));
+
+var _Legend =
+/** @class */
+function (_super) {
+  __extends(_Legend, _super);
+
+  function _Legend() {
+    return _super !== null && _super.apply(this, arguments) || this;
+  }
+
+  _Legend.prototype.render = function () {
+    var _this = this;
+
+    var rws = [React.createElement("tr", {
+      key: "legend-table-head"
+    }, React.createElement("th", null), React.createElement("th", null, "Severity"), React.createElement("th", null, "Mapped"), React.createElement("th", null, "Queried"))];
+
+    var _loop_1 = function _loop_1(sv) {
+      var resInfo = this_1.props.res[sv];
+
+      if (!resInfo) {
+        return "continue";
+      }
+
+      rws.push(React.createElement("tr", {
+        key: sv
+      }, React.createElement("td", null, React.createElement("input", {
+        type: "checkbox",
+        checked: this_1.props.lyrChecked[sv],
+        onChange: function onChange(e) {
+          _this.props.checkChange(sv, e.target.checked); // console.log(e.target.checked);
+
+        }
+      })), React.createElement("td", null, sv), React.createElement("td", null, resInfo.mapped), React.createElement("td", null, resInfo.queried)));
+    };
+
+    var this_1 = this;
+
+    for (var _i = 0, _a = intf.crashSevList; _i < _a.length; _i++) {
+      var sv = _a[_i];
+
+      _loop_1(sv);
+    }
+
+    return React.createElement("table", {
+      id: "legend-table"
+    }, React.createElement("tbody", null, rws));
+  };
+
+  return _Legend;
+}(React.Component);
+
+exports.Legend = react_redux_1.connect(function (s) {
+  return {
+    res: s.queryResults,
+    lyrChecked: s.layerChecked
+  };
+}, function (dispatch) {
+  return {
+    checkChange: function checkChange(sev, chk) {
+      dispatch({
+        type: act.SET_LYR_CHECKED,
+        sev: sev,
+        checked: chk
+      });
+    }
+  };
+})(_Legend);
+},{"react":"node_modules/react/react.js","react-redux":"node_modules/react-redux/es/index.js","./interfaces":"ts/interfaces.ts","./actions":"ts/actions.ts"}],"ts/crashMap.tsx":[function(require,module,exports) {
 "use strict";
 
 var __extends = this && this.__extends || function () {
@@ -113302,9 +113471,23 @@ var lyr = __importStar(require("./layers"));
 
 var accordionSetup_1 = require("./accordionSetup");
 
+var act = __importStar(require("./actions"));
+
+var cond = __importStar(require("ol/events/condition"));
+
+var interaction_js_1 = require("ol/interaction.js");
+
 var constEls = __importStar(require("./staticElements"));
 
+var intf = __importStar(require("./interfaces"));
+
+var Legend_1 = require("./Legend");
+
 var esriJson = new EsriJSON_1.default();
+store.store.subscribe(function () {
+  var s = store.getState();
+  console.log(s);
+});
 
 var _CrashMap =
 /** @class */
@@ -113355,12 +113538,38 @@ function (_super) {
       } else if (!resultObj['success']) {
         alert('Unknown request error');
         return;
+      } // console.log(resultObj['out_features']);
+
+
+      var res = {};
+      var mappedFeatures = [];
+
+      for (var _b = 0, _c = resultObj['out_features']['features']; _b < _c.length; _b++) {
+        var f = _c[_b];
+        var sev = f['attributes']['injSvr'] || 'O';
+        res[sev] = res[sev] || {
+          queried: 0,
+          mapped: 0
+        };
+        res[sev].queried++;
+
+        if (!isNaN(f['geometry']['x']) && !isNaN(f['geometry']['y'])) {
+          res[sev].mapped++;
+          mappedFeatures.push(f);
+        } else {} // res.A = res.A ? res.A : {queried: 0, mapped: 0};
+        // console.log(f['geometry']);
+        // console.log(isNaN(f['geometry']['x']));
+
       }
+
+      resultObj['out_features']['features'] = mappedFeatures;
+
+      _this.props.setQueryResults(res);
 
       var features = esriJson.readFeatures(resultObj['out_features']);
 
-      for (var _b = 0, features_1 = features; _b < features_1.length; _b++) {
-        var f = features_1[_b];
+      for (var _d = 0, features_1 = features; _d < features_1.length; _d++) {
+        var f = features_1[_d];
 
         switch (f.getProperties()['injSvr']) {
           case 'K':
@@ -113403,42 +113612,25 @@ function (_super) {
     }, 'json');
   };
 
-  _CrashMap.prototype.componentDidMount = function () {
-    //
-    // let duration = 100;
-    //
-    // let $accordion = $('#accordion');
-    //
-    // $accordion.accordion({heightStyle: 'fill'});
-    //
-    // window.onresize = () => {
-    //     $accordion.accordion('refresh');
-    // };
-    //
-    // let hider = document.getElementById("hider");
-    // let shower = document.getElementById("shower");
-    // let $accordionContainer = $('#accordion-container');
-    // let $accordionContainerCollapsed = $('#accordion-container-collapsed');
-    // // let $hider = $('#hider');
-    //
-    // hider.onclick = () => {
-    //     $accordionContainer.hide(
-    //         "slide",
-    //         {direction: "left"},
-    //         duration,
-    //         () => {
-    //             $accordionContainerCollapsed.show(
-    //                 "slide",
-    //                 {direction: "left"},
-    //                 duration)
-    //         });
-    // };
-    var _this = this; // $('#accordion-container').hide("slide", {direction: "left"}, 100);
-    //
-    // setTimeout(() => {
-    //     $('#accordion-container').show("slide", {direction: "left"}, 100);
-    // }, 2000);
+  _CrashMap.prototype.componentDidUpdate = function () {
+    var lyrs = {
+      K: this.crashPointsK,
+      A: this.crashPointsA,
+      B: this.crashPointsB,
+      C: this.crashPointsC,
+      P: this.crashPointsP,
+      O: this.crashPointsO
+    };
+    this.crashPointsK.setVisible(false);
 
+    for (var _i = 0, _a = intf.crashSevList; _i < _a.length; _i++) {
+      var l = _a[_i];
+      lyrs[l].setVisible(this.props.lyrChecked[l]);
+    }
+  };
+
+  _CrashMap.prototype.componentDidMount = function () {
+    var _this = this;
 
     this.map = new WebGLMap_js_1.default({
       target: document.getElementById('map'),
@@ -113541,6 +113733,41 @@ function (_super) {
         document.getElementById('crash-info').innerHTML = '';
       }
     });
+    var select = new interaction_js_1.Select({
+      multi: true
+    });
+    this.map.addInteraction(select);
+    var selectedFeatures = select.getFeatures();
+    var dragBox = new interaction_js_1.DragBox({
+      condition: cond['platformModifierKeyOnly']
+    });
+    this.map.addInteraction(dragBox);
+    dragBox.on('boxend', function () {
+      // features that intersect the box are added to the collection of
+      // selected features
+      var extent = dragBox.getGeometry().getExtent();
+
+      for (var _i = 0, _a = [_this.crashPointsK, _this.crashPointsA, _this.crashPointsB, _this.crashPointsC, _this.crashPointsO]; _i < _a.length; _i++) {
+        var lyr_1 = _a[_i];
+        lyr_1.getSource().forEachFeatureIntersectingExtent(extent, function (feature) {
+          // console.log(feature.getProperties()['id']);
+          // crashIds.push(feature.getProperties()['id']);
+          selectedFeatures.push(feature);
+        });
+      }
+    });
+    selectedFeatures.on(['add', 'remove'], function () {
+      var selDiv = document.getElementById('selections');
+      var ids = selectedFeatures.getArray().map(function (feature) {
+        return feature.get('id');
+      });
+
+      if (ids.length > 0) {
+        selDiv.innerHTML = ids.join(', ');
+      } else {
+        selDiv.innerHTML = 'No crashes selected';
+      }
+    });
   };
 
   _CrashMap.prototype.render = function () {
@@ -113560,7 +113787,9 @@ function (_super) {
       id: "hider"
     }, "Hide\u25BC"), React.createElement("div", {
       id: "accordion"
-    }, React.createElement("h3", null, "Legend"), React.createElement("div", null), React.createElement("h3", null, "Selection"), React.createElement("div", null, "Selection tools here"), constEls.disclamerH3, constEls.disclamerDiv, constEls.aboutH3, constEls.aboutDiv)), React.createElement("div", {
+    }, React.createElement("h3", null, "Legend"), React.createElement("div", null, React.createElement(Legend_1.Legend, null)), React.createElement("h3", null, "Selection"), React.createElement("div", {
+      id: "selections"
+    }), constEls.disclamerH3, constEls.disclamerDiv, constEls.aboutH3, constEls.aboutDiv)), React.createElement("div", {
       id: "map"
     }, React.createElement("div", {
       id: "crash-info"
@@ -113575,14 +113804,23 @@ function (_super) {
 }(React.Component);
 
 var CrashMap = connect(function (s) {
-  return {};
+  return {
+    lyrChecked: s.layerChecked
+  };
 }, function (dispatch) {
-  return {};
+  return {
+    setQueryResults: function setQueryResults(r) {
+      dispatch({
+        type: act.SET_QUERY_RESULTS,
+        results: r
+      });
+    }
+  };
 })(_CrashMap);
 ReactDom.render(React.createElement(Provider, {
   store: store.store
 }, React.createElement(CrashMap, null)), document.getElementById('root'));
-},{"react":"node_modules/react/react.js","react-dom":"node_modules/react-dom/index.js","react-redux":"node_modules/react-redux/es/index.js","jquery":"node_modules/jquery/dist/jquery.js","webmapsjs/dist/import-queryui":"node_modules/webmapsjs/dist/import-queryui.js","./store":"ts/store.ts","ol/WebGLMap.js":"node_modules/ol/WebGLMap.js","./layerSwitcher":"ts/layerSwitcher.tsx","ol/View":"node_modules/ol/View.js","ol/format/EsriJSON":"node_modules/ol/format/EsriJSON.js","./layers":"ts/layers.ts","./accordionSetup":"ts/accordionSetup.ts","./staticElements":"ts/staticElements.tsx"}],"node_modules/parcel/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+},{"react":"node_modules/react/react.js","react-dom":"node_modules/react-dom/index.js","react-redux":"node_modules/react-redux/es/index.js","jquery":"node_modules/jquery/dist/jquery.js","webmapsjs/dist/import-queryui":"node_modules/webmapsjs/dist/import-queryui.js","./store":"ts/store.ts","ol/WebGLMap.js":"node_modules/ol/WebGLMap.js","./layerSwitcher":"ts/layerSwitcher.tsx","ol/View":"node_modules/ol/View.js","ol/format/EsriJSON":"node_modules/ol/format/EsriJSON.js","./layers":"ts/layers.ts","./accordionSetup":"ts/accordionSetup.ts","./actions":"ts/actions.ts","ol/events/condition":"node_modules/ol/events/condition.js","ol/interaction.js":"node_modules/ol/interaction.js","./staticElements":"ts/staticElements.tsx","./interfaces":"ts/interfaces.ts","./Legend":"ts/Legend.tsx"}],"node_modules/parcel/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -113610,7 +113848,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "58356" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "53117" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

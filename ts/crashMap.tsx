@@ -1,7 +1,6 @@
 import React = require('react');
 import ReactDom = require('react-dom');
 import ReactRedux = require('react-redux');
-import Redux = require('redux');
 import $ = require("jquery");
 
 const connect = ReactRedux.connect;
@@ -17,14 +16,30 @@ import VectorLayer from 'ol/layer/Vector.js';
 import EsriJSON from 'ol/format/EsriJSON';
 import * as lyr from './layers';
 import {accordionSetup} from './accordionSetup';
+import * as act from './actions'
+
+import * as cond from 'ol/events/condition';
+import {DragBox, Select} from 'ol/interaction.js';
+
 
 import * as constEls from './staticElements';
+import * as intf from './interfaces';
+import {Legend} from './Legend';
+
 
 const esriJson = new EsriJSON();
 
 declare let glob: Object;
 
-class _CrashMap extends React.Component<{}, null> {
+store.store.subscribe(() => {
+    let s = store.getState();
+    console.log(s)
+});
+
+class _CrashMap extends React.Component<{
+    setQueryResults: (r: { [s: string]: { queried: number, mapped: number } }) => any,
+    lyrChecked: { [s: string]: boolean }
+}, null> {
 
     private map: Map;
     readonly allPointLayer: VectorLayer;
@@ -82,6 +97,32 @@ class _CrashMap extends React.Component<{}, null> {
                     return;
                 }
 
+                // console.log(resultObj['out_features']);
+
+                let res: { [s: string]: intf.iResultInner } = {};
+                let mappedFeatures = [];
+
+                for (let f of resultObj['out_features']['features']) {
+                    let sev = f['attributes']['injSvr'] || 'O';
+                    res[sev] = res[sev] || {queried: 0, mapped: 0};
+                    res[sev].queried++;
+
+                    if (!isNaN(f['geometry']['x']) && !isNaN(f['geometry']['y'])) {
+                        res[sev].mapped++;
+                        mappedFeatures.push(f);
+                    } else {
+
+                    }
+                    // res.A = res.A ? res.A : {queried: 0, mapped: 0};
+                    // console.log(f['geometry']);
+
+                    // console.log(isNaN(f['geometry']['x']));
+                }
+
+                resultObj['out_features']['features'] = mappedFeatures;
+
+                this.props.setQueryResults(res);
+
                 let features = esriJson.readFeatures(resultObj['out_features']);
 
                 for (let f of features) {
@@ -116,45 +157,24 @@ class _CrashMap extends React.Component<{}, null> {
             'json');
     }
 
+    componentDidUpdate() {
+        let lyrs: { [s: string]: VectorLayer } = {
+            K: this.crashPointsK,
+            A: this.crashPointsA,
+            B: this.crashPointsB,
+            C: this.crashPointsC,
+            P: this.crashPointsP,
+            O: this.crashPointsO,
+        };
+
+        this.crashPointsK.setVisible(false);
+
+        for (let l of intf.crashSevList) {
+            lyrs[l].setVisible(this.props.lyrChecked[l]);
+        }
+    }
+
     componentDidMount() {
-        //
-        // let duration = 100;
-        //
-        // let $accordion = $('#accordion');
-        //
-        // $accordion.accordion({heightStyle: 'fill'});
-        //
-        // window.onresize = () => {
-        //     $accordion.accordion('refresh');
-        // };
-        //
-        // let hider = document.getElementById("hider");
-        // let shower = document.getElementById("shower");
-        // let $accordionContainer = $('#accordion-container');
-        // let $accordionContainerCollapsed = $('#accordion-container-collapsed');
-        // // let $hider = $('#hider');
-        //
-        // hider.onclick = () => {
-        //     $accordionContainer.hide(
-        //         "slide",
-        //         {direction: "left"},
-        //         duration,
-        //         () => {
-        //             $accordionContainerCollapsed.show(
-        //                 "slide",
-        //                 {direction: "left"},
-        //                 duration)
-        //         });
-        // };
-
-
-
-
-        // $('#accordion-container').hide("slide", {direction: "left"}, 100);
-        //
-        // setTimeout(() => {
-        //     $('#accordion-container').show("slide", {direction: "left"}, 100);
-        // }, 2000);
 
         this.map = new Map({
             target: document.getElementById('map'),
@@ -268,9 +288,55 @@ class _CrashMap extends React.Component<{}, null> {
                 (document.getElementById('crash-info') as HTMLDivElement).innerHTML = '';
             }
         });
+
+        let select = new Select({
+            multi: true
+        });
+
+        this.map.addInteraction(select);
+
+        let selectedFeatures = select.getFeatures();
+
+        let dragBox = new DragBox({
+            condition: cond['platformModifierKeyOnly']
+        });
+
+        this.map.addInteraction(dragBox);
+
+        dragBox.on('boxend', () => {
+            // features that intersect the box are added to the collection of
+            // selected features
+            let extent = dragBox.getGeometry().getExtent();
+
+            for (let lyr of [
+                this.crashPointsK, this.crashPointsA, this.crashPointsB, this.crashPointsC, this.crashPointsO
+            ]) {
+                lyr.getSource().forEachFeatureIntersectingExtent(extent, (feature) => {
+                    // console.log(feature.getProperties()['id']);
+                    // crashIds.push(feature.getProperties()['id']);
+                    selectedFeatures.push(feature);
+                });
+            }
+        });
+
+        selectedFeatures.on(['add', 'remove'], function () {
+            let selDiv = (document.getElementById('selections') as HTMLDivElement);
+
+            let ids = selectedFeatures.getArray().map(function (feature) {
+                return feature.get('id');
+            });
+            if (ids.length > 0) {
+                selDiv.innerHTML = ids.join(', ');
+            } else {
+                selDiv.innerHTML = 'No crashes selected';
+            }
+        });
+
+
     }
 
     render() {
+
         return <div id="app-container">
             {constEls.header}
             <div id="map-container">
@@ -282,11 +348,11 @@ class _CrashMap extends React.Component<{}, null> {
                     <div id="accordion">
                         <h3>Legend</h3>
                         <div>
+                            <Legend/>
                             {/*<img src="/legend.png"/>*/}
                         </div>
                         <h3>Selection</h3>
-                        <div>
-                            Selection tools here
+                        <div id="selections">
                         </div>
                         {constEls.disclamerH3}
                         {constEls.disclamerDiv}
@@ -307,10 +373,16 @@ class _CrashMap extends React.Component<{}, null> {
 
 let CrashMap = connect(
     (s: store.iState) => {
-        return {};
+        return {
+            lyrChecked: s.layerChecked
+        };
     },
     (dispatch) => {
-        return {}
+        return {
+            setQueryResults: (r: { [s: string]: { queried: number, mapped: number } }) => {
+                dispatch({type: act.SET_QUERY_RESULTS, results: r} as act.iSetQueryResults);
+            }
+        }
     }
 )(_CrashMap);
 

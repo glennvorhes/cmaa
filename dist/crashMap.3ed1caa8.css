@@ -94,6 +94,15 @@ header {
   background-color: white;
   overflow: auto;
 }
+#legend-table {
+  border-collapse: collapse;
+}
+#legend-table th,
+#legend-table td {
+  border: solid black 1px;
+  text-align: center;
+  padding: 1px 3px;
+}
 
 
 /*# sourceMappingURL=/crashMap.3ed1caa8.css.map */

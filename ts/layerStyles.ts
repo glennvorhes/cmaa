@@ -6,7 +6,6 @@ import VectorSource from 'ol/source/Vector.js';
 import Cluster from 'ol/source/Cluster';
 import {Circle as CircleStyle, Fill, Stroke, Style, Text, Icon} from 'ol/style.js';
 import * as ax from 'webmapsjs/dist/api/axios';
-import {arcgisToGeoJSON} from '@esri/arcgis-to-geojson-utils';
 import GeoJSON from 'ol/format/GeoJSON.js';
 import TileLayer from 'ol/layer/Tile.js';
 import XYZ from 'ol/source/XYZ.js';
@@ -21,7 +20,8 @@ let colors = {
     B: '#fbea5b',
     C: '#5858ff',
     P: '#61d961',
-    O: '#b6b6b6'
+    O: '#61d961',
+    // O: '#b6b6b6'
 };
 
 let styleCache = {};
