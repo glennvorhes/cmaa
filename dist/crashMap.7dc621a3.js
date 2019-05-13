@@ -113473,10 +113473,6 @@ var accordionSetup_1 = require("./accordionSetup");
 
 var act = __importStar(require("./actions"));
 
-var cond = __importStar(require("ol/events/condition"));
-
-var interaction_js_1 = require("ol/interaction.js");
-
 var constEls = __importStar(require("./staticElements"));
 
 var intf = __importStar(require("./interfaces"));
@@ -113732,42 +113728,48 @@ function (_super) {
       } else {
         document.getElementById('crash-info').innerHTML = '';
       }
-    });
-    var select = new interaction_js_1.Select({
-      multi: true
-    });
-    this.map.addInteraction(select);
-    var selectedFeatures = select.getFeatures();
-    var dragBox = new interaction_js_1.DragBox({
-      condition: cond['platformModifierKeyOnly']
-    });
-    this.map.addInteraction(dragBox);
-    dragBox.on('boxend', function () {
-      // features that intersect the box are added to the collection of
-      // selected features
-      var extent = dragBox.getGeometry().getExtent();
-
-      for (var _i = 0, _a = [_this.crashPointsK, _this.crashPointsA, _this.crashPointsB, _this.crashPointsC, _this.crashPointsO]; _i < _a.length; _i++) {
-        var lyr_1 = _a[_i];
-        lyr_1.getSource().forEachFeatureIntersectingExtent(extent, function (feature) {
-          // console.log(feature.getProperties()['id']);
-          // crashIds.push(feature.getProperties()['id']);
-          selectedFeatures.push(feature);
-        });
-      }
-    });
-    selectedFeatures.on(['add', 'remove'], function () {
-      var selDiv = document.getElementById('selections');
-      var ids = selectedFeatures.getArray().map(function (feature) {
-        return feature.get('id');
-      });
-
-      if (ids.length > 0) {
-        selDiv.innerHTML = ids.join(', ');
-      } else {
-        selDiv.innerHTML = 'No crashes selected';
-      }
-    });
+    }); // let select = new Select({
+    //     multi: true
+    // });
+    //
+    // this.map.addInteraction(select);
+    //
+    // let selectedFeatures = select.getFeatures();
+    //
+    // let dragBox = new DragBox({
+    //     condition: cond['platformModifierKeyOnly']
+    // });
+    //
+    // this.map.addInteraction(dragBox);
+    //
+    // dragBox.on('boxend', () => {
+    //     // features that intersect the box are added to the collection of
+    //     // selected features
+    //     let extent = dragBox.getGeometry().getExtent();
+    //
+    //     for (let lyr of [
+    //         this.crashPointsK, this.crashPointsA, this.crashPointsB, this.crashPointsC, this.crashPointsO
+    //     ]) {
+    //         lyr.getSource().forEachFeatureIntersectingExtent(extent, (feature) => {
+    //             // console.log(feature.getProperties()['id']);
+    //             // crashIds.push(feature.getProperties()['id']);
+    //             selectedFeatures.push(feature);
+    //         });
+    //     }
+    // });
+    //
+    // selectedFeatures.on(['add', 'remove'], function () {
+    //     let selDiv = (document.getElementById('selections') as HTMLDivElement);
+    //
+    //     let ids = selectedFeatures.getArray().map(function (feature) {
+    //         return feature.get('id');
+    //     });
+    //     if (ids.length > 0) {
+    //         selDiv.innerHTML = ids.join(', ');
+    //     } else {
+    //         selDiv.innerHTML = 'No crashes selected';
+    //     }
+    // });
   };
 
   _CrashMap.prototype.render = function () {
@@ -113820,7 +113822,7 @@ var CrashMap = connect(function (s) {
 ReactDom.render(React.createElement(Provider, {
   store: store.store
 }, React.createElement(CrashMap, null)), document.getElementById('root'));
-},{"react":"node_modules/react/react.js","react-dom":"node_modules/react-dom/index.js","react-redux":"node_modules/react-redux/es/index.js","jquery":"node_modules/jquery/dist/jquery.js","webmapsjs/dist/import-queryui":"node_modules/webmapsjs/dist/import-queryui.js","./store":"ts/store.ts","ol/WebGLMap.js":"node_modules/ol/WebGLMap.js","./layerSwitcher":"ts/layerSwitcher.tsx","ol/View":"node_modules/ol/View.js","ol/format/EsriJSON":"node_modules/ol/format/EsriJSON.js","./layers":"ts/layers.ts","./accordionSetup":"ts/accordionSetup.ts","./actions":"ts/actions.ts","ol/events/condition":"node_modules/ol/events/condition.js","ol/interaction.js":"node_modules/ol/interaction.js","./staticElements":"ts/staticElements.tsx","./interfaces":"ts/interfaces.ts","./Legend":"ts/Legend.tsx"}],"node_modules/parcel/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+},{"react":"node_modules/react/react.js","react-dom":"node_modules/react-dom/index.js","react-redux":"node_modules/react-redux/es/index.js","jquery":"node_modules/jquery/dist/jquery.js","webmapsjs/dist/import-queryui":"node_modules/webmapsjs/dist/import-queryui.js","./store":"ts/store.ts","ol/WebGLMap.js":"node_modules/ol/WebGLMap.js","./layerSwitcher":"ts/layerSwitcher.tsx","ol/View":"node_modules/ol/View.js","ol/format/EsriJSON":"node_modules/ol/format/EsriJSON.js","./layers":"ts/layers.ts","./accordionSetup":"ts/accordionSetup.ts","./actions":"ts/actions.ts","./staticElements":"ts/staticElements.tsx","./interfaces":"ts/interfaces.ts","./Legend":"ts/Legend.tsx"}],"node_modules/parcel/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -113848,7 +113850,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "53117" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "51516" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
