@@ -289,50 +289,48 @@ class _CrashMap extends React.Component<{
             }
         });
 
-        // let select = new Select({
-        //     multi: true
-        // });
-        //
-        // this.map.addInteraction(select);
-        //
-        // let selectedFeatures = select.getFeatures();
-        //
-        // let dragBox = new DragBox({
-        //     condition: cond['platformModifierKeyOnly']
-        // });
-        //
-        // this.map.addInteraction(dragBox);
-        //
-        // dragBox.on('boxend', () => {
-        //     // features that intersect the box are added to the collection of
-        //     // selected features
-        //     let extent = dragBox.getGeometry().getExtent();
-        //
-        //     for (let lyr of [
-        //         this.crashPointsK, this.crashPointsA, this.crashPointsB, this.crashPointsC, this.crashPointsO
-        //     ]) {
-        //         lyr.getSource().forEachFeatureIntersectingExtent(extent, (feature) => {
-        //             // console.log(feature.getProperties()['id']);
-        //             // crashIds.push(feature.getProperties()['id']);
-        //             selectedFeatures.push(feature);
-        //         });
-        //     }
-        // });
-        //
-        // selectedFeatures.on(['add', 'remove'], function () {
-        //     let selDiv = (document.getElementById('selections') as HTMLDivElement);
-        //
-        //     let ids = selectedFeatures.getArray().map(function (feature) {
-        //         return feature.get('id');
-        //     });
-        //     if (ids.length > 0) {
-        //         selDiv.innerHTML = ids.join(', ');
-        //     } else {
-        //         selDiv.innerHTML = 'No crashes selected';
-        //     }
-        // });
+        let select = new Select({
+            multi: true
+        });
 
+        this.map.addInteraction(select);
 
+        let selectedFeatures = select.getFeatures();
+
+        let dragBox = new DragBox({
+            condition: cond['platformModifierKeyOnly']
+        });
+
+        this.map.addInteraction(dragBox);
+
+        dragBox.on('boxend', () => {
+            // features that intersect the box are added to the collection of
+            // selected features
+            let extent = dragBox.getGeometry().getExtent();
+
+            for (let lyr of [
+                this.crashPointsK, this.crashPointsA, this.crashPointsB, this.crashPointsC, this.crashPointsO
+            ]) {
+                lyr.getSource().forEachFeatureIntersectingExtent(extent, (feature) => {
+                    // console.log(feature.getProperties()['id']);
+                    // crashIds.push(feature.getProperties()['id']);
+                    selectedFeatures.push(feature);
+                });
+            }
+        });
+
+        selectedFeatures.on(['add', 'remove'], function () {
+            let selDiv = (document.getElementById('selections') as HTMLDivElement);
+
+            let ids = selectedFeatures.getArray().map(function (feature) {
+                return feature.get('id');
+            });
+            if (ids.length > 0) {
+                selDiv.innerHTML = ids.join(', ');
+            } else {
+                selDiv.innerHTML = 'No crashes selected';
+            }
+        });
     }
 
     render() {
