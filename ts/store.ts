@@ -5,6 +5,7 @@
 import * as act from './actions';
 import Redux = require('redux');
 import * as intf from './interfaces';
+import Feature from 'ol/Feature';
 
 
 function queryResults(state: intf.iQueryResults = {}, action: act.iSetQueryResults) {
@@ -45,14 +46,47 @@ function layerChecked(state: { [s: string]: boolean } = _lyrChecked, action: act
     }
 }
 
+function selectedFeatures(state: Feature[] = [], action: act.iSetSelectedFeatures) {
+    if (action.type === act.SET_SELECTED_FEATURES){
+
+        action.features.sort((a: Feature, b: Feature) => {
+            let sevA = a.getProperties()['injSvr'];
+            let sevB = b.getProperties()['injSvr'];
+
+            if (sevA === sevB){
+                return 0
+            }
+
+            let indA = intf.crashSevList.indexOf(sevA);
+            let indB = intf.crashSevList.indexOf(sevA);
+
+            if (indA < 0){
+                return 1
+            }
+
+            if (indB < 0){
+                return -1;
+            }
+
+            return indA < indB ? 1 : -1;
+        });
+
+        return action.features;
+    } else {
+        return state;
+    }
+
+}
+
 export const store = Redux.createStore(
-    Redux.combineReducers({queryResults, layerChecked})
+    Redux.combineReducers({queryResults, layerChecked, selectedFeatures})
 );
 
 
 export interface iState {
     queryResults: intf.iQueryResults;
     layerChecked: { [s: string]: boolean };
+    selectedFeatures: Feature[];
 }
 
 export function getState(): iState {

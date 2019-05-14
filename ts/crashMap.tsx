@@ -1,15 +1,16 @@
 import React = require('react');
 import ReactDom = require('react-dom');
-import ReactRedux = require('react-redux');
 import $ = require("jquery");
+import {connect, Provider} from "react-redux";
+import {SelectionInfo} from "./SelectionInfo";
 
-const connect = ReactRedux.connect;
-const Provider = ReactRedux.Provider;
 
 import 'webmapsjs/dist/import-queryui';
 
+
 import * as store from './store'
 import Map from 'ol/WebGLMap.js';
+import Feature from 'ol/Feature';
 import {LayerSwitcher} from './layerSwitcher';
 import View from "ol/View";
 import VectorLayer from 'ol/layer/Vector.js';
@@ -25,7 +26,7 @@ import {DragBox, Select} from 'ol/interaction.js';
 import * as constEls from './staticElements';
 import * as intf from './interfaces';
 import {Legend} from './Legend';
-
+import {Popup} from "./popup";
 
 const esriJson = new EsriJSON();
 
@@ -38,10 +39,12 @@ store.store.subscribe(() => {
 
 class _CrashMap extends React.Component<{
     setQueryResults: (r: { [s: string]: { queried: number, mapped: number } }) => any,
-    lyrChecked: { [s: string]: boolean }
+    lyrChecked: { [s: string]: boolean },
+    setSelectedCrashes: (features: Feature[]) => any
 }, null> {
 
     private map: Map;
+    private selectionTimeout: number = null;
     readonly allPointLayer: VectorLayer;
     // readonly clusterLayer: VectorLayer;
 
@@ -49,7 +52,7 @@ class _CrashMap extends React.Component<{
     readonly crashPointsA: VectorLayer;
     readonly crashPointsB: VectorLayer;
     readonly crashPointsC: VectorLayer;
-    readonly crashPointsP: VectorLayer;
+    // readonly crashPointsP: VectorLayer;
     readonly crashPointsO: VectorLayer;
 
 
@@ -62,7 +65,7 @@ class _CrashMap extends React.Component<{
         this.crashPointsA = lyr.crashVector('A', 9);
         this.crashPointsB = lyr.crashVector('B', 8);
         this.crashPointsC = lyr.crashVector('C', 7);
-        this.crashPointsP = lyr.crashVector('P', 6);
+        // this.crashPointsP = lyr.crashVector('P', 6);
         this.crashPointsO = lyr.crashVector('O', 5);
 
 
@@ -113,10 +116,6 @@ class _CrashMap extends React.Component<{
                     } else {
 
                     }
-                    // res.A = res.A ? res.A : {queried: 0, mapped: 0};
-                    // console.log(f['geometry']);
-
-                    // console.log(isNaN(f['geometry']['x']));
                 }
 
                 resultObj['out_features']['features'] = mappedFeatures;
@@ -140,7 +139,7 @@ class _CrashMap extends React.Component<{
                             this.crashPointsC.getSource().addFeature(f);
                             break;
                         case 'P':
-                            this.crashPointsP.getSource().addFeature(f);
+                            // this.crashPointsP.getSource().addFeature(f);
                             break;
                         default:
                             this.crashPointsO.getSource().addFeature(f);
@@ -163,7 +162,7 @@ class _CrashMap extends React.Component<{
             A: this.crashPointsA,
             B: this.crashPointsB,
             C: this.crashPointsC,
-            P: this.crashPointsP,
+            // P: this.crashPointsP,
             O: this.crashPointsO,
         };
 
@@ -184,6 +183,13 @@ class _CrashMap extends React.Component<{
             })
         });
 
+        // let popup = new Popup(this.map);
+        //
+        // popup.addVectorOlPopup(this.crashPointsO, (f) => {
+        //     return 'jjjj'
+        // });
+
+
         accordionSetup(this.map);
 
         this.map.addLayer(this.allPointLayer);
@@ -191,9 +197,10 @@ class _CrashMap extends React.Component<{
         this.map.addLayer(this.crashPointsA);
         this.map.addLayer(this.crashPointsB);
         this.map.addLayer(this.crashPointsC);
-        this.map.addLayer(this.crashPointsP);
+        // this.map.addLayer(this.crashPointsP);
         this.map.addLayer(this.crashPointsO);
         // this.map.addLayer(this.clusterLayer);
+
 
         glob['map'] = this.map;
 
@@ -243,51 +250,51 @@ class _CrashMap extends React.Component<{
         //     displayFeatureInfo(pixel);
         // });
 
-        this.map.on('click', (evt) => {
-
-            let feature = this.map.forEachFeatureAtPixel(evt.pixel, function (feature) {
-                return feature;
-            });
-
-            if (feature) {
-                let crashNumber = parseInt(feature.getProperties()['id']);
-
-                $.get('https://transportal.cee.wisc.edu/applications/arcgis2/rest/services/crash/GetCrashProps/GPServer/GetCrashProps/execute',
-                    {crashNumber: crashNumber, f: 'json'},
-                    (d) => {
-                        let resultObj = {};
-
-                        for (let r of d.results) {
-                            resultObj[r['paramName']] = r['value']
-                        }
-
-                        if (resultObj['error']) {
-                            alert(resultObj['error']);
-                            return;
-                        } else if (!resultObj['success']) {
-                            alert('Unknown request error');
-                            return;
-                        }
-
-                        let propOrder = ["DOCTNMBR", "CRSHDATE", "CNTYNAME", "MUNINAME", "MUNITYPE",
-                            "ONHWY", "ONSTR", "ATHWY", "ATSTR", "INTDIR", "INTDIS", "INJSVR", "TOTVEH", "TOTINJ",
-                            "TOTFATL", "CMAALAT", "CMAALONG"];
-
-                        let crashProps = resultObj['props'];
-                        let outHtml = '<table style="border-collapse: collapse">';
-
-                        for (let p of propOrder) {
-                            outHtml += `<tr><td style="border: solid black 1px">${p}</td><td style="border: solid black 1px">${crashProps[p] || ''}</td></tr>`;
-                        }
-                        outHtml += '</table>';
-
-                        (document.getElementById('crash-info') as HTMLDivElement).innerHTML = outHtml;
-                    },
-                    'json');
-            } else {
-                (document.getElementById('crash-info') as HTMLDivElement).innerHTML = '';
-            }
-        });
+        // this.map.on('click', (evt) => {
+        //
+        //     let feature = this.map.forEachFeatureAtPixel(evt.pixel, function (feature) {
+        //         return feature;
+        //     });
+        //
+        //     if (feature) {
+        //         let crashNumber = parseInt(feature.getProperties()['id']);
+        //
+        //         $.get('https://transportal.cee.wisc.edu/applications/arcgis2/rest/services/crash/GetCrashProps/GPServer/GetCrashProps/execute',
+        //             {crashNumber: crashNumber, f: 'json'},
+        //             (d) => {
+        //                 let resultObj = {};
+        //
+        //                 for (let r of d.results) {
+        //                     resultObj[r['paramName']] = r['value']
+        //                 }
+        //
+        //                 if (resultObj['error']) {
+        //                     alert(resultObj['error']);
+        //                     return;
+        //                 } else if (!resultObj['success']) {
+        //                     alert('Unknown request error');
+        //                     return;
+        //                 }
+        //
+        //                 let propOrder = ["DOCTNMBR", "CRSHDATE", "CNTYNAME", "MUNINAME", "MUNITYPE",
+        //                     "ONHWY", "ONSTR", "ATHWY", "ATSTR", "INTDIR", "INTDIS", "INJSVR", "TOTVEH", "TOTINJ",
+        //                     "TOTFATL", "CMAALAT", "CMAALONG"];
+        //
+        //                 let crashProps = resultObj['props'];
+        //                 let outHtml = '<table style="border-collapse: collapse">';
+        //
+        //                 for (let p of propOrder) {
+        //                     outHtml += `<tr><td style="border: solid black 1px">${p}</td><td style="border: solid black 1px">${crashProps[p] || ''}</td></tr>`;
+        //                 }
+        //                 outHtml += '</table>';
+        //
+        //                 (document.getElementById('crash-info') as HTMLDivElement).innerHTML = outHtml;
+        //             },
+        //             'json');
+        //     } else {
+        //         (document.getElementById('crash-info') as HTMLDivElement).innerHTML = '';
+        //     }
+        // });
 
         let select = new Select({
             multi: true
@@ -319,17 +326,35 @@ class _CrashMap extends React.Component<{
             }
         });
 
-        selectedFeatures.on(['add', 'remove'], function () {
-            let selDiv = (document.getElementById('selections') as HTMLDivElement);
+        selectedFeatures.on(['add', 'remove'], () => {
 
-            let ids = selectedFeatures.getArray().map(function (feature) {
-                return feature.get('id');
-            });
-            if (ids.length > 0) {
-                selDiv.innerHTML = ids.join(', ');
-            } else {
-                selDiv.innerHTML = 'No crashes selected';
+            if (this.selectionTimeout) {
+                clearTimeout(this.selectionTimeout);
             }
+
+            this.selectionTimeout = setTimeout(() => {
+                let selDiv = (document.getElementById('selections') as HTMLDivElement);
+
+                let ids = selectedFeatures.getArray().map(function (feature) {
+                    return feature.get('id');
+                });
+
+                let features: Feature[] = selectedFeatures.getArray().map(function (feature) {
+                    return feature;
+                });
+
+                this.props.setSelectedCrashes(features);
+
+                // if (ids.length > 0) {
+                //     selDiv.innerHTML = ids.join(', ');
+                // } else {
+                //     selDiv.innerHTML = 'No crashes selected';
+                // }
+
+                this.map.getView().setZoom(this.map.getView().getZoom());
+            }, 2)
+
+
         });
     }
 
@@ -350,8 +375,14 @@ class _CrashMap extends React.Component<{
                             {/*<img src="/legend.png"/>*/}
                         </div>
                         <h3>Selection</h3>
-                        <div id="selections">
-                        </div>
+                        <SelectionInfo/>
+                        {/*<div id="selection-container">*/}
+                        {/*<div id="selections">*/}
+                        {/*</div>*/}
+                        {/*<div id="selection-info">*/}
+                        {/*</div>*/}
+                        {/*</div>*/}
+
                         {constEls.disclamerH3}
                         {constEls.disclamerDiv}
                         {constEls.aboutH3}
@@ -359,7 +390,7 @@ class _CrashMap extends React.Component<{
                     </div>
                 </div>
                 <div id="map">
-                    <div id="crash-info"/>
+                    {/*<div id="crash-info"/>*/}
                     <LayerSwitcher mapFunc={() => {
                         return this.map
                     }}/>
@@ -379,6 +410,10 @@ let CrashMap = connect(
         return {
             setQueryResults: (r: { [s: string]: { queried: number, mapped: number } }) => {
                 dispatch({type: act.SET_QUERY_RESULTS, results: r} as act.iSetQueryResults);
+            },
+            setSelectedCrashes: (features: Feature[]) => {
+                dispatch({type: act.SET_SELECTED_FEATURES, features: features} as act.iSetSelectedFeatures)
+
             }
         }
     }
