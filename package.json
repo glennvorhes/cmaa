@@ -6,7 +6,8 @@
   "scripts": {
     "serve": "node_modules\\.bin\\parcel serve index.html",
     "build-js": "node_modules\\.bin\\parcel build ts/crashMap.tsx",
-    "build-css": "node_modules\\.bin\\parcel build css/crashMap.less"
+    "build-css": "node_modules\\.bin\\parcel build css/crashMap.less",
+    "test-serve": "C:\\Python34\\python.exe -m http.server"
   },
   "author": "",
   "license": "ISC",

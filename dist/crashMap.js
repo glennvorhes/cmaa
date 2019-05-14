@@ -428,7 +428,7 @@ var t;!function(e){"function"==typeof t&&t.amd?t(["jquery"],e):e(jQuery)}(functi
 },{"jquery":"juYr","jqueryui":"kveV"}],"0A+1":[function(require,module,exports) {
 "use strict";Object.defineProperty(exports,"__esModule",{value:!0}),exports.DUMMY="dummy action",exports.SET_QUERY_RESULTS="SET_QUERY_RESULTS",exports.SET_LYR_CHECKED="SET_LYR_CHECKED";
 },{}],"5gKv":[function(require,module,exports) {
-"use strict";Object.defineProperty(exports,"__esModule",{value:!0}),exports.crashSevList=["K","A","B","C","P","O"];
+"use strict";Object.defineProperty(exports,"__esModule",{value:!0}),exports.crashSevList=["K","A","B","C","O"];
 },{}],"7UyE":[function(require,module,exports) {
 "use strict";var e=this&&this.__importStar||function(e){if(e&&e.__esModule)return e;var r={};if(null!=e)for(var t in e)Object.hasOwnProperty.call(e,t)&&(r[t]=e[t]);return r.default=e,r};Object.defineProperty(exports,"__esModule",{value:!0});var r=e(require("./actions")),t=require("redux"),s=e(require("./interfaces"));function u(e,t){if(void 0===e&&(e={}),t.type===r.SET_QUERY_RESULTS){for(var u=0,o=s.crashSevList;u<o.length;u++){var a=o[u];t.results[a]||(t.results[a]={queried:0,mapped:0})}return t.results}return e}for(var o={},a=0,i=s.crashSevList;a<i.length;a++){var n=i[a];o[n]=!0}function c(e,t){if(void 0===e&&(e=o),t.type===r.SET_LYR_CHECKED){for(var u={},a=0,i=s.crashSevList;a<i.length;a++){var n=i[a];t.sev===n?u[n]=t.checked:u[n]=e[n]}return u}return e}function l(){return exports.store.getState()}exports.store=t.createStore(t.combineReducers({queryResults:u,layerChecked:c})),exports.getState=l,exports.default=exports.store;
 },{"./actions":"0A+1","redux":"fpuT","./interfaces":"5gKv"}],"KA50":[function(require,module,exports) {

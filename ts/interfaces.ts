@@ -14,4 +14,4 @@ export interface iQueryResults {
     O?: iResultInner;
 }
 
-export const crashSevList = ['K', 'A', 'B', 'C', 'P', 'O'];
+export const crashSevList = ['K', 'A', 'B', 'C', 'O'];
