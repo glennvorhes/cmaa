@@ -4,9 +4,10 @@ import Map from 'ol/Map'
 
 let transitionTime = 200;
 
-function updateMapSize(map: Map) {
+function updateMapSize(map: Map, $accordion: JQuery) {
     setTimeout(() => {
-        map.updateSize()
+        map.updateSize();
+        $accordion.accordion('refresh');
     }, 2 * transitionTime + 10);
 }
 
@@ -32,7 +33,7 @@ export function accordionSetup(map: Map) {
             accordionContainerCollapsed.classList.remove('collapsed');
         }, transitionTime);
 
-        updateMapSize(map);
+        updateMapSize(map, $accordion);
     };
 
     shower.onclick = () => {
@@ -43,7 +44,7 @@ export function accordionSetup(map: Map) {
             accordionContainer.classList.remove('collapsed');
         }, transitionTime);
 
-        updateMapSize(map);
+        updateMapSize(map, $accordion);
     };
 }
 

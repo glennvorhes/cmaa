@@ -113450,9 +113450,10 @@ var $ = require("jquery");
 
 var transitionTime = 200;
 
-function updateMapSize(map) {
+function updateMapSize(map, $accordion) {
   setTimeout(function () {
     map.updateSize();
+    $accordion.accordion('refresh');
   }, 2 * transitionTime + 10);
 }
 
@@ -113476,7 +113477,7 @@ function accordionSetup(map) {
     setTimeout(function () {
       accordionContainerCollapsed.classList.remove('collapsed');
     }, transitionTime);
-    updateMapSize(map);
+    updateMapSize(map, $accordion);
   };
 
   shower.onclick = function () {
@@ -113485,7 +113486,7 @@ function accordionSetup(map) {
     setTimeout(function () {
       accordionContainer.classList.remove('collapsed');
     }, transitionTime);
-    updateMapSize(map);
+    updateMapSize(map, $accordion);
   };
 }
 
