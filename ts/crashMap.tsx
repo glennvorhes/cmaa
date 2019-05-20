@@ -364,9 +364,9 @@ class _CrashMap extends React.Component<{
             {constEls.header}
             <div id="map-container">
                 <div id="accordion-container-collapsed">
-                    <div id="shower">Show&nbsp;&#9658;</div>
+                    <div id="shower">Show&nbsp;&#9650;</div>
                 </div>
-                <div id="accordion-container">
+                <div id="accordion-container" className="collapsed">
                     <div id="hider">Hide&#9660;</div>
                     <div id="accordion">
                         <h3>Legend</h3>

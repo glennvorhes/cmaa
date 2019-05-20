@@ -113448,7 +113448,7 @@ require("webmapsjs/dist/import-queryui");
 
 var $ = require("jquery");
 
-var duration = 200;
+var transitionTime = 200;
 
 function accordionSetup(map) {
   var $accordion = $('#accordion');
@@ -113462,33 +113462,29 @@ function accordionSetup(map) {
 
   var hider = document.getElementById("hider");
   var shower = document.getElementById("shower");
-  var $accordionContainer = $('#accordion-container');
-  var $accordionContainerCollapsed = $('#accordion-container-collapsed');
+  var accordionContainer = document.getElementById("accordion-container");
+  var accordionContainerCollapsed = document.getElementById("accordion-container-collapsed");
 
   hider.onclick = function () {
-    $accordionContainer.hide("slide", {
-      direction: "left"
-    }, duration, function () {
-      $accordionContainerCollapsed.show("slide", {
-        direction: "left"
-      }, duration, function () {
-        map.updateSize();
-        $accordion.accordion('refresh');
-      });
-    });
+    accordionContainer.classList.add('collapsed');
+    setTimeout(function () {
+      accordionContainerCollapsed.classList.remove('collapsed');
+    }, transitionTime);
+    setTimeout(function () {
+      map.updateSize();
+    }, 2 * transitionTime);
   };
 
   shower.onclick = function () {
-    $accordionContainerCollapsed.hide("slide", {
-      direction: "left"
-    }, duration, function () {
-      $accordionContainer.show("slide", {
-        direction: "left"
-      }, duration, function () {
-        map.updateSize();
-        $accordion.accordion('refresh');
-      });
-    });
+    accordionContainerCollapsed.classList.add('collapsed');
+    accordionContainer.style.display = 'block';
+    setTimeout(function () {
+      accordionContainer.classList.remove('collapsed');
+    }, transitionTime);
+    setTimeout(function () {
+      $accordion.accordion('refresh');
+      map.updateSize();
+    }, 2 * transitionTime);
   };
 }
 
@@ -114040,8 +114036,9 @@ function (_super) {
       id: "accordion-container-collapsed"
     }, React.createElement("div", {
       id: "shower"
-    }, "Show\xA0\u25BA")), React.createElement("div", {
-      id: "accordion-container"
+    }, "Show\xA0\u25B2")), React.createElement("div", {
+      id: "accordion-container",
+      className: "collapsed"
     }, React.createElement("div", {
       id: "hider"
     }, "Hide\u25BC"), React.createElement("div", {
@@ -114109,7 +114106,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "58963" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "59381" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

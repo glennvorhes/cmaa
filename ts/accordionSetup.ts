@@ -2,7 +2,7 @@ import 'webmapsjs/dist/import-queryui';
 import $ = require("jquery");
 import Map from 'ol/Map'
 
-let duration = 200;
+let transitionTime = 200;
 
 export function accordionSetup(map: Map) {
 
@@ -14,45 +14,35 @@ export function accordionSetup(map: Map) {
         $accordion.accordion('refresh');
     };
 
-    let hider = document.getElementById("hider");
-    let shower = document.getElementById("shower");
-    let $accordionContainer = $('#accordion-container');
-    let $accordionContainerCollapsed = $('#accordion-container-collapsed');
-
+    let hider = document.getElementById("hider") as HTMLDivElement;
+    let shower = document.getElementById("shower") as HTMLDivElement;
+    let accordionContainer = document.getElementById("accordion-container") as HTMLDivElement;
+    let accordionContainerCollapsed = document.getElementById("accordion-container-collapsed") as HTMLDivElement;
 
     hider.onclick = () => {
-        $accordionContainer.hide(
-            "slide",
-            {direction: "left"},
-            duration,
-            () => {
-                $accordionContainerCollapsed.show(
-                    "slide",
-                    {direction: "left"},
-                    duration,
-                    () => {
-                        map.updateSize();
-                        $accordion.accordion('refresh');
-                    })
-            });
+        accordionContainer.classList.add('collapsed');
+
+        setTimeout(() => {
+            accordionContainerCollapsed.classList.remove('collapsed');
+        }, transitionTime);
+
+        setTimeout(() => {
+            map.updateSize()
+        }, 2 * transitionTime);
     };
 
     shower.onclick = () => {
-        $accordionContainerCollapsed.hide(
-            "slide",
-            {direction: "left"},
-            duration,
-            () => {
-                $accordionContainer.show(
-                    "slide",
-                    {direction: "left"},
-                    duration,
-                    () => {
-                        map.updateSize();
-                        $accordion.accordion('refresh');
-                    }
-                )
-            });
+        accordionContainerCollapsed.classList.add('collapsed');
+        accordionContainer.style.display = 'block';
+
+        setTimeout(() => {
+            accordionContainer.classList.remove('collapsed');
+        }, transitionTime);
+
+        setTimeout(() => {
+            $accordion.accordion('refresh');
+            map.updateSize()
+        }, 2 * transitionTime);
     };
 }
 

@@ -88,6 +88,7 @@ header {
   display: none;
   width: 350px;
   position: relative;
+  transition: width 0.2s;
 }
 #accordion-container #hider {
   position: absolute;
@@ -121,14 +122,30 @@ header {
   background-color: #CB2028;
   border-color: #9c1d22;
 }
+#accordion-container.collapsed {
+  width: 0;
+}
+#accordion-container.collapsed #hider {
+  display: none;
+}
 #accordion-container-collapsed {
   background-color: #CB2028;
+  transition: width 0.2s;
+  position: relative;
+  width: 28px;
 }
 #accordion-container-collapsed #shower {
+  left: -26px;
+  top: 20px;
+  position: absolute;
   border: solid #9c1d22 2px;
   color: white;
   padding: 4px 10px;
   cursor: pointer;
+  transform: rotate(90deg);
+}
+#accordion-container-collapsed.collapsed {
+  width: 0;
 }
 #map {
   height: 100%;

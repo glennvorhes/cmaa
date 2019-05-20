@@ -1,5 +1,6 @@
 @import (inline ) "./ol-popup.css";
 @headerHeight: 80px;
+@transitionTime: 0.2s;
 
 header {
   display: flex;
@@ -48,6 +49,7 @@ header {
   display: none;
   width: 350px;
   position: relative;
+  transition: width @transitionTime;
   //display: flex;
 
   #hider {
@@ -88,18 +90,37 @@ header {
   }
 }
 
+#accordion-container.collapsed {
+  width: 0;
+
+  #hider {
+    display: none;
+  }
+}
+
 #accordion-container-collapsed {
   //display: none;
   background-color: #CB2028;
+  transition: width @transitionTime;
+  position: relative;
+  width: 28px;
 
   #shower {
+    left: -26px;
+    top: 20px;
+    position: absolute;
     border: solid #9c1d22 2px;
     color: white;
     padding: 4px 10px;
     cursor: pointer;
+    transform: rotate(90deg);
   }
   //display: flex;
   //width: 40px;
+}
+
+#accordion-container-collapsed.collapsed {
+  width: 0;
 }
 
 #map {
