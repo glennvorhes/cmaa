@@ -4,13 +4,6 @@ import Map from 'ol/Map'
 
 let transitionTime = 200;
 
-function updateMapSize(map: Map, $accordion: JQuery) {
-    setTimeout(() => {
-        map.updateSize();
-        $accordion.accordion('refresh');
-    }, 2 * transitionTime + 10);
-}
-
 export function accordionSetup(map: Map) {
 
     let $accordion = $('#accordion');
@@ -57,7 +50,6 @@ export function accordionSetup(map: Map) {
         }, transitionTime);
 
         setTimeout(() => {
-            // map.updateSize();
             $accordion.accordion('refresh');
         }, 2 * transitionTime);
 
@@ -69,4 +61,3 @@ export function accordionSetup(map: Map) {
         }, 1)
     };
 }
-

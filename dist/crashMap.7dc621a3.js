@@ -113450,13 +113450,6 @@ var $ = require("jquery");
 
 var transitionTime = 200;
 
-function updateMapSize(map, $accordion) {
-  setTimeout(function () {
-    map.updateSize();
-    $accordion.accordion('refresh');
-  }, 2 * transitionTime + 10);
-}
-
 function accordionSetup(map) {
   var $accordion = $('#accordion');
   $accordion.accordion({
@@ -113497,7 +113490,6 @@ function accordionSetup(map) {
       accordionContainer.classList.remove('collapsed');
     }, transitionTime);
     setTimeout(function () {
-      // map.updateSize();
       $accordion.accordion('refresh');
     }, 2 * transitionTime);
     timeOut = setInterval(function () {
