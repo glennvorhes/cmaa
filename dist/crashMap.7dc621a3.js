@@ -113471,22 +113471,42 @@ function accordionSetup(map) {
   var shower = document.getElementById("shower");
   var accordionContainer = document.getElementById("accordion-container");
   var accordionContainerCollapsed = document.getElementById("accordion-container-collapsed");
+  var startTime = null;
+  var timeOut = null;
 
   hider.onclick = function () {
+    startTime = new Date();
     accordionContainer.classList.add('collapsed');
     setTimeout(function () {
       accordionContainerCollapsed.classList.remove('collapsed');
     }, transitionTime);
-    updateMapSize(map, $accordion);
+    timeOut = setInterval(function () {
+      map.updateSize();
+
+      if (new Date().getTime() - startTime.getTime() > 2 * transitionTime + 10) {
+        clearInterval(timeOut);
+      }
+    }, 1);
   };
 
   shower.onclick = function () {
+    startTime = new Date();
     accordionContainerCollapsed.classList.add('collapsed');
     accordionContainer.style.display = 'block';
     setTimeout(function () {
       accordionContainer.classList.remove('collapsed');
     }, transitionTime);
-    updateMapSize(map, $accordion);
+    setTimeout(function () {
+      // map.updateSize();
+      $accordion.accordion('refresh');
+    }, 2 * transitionTime);
+    timeOut = setInterval(function () {
+      map.updateSize();
+
+      if (new Date().getTime() - startTime.getTime() > 2 * transitionTime + 10) {
+        clearInterval(timeOut);
+      }
+    }, 1);
   };
 }
 
@@ -114108,7 +114128,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "59381" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "62538" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
