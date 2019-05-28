@@ -3,10 +3,9 @@ import ReactDom = require('react-dom');
 import $ = require("jquery");
 import {connect, Provider} from "react-redux";
 import {SelectionInfo} from "./SelectionInfo";
-
+import * as ajx from './ajax';
 
 import 'webmapsjs/dist/import-queryui';
-
 
 import * as store from './store'
 import Map from 'ol/WebGLMap.js';
@@ -22,11 +21,13 @@ import * as act from './actions'
 import * as cond from 'ol/events/condition';
 import {DragBox, Select} from 'ol/interaction.js';
 
-
 import * as constEls from './staticElements';
 import * as intf from './interfaces';
 import {Legend} from './Legend';
 import {Popup} from "./popup";
+import {Operation} from "./selection/operation";
+import {Box, Line, Poly} from './selection/box';
+import * as sel from './selection/selectionLayer';
 
 const esriJson = new EsriJSON();
 
@@ -183,11 +184,28 @@ class _CrashMap extends React.Component<{
             })
         });
 
-        // let popup = new Popup(this.map);
-        //
-        // popup.addVectorOlPopup(this.crashPointsO, (f) => {
-        //     return 'jjjj'
-        // });
+        let popup = new Popup(this.map);
+
+        popup.addVectorOlPopup(this.crashPointsO, (f) => {
+            let props = f.getProperties();
+            let crashNum = props['id'];
+
+            return `${crashNum}`;
+
+
+            // console.log(props);
+
+            // return 'jjjj'
+        }, (d) => {
+
+            let id2 = parseInt(d.innerHTML);
+            // console.log(d.innerHTML.search(/\d*/));
+            console.log(id2);
+
+            let h = ajx.getCrashInfo(id2, d);
+            console.log(h);
+
+        });
 
 
         accordionSetup(this.map);
@@ -296,6 +314,11 @@ class _CrashMap extends React.Component<{
         //     }
         // });
 
+
+
+
+
+
         let select = new Select({
             multi: true
         });
@@ -307,6 +330,9 @@ class _CrashMap extends React.Component<{
         let dragBox = new DragBox({
             condition: cond['platformModifierKeyOnly']
         });
+
+        sel.seletionLayerSetup(this.map);
+
 
         this.map.addInteraction(dragBox);
 
@@ -394,6 +420,13 @@ class _CrashMap extends React.Component<{
                     <LayerSwitcher mapFunc={() => {
                         return this.map
                     }}/>
+                    <div id="toolbar">
+                        <div className="toolbar-button ruler" title="Measure"/>
+                        <Box/>
+                        <Line/>
+                        <Poly/>
+                        <Operation/>
+                    </div>
                 </div>
             </div>
         </div>

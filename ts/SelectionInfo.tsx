@@ -40,8 +40,6 @@ function getCrashInfo(crsh: number) {
             (document.getElementById('selection-info') as HTMLDivElement).innerHTML = outHtml;
         },
         'json');
-
-
 }
 
 

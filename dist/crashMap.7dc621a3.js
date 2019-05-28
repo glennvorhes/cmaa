@@ -35383,7 +35383,56 @@ exports.SelectionInfo = react_redux_1.connect(function (s) {
     features: s.selectedFeatures
   };
 })(_SelectionInfo);
-},{"react":"node_modules/react/react.js","react-redux":"node_modules/react-redux/es/index.js","jquery":"node_modules/jquery/dist/jquery.js","webmapsjs/dist/util/makeGuid":"node_modules/webmapsjs/dist/util/makeGuid.js"}],"node_modules/jqueryui/jquery-ui.js":[function(require,module,exports) {
+},{"react":"node_modules/react/react.js","react-redux":"node_modules/react-redux/es/index.js","jquery":"node_modules/jquery/dist/jquery.js","webmapsjs/dist/util/makeGuid":"node_modules/webmapsjs/dist/util/makeGuid.js"}],"ts/ajax.ts":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var $ = require("jquery");
+
+function getCrashInfo(crsh, container) {
+  $.get('https://transportal.cee.wisc.edu/applications/arcgis2/rest/services/crash/GetCrashProps/GPServer/GetCrashProps/execute', {
+    crashNumber: crsh,
+    f: 'json'
+  }, function (d) {
+    var resultObj = {};
+
+    for (var _i = 0, _a = d.results; _i < _a.length; _i++) {
+      var r = _a[_i];
+      resultObj[r['paramName']] = r['value'];
+    }
+
+    if (resultObj['error']) {
+      alert(resultObj['error']);
+      return;
+    } else if (!resultObj['success']) {
+      alert('Unknown request error');
+      return;
+    }
+
+    var propOrder = ["DOCTNMBR", "CRSHDATE", "CNTYNAME", "MUNINAME", "MUNITYPE", "ONHWY", "ONSTR", "ATHWY", "ATSTR", "INTDIR", "INTDIS", "INJSVR", "TOTVEH", "TOTINJ", "TOTFATL", "CMAALAT", "CMAALONG"];
+    var crashProps = resultObj['props'];
+    var outHtml = '<table style="border-collapse: collapse">';
+
+    for (var _b = 0, propOrder_1 = propOrder; _b < propOrder_1.length; _b++) {
+      var p = propOrder_1[_b];
+      outHtml += "<tr><td style=\"border: solid black 1px\">" + p + "</td><td style=\"border: solid black 1px\">" + (crashProps[p] || '') + "</td></tr>";
+    }
+
+    outHtml += '</table>';
+
+    if (container) {
+      container.innerHTML = outHtml;
+    }
+
+    return outHtml; // (document.getElementById('selection-info') as HTMLDivElement).innerHTML = outHtml;
+  }, 'json');
+}
+
+exports.getCrashInfo = getCrashInfo;
+},{"jquery":"node_modules/jquery/dist/jquery.js"}],"node_modules/jqueryui/jquery-ui.js":[function(require,module,exports) {
 var define;
 /*! jQuery UI - v1.11.1 - 2014-08-13
 * http://jqueryui.com
@@ -51777,6 +51826,10 @@ exports.DUMMY = 'dummy action';
 exports.SET_QUERY_RESULTS = 'SET_QUERY_RESULTS';
 exports.SET_LYR_CHECKED = 'SET_LYR_CHECKED';
 exports.SET_SELECTED_FEATURES = 'SET_SELECTED_FEATURES';
+exports.SET_OPERATION = 'SET_OPERATION';
+exports.OPERATION_UNION = 'OPERATION_UNION';
+exports.OPERATION_SUBSET = 'OPERATION_SUBSET';
+exports.OPERATION_REMOVE = 'OPERATION_REMOVE';
 },{}],"ts/interfaces.ts":[function(require,module,exports) {
 "use strict";
 
@@ -51897,10 +51950,23 @@ function selectedFeatures(state, action) {
   }
 }
 
+function operation(state, action) {
+  if (state === void 0) {
+    state = act.OPERATION_UNION;
+  }
+
+  if (action.type === act.SET_OPERATION) {
+    return action.operation;
+  } else {
+    return state;
+  }
+}
+
 exports.store = Redux.createStore(Redux.combineReducers({
   queryResults: queryResults,
   layerChecked: layerChecked,
-  selectedFeatures: selectedFeatures
+  selectedFeatures: selectedFeatures,
+  operation: operation
 }));
 
 function getState() {
@@ -113648,7 +113714,518 @@ exports.Legend = react_redux_1.connect(function (s) {
     }
   };
 })(_Legend);
-},{"react":"node_modules/react/react.js","react-redux":"node_modules/react-redux/es/index.js","./interfaces":"ts/interfaces.ts","./actions":"ts/actions.ts"}],"ts/crashMap.tsx":[function(require,module,exports) {
+},{"react":"node_modules/react/react.js","react-redux":"node_modules/react-redux/es/index.js","./interfaces":"ts/interfaces.ts","./actions":"ts/actions.ts"}],"ts/popup.ts":[function(require,module,exports) {
+"use strict";
+
+var __importDefault = this && this.__importDefault || function (mod) {
+  return mod && mod.__esModule ? mod : {
+    "default": mod
+  };
+};
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var Overlay_1 = __importDefault(require("ol/Overlay"));
+
+var coordinate_js_1 = require("ol/coordinate.js");
+
+var proj_js_1 = require("ol/proj.js");
+
+var _PopupTracker =
+/** @class */
+function () {
+  function _PopupTracker(lyr, fn, cl) {
+    this.lyr = lyr;
+    this.fn = fn;
+    this.cl = cl;
+  }
+
+  _PopupTracker.prototype.layerHasFeature = function (f) {
+    var feats = this.lyr.getSource().getFeatures();
+    return feats.indexOf(f) > -1;
+  };
+
+  _PopupTracker.prototype.getHtml = function (f) {
+    return this.fn(f);
+  };
+
+  _PopupTracker.prototype.runCallback = function (contentDiv) {
+    this.cl(contentDiv);
+  };
+
+  return _PopupTracker;
+}();
+
+var Popup =
+/** @class */
+function () {
+  function Popup(m) {
+    var _this = this;
+
+    this.popupDivId = 'popup';
+    this.popupCloserId = 'popup-close';
+    this.popupContentId = 'popup-content';
+    this.popupTrackers = [];
+    this.map = m;
+    this.mapDiv = this.map.getTargetElement();
+    var popupDiv = document.createElement('div');
+    popupDiv.id = this.popupDivId;
+    popupDiv.classList.add("ol-popup");
+    var popupDivA = document.createElement('a');
+    popupDivA.href = '#';
+    popupDivA.id = this.popupCloserId;
+    popupDivA.classList.add('ol-popup-closer');
+    var popupDivContent = document.createElement('div');
+    popupDivContent.id = this.popupContentId;
+    popupDiv.appendChild(popupDivA);
+    popupDiv.appendChild(popupDivContent);
+    this.mapDiv.parentNode.insertBefore(popupDiv, this.mapDiv.nextSibling);
+    this.popupDiv = document.getElementById(this.popupDivId);
+    this.popupCloser = document.getElementById(this.popupCloserId);
+    this.popupContent = document.getElementById(this.popupContentId);
+    this.overlay = new Overlay_1.default({
+      element: this.popupDiv,
+      autoPan: true,
+      autoPanAnimation: {
+        duration: 250,
+        source: undefined
+      }
+    });
+
+    this.popupCloser.onclick = function (e) {
+      e.preventDefault();
+
+      _this.closePopup();
+    };
+
+    this.map.addOverlay(this.overlay);
+    this.map.on('pointermove', function (e) {
+      if (e['dragging']) {
+        return;
+      }
+
+      var vLayers = [];
+
+      for (var _i = 0, _a = _this.popupTrackers; _i < _a.length; _i++) {
+        var t = _a[_i];
+        vLayers.push(t.lyr);
+      }
+
+      if (_this.map.hasFeatureAtPixel(e['pixel'], {
+        layerFilter: function layerFilter(l) {
+          return vLayers.indexOf(l) > -1;
+        }
+      })) {
+        _this.mapDiv.style.cursor = 'pointer';
+      } else {
+        _this.mapDiv.style.cursor = '';
+      }
+    });
+    this.map.on('singleclick', function (e) {
+      var vLayers = [];
+
+      for (var _i = 0, _a = _this.popupTrackers; _i < _a.length; _i++) {
+        var t = _a[_i];
+        vLayers.push(t.lyr);
+      }
+
+      var feats = _this.map.getFeaturesAtPixel(e['pixel'], {
+        layerFilter: function layerFilter(l) {
+          return vLayers.indexOf(l) > -1;
+        }
+      });
+
+      if (feats) {
+        var coordinate = e['coordinate'];
+        var featTrack = [];
+
+        for (var _b = 0, feats_1 = feats; _b < feats_1.length; _b++) {
+          var f = feats_1[_b];
+
+          for (var _c = 0, _d = _this.popupTrackers; _c < _d.length; _c++) {
+            var t = _d[_c];
+
+            if (t.layerHasFeature(f)) {
+              featTrack.push({
+                f: f,
+                t: t
+              });
+            }
+          }
+        }
+
+        if (featTrack.length === 0) {
+          return;
+        } else if (featTrack.length === 1) {
+          _this.popupHtml = featTrack[0].t.getHtml(featTrack[0].f);
+
+          _this.overlay.setPosition(coordinate);
+
+          featTrack[0].t.runCallback(_this.popupContent);
+        } else {}
+      } else {
+        _this.closePopup();
+      }
+    });
+  }
+
+  Object.defineProperty(Popup.prototype, "popupHtml", {
+    get: function get() {
+      return this.popupContent.innerHTML;
+    },
+    set: function set(s) {
+      this.popupContent.innerHTML = s;
+    },
+    enumerable: true,
+    configurable: true
+  });
+
+  Popup.prototype.closePopup = function () {
+    this.overlay.setPosition(undefined);
+    this.popupCloser.blur();
+    return false;
+  };
+
+  Popup.prototype.addCoordinatePopup = function () {
+    var _this = this;
+
+    this.map.on('singleclick', function (evt) {
+      var coordinate = evt['coordinate'];
+      var hdms = coordinate_js_1.toStringHDMS(proj_js_1.toLonLat(coordinate));
+      _this.popupContent.innerHTML = "<p>You clicked here:</p><code>" + hdms + "</code>";
+
+      _this.overlay.setPosition(coordinate);
+    });
+  };
+
+  Popup.prototype.addVectorOlPopup = function (lyr, fn, cl) {
+    if (cl === void 0) {
+      cl = function cl(dv) {};
+    }
+
+    for (var _i = 0, _a = this.popupTrackers; _i < _a.length; _i++) {
+      var t = _a[_i];
+
+      if (lyr === t.lyr) {
+        return;
+      }
+    }
+
+    this.popupTrackers.push(new _PopupTracker(lyr, fn, cl));
+  };
+
+  return Popup;
+}();
+
+exports.Popup = Popup;
+},{"ol/Overlay":"node_modules/ol/Overlay.js","ol/coordinate.js":"node_modules/ol/coordinate.js","ol/proj.js":"node_modules/ol/proj.js"}],"ts/selection/operation.tsx":[function(require,module,exports) {
+"use strict";
+
+var __extends = this && this.__extends || function () {
+  var _extendStatics = function extendStatics(d, b) {
+    _extendStatics = Object.setPrototypeOf || {
+      __proto__: []
+    } instanceof Array && function (d, b) {
+      d.__proto__ = b;
+    } || function (d, b) {
+      for (var p in b) {
+        if (b.hasOwnProperty(p)) d[p] = b[p];
+      }
+    };
+
+    return _extendStatics(d, b);
+  };
+
+  return function (d, b) {
+    _extendStatics(d, b);
+
+    function __() {
+      this.constructor = d;
+    }
+
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+  };
+}();
+
+var __importStar = this && this.__importStar || function (mod) {
+  if (mod && mod.__esModule) return mod;
+  var result = {};
+  if (mod != null) for (var k in mod) {
+    if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+  }
+  result["default"] = mod;
+  return result;
+};
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var React = require("react");
+
+var react_redux_1 = require("react-redux");
+
+var act = __importStar(require("../actions"));
+
+var _Operation =
+/** @class */
+function (_super) {
+  __extends(_Operation, _super);
+
+  function _Operation() {
+    return _super !== null && _super.apply(this, arguments) || this;
+  }
+
+  _Operation.prototype.render = function () {
+    var _this = this;
+
+    return React.createElement("ul", {
+      id: "selection-operation"
+    }, React.createElement("li", null, React.createElement("label", {
+      htmlFor: "selection-operation-union"
+    }, "Union"), React.createElement("input", {
+      id: "selection-operation-union",
+      type: "radio",
+      name: "selection-operation",
+      checked: this.props.selected === act.OPERATION_UNION,
+      onChange: function onChange() {
+        _this.props.changed(act.OPERATION_UNION);
+      }
+    })), React.createElement("li", null, React.createElement("label", {
+      htmlFor: "selection-operation-subset"
+    }, "Subset"), React.createElement("input", {
+      id: "selection-operation-subset",
+      type: "radio",
+      name: "selection-operation",
+      checked: this.props.selected === act.OPERATION_SUBSET,
+      onChange: function onChange() {
+        _this.props.changed(act.OPERATION_SUBSET);
+      }
+    })), React.createElement("li", null, React.createElement("label", {
+      htmlFor: "selection-operation-remove"
+    }, "Remove"), React.createElement("input", {
+      id: "selection-operation-remove",
+      type: "radio",
+      name: "selection-operation",
+      checked: this.props.selected === act.OPERATION_REMOVE,
+      onChange: function onChange() {
+        _this.props.changed(act.OPERATION_REMOVE);
+      }
+    })));
+  };
+
+  return _Operation;
+}(React.Component);
+
+exports.Operation = react_redux_1.connect(function (s) {
+  return {
+    selected: s.operation
+  };
+}, function (dispatch) {
+  return {
+    changed: function changed(s) {
+      dispatch({
+        type: act.SET_OPERATION,
+        operation: s
+      });
+    }
+  };
+})(_Operation);
+},{"react":"node_modules/react/react.js","react-redux":"node_modules/react-redux/es/index.js","../actions":"ts/actions.ts"}],"ts/selection/selectionLayer.tsx":[function(require,module,exports) {
+"use strict";
+
+var __extends = this && this.__extends || function () {
+  var _extendStatics = function extendStatics(d, b) {
+    _extendStatics = Object.setPrototypeOf || {
+      __proto__: []
+    } instanceof Array && function (d, b) {
+      d.__proto__ = b;
+    } || function (d, b) {
+      for (var p in b) {
+        if (b.hasOwnProperty(p)) d[p] = b[p];
+      }
+    };
+
+    return _extendStatics(d, b);
+  };
+
+  return function (d, b) {
+    _extendStatics(d, b);
+
+    function __() {
+      this.constructor = d;
+    }
+
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+  };
+}();
+
+var __importDefault = this && this.__importDefault || function (mod) {
+  return mod && mod.__esModule ? mod : {
+    "default": mod
+  };
+};
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var Vector_1 = __importDefault(require("ol/layer/Vector"));
+
+var Vector_2 = __importDefault(require("ol/source/Vector"));
+
+var React = require("react");
+
+var iconString = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAACICAMAAADH0avOAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAMAUExURQAAABoaGiMiIygnKSoqKy8uMDQ0NDg3ODs7PD8/QD5VWjVcZDldZDtgaDRvejJyfj50fkNDREdGSEtLTENOUU5OUERQVE5VV1NTVFVWWFVZW1pbW0FeZF1fYEVmbEVob0xkaU1pb0Rud09tckVweEl2flVhZFNmalJpbV1gYl1maV1obGBfYGNjZGZmaGdoaWtrbGFvcm9vcGdydGF3e2xxcnBvcHNzdHZ2eHh3eXt7eyZ8jCtzgC5+jTV9izp2gTh4hDt9iUV5g0N+iVF4gH9/gB2HmhyJnReMoRiMoRCTqxmTqRyYrhucsxWiuxqiuyWJnCiElSuKnDGEkzeImDuGlTuLmiSOoSiOoSORpSKZriyZrTSSojudrjGesjqesCamvCqgtC2muzKgswilwQywzQC21wO83Q6z0Q241gq62RanwRWpxBGtyRmnwBipwx2vyRCxzhO10RS51xS92xq20gC/4SOsxSiswyKyyzmswDW70xHA3wPD5AHG6QHJ7QzC4wjH6QjK7ALN8QvN8AHQ9ALT+BnM6xbS8ybV8zbI4jfV8UKBjEGHlEiMmFKDjFiCilCHkFqJkUGTolefrEWoukultVagrVCjslyquG+Ag2yMkm+Xn3aFiH+DhHWXnn2Wm2WapG2aoniepFazxEjN5UvZ8lzR5lLa8mXH2XfI1n/N23PT5XjV5njd74ODg4OHiIaGiImJiYqKjIuMjYyLjI2Njo+PkIeYm42SlI2ZnJCPkJGRkZOTlJSTlJWVlZaXmJeYmZmZmZubnJucnJybnJ2dnZ+foIOkqoyqsJukp5+goJ2ipJOvs5qxtaGhoaOjpKOkpKSjpKWlpaemqKWpq6urrK6vsKC0t66ytKi3uqy5vLCvsLGxsbGztLO0tLW1tbe3uLW7vLi3uLm5ubu8vL29vYG9yL6/wJ7DyZnM1YbZ6MLCw8PJy8vLy8/P0MvV2NHR0dPT1NPU1NTT1NXV1dnZ2dzb3N3d3d7f4ODf4OPj4+rq6vX19fn5+QAAAPbjxMAAAAEAdFJOU////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////wBT9wclAAAACXBIWXMAAA7DAAAOwwHHb6hkAAAAGHRFWHRTb2Z0d2FyZQBwYWludC5uZXQgNC4xLjb9TgnoAAAG8ElEQVRYR92Xe5TcVB3Hdc84jg/EIazMElfwiYvNNorbLPFF0YoVh62ttKe2Vq3WHnE9qz0L+JqdtXvWByBV8IFyFK0vVPRKVgZbUlKmNT4Qok29WDFtukyjaLg11Azx3Dy8eWz33u3qn55jv3/MZO5nfkkm937v9zdPSv6r/lfYV2eUOxX1fsO4X9dbnWwsx4GFk8QdWLN69XIB2rY92xHbGcix2296oXvBlmsaoxd1o5gI7M1AjjuVXhWhr403mtt2PBbGcYSHtQwUuGrLw8Zj3/90c/I9u4M40BWePrldfQLp4KeP3nH99vGbDnWghSS62q7iqHsQzDzwo9s/s3nnLiOI5XszkOPDT8NxHHYk+Td/u/2z77zVjmNZzUCOrQrBcehfzIN//OS6WyDBdPWhCo4iXxa58lP5h3/81Z9HEVMNywF0PJmXFbDH/ft3dgahxODSAXFFB3Laoz/8wR3f+/hXOli6JwMF7uF5oRXw4C/f/fCWLfXPAVtgqp9cOSDzPhTB786qElUqVfp3w579j0MJYFE62rFgpuMZyLGzFJH5rPq6NIMLZeMF7s6SlyOcpvT1B9nAnHKcyVO4Wq/oF59yUThBlSXwX8VxIRpj5BWXPCkaL6LTBHd93z/he5nyJ8Bgie+rEfVyHNerZyMMFteNfnD0Auj73a5E26DQ0npjonHpbBhHwTDtsUKDIxPN5toH/a5jizQuZkIYaU413/0raAI4SC0mWzYfT9+Fkanp6fEdYgvHMoXhUPtnM7pzYmDsisu2T137hT0RYyIoH3egaeznV7/mmW/dNrn5Np9xCZwhhj9x7Je11z574Otv+8DYLTAcZjFRhPlVVyo+uHT9O1RMm2gO949tasWRMXC23JXuXojj8MIzzm+Rt2Nypa9KV5NBUh3+dpekEGwJPaWzqGf+UIbJo+zukzEO9nJcn0xte0U1kSloWgB54LjdeXworyZfUEvlsuPdxc9ZKa++O4dRpJQlTvMeqdq0Ba1hs5DIuy0RgJKWnzvH6L779uZSzeSEUBOFdAtOlWFWmmyGxeFimNZpgq3fk5AydH1/u6272QiDh150ySWvO3cYEPUv5rH6NY2tL3TTpKLX+ZwG641m44Y/4ThCCy2IHV3l6xNTzY0PIFczBdaC2FR1k798a3Pq2tv27IdsUJGgA22vK6x875apyZtf2QpjeU82PIcV049C4fLLXv3+qfGbd7EeIxKcKA4HRtadfcYVn/zot1w2iRJXQlGEl4xukP7whlUjXzIYEyUe0AOy/vmxTUoIb12+XGEwtiRENpRwYN2VZEk73+gXTIHymNuCJLTjcKivL13xHig9pULvDiAkDzKK3FmFeAy3az09nDmPLTVrCKIQG5Lr4l9wokLPmAU8HKYmiXROko53RAn51KbpKDp0UDeMQlDiKvCfeg1lsMAJ0i4WBYBCJFZUHrjHymbhwRyTzqXraqIq8RI+wvfxPS3aY7l82zQhSrDEA9MrxihMvtBNb6gD87tOxeBTdZrgOyUx1aAgCIMwG2GwuKZef/tL9nUcx3nFfwqqF89GZO+WFw2qRnNi7R+72HOYVjIXzoJqw687UNIF1kRIkyW5903vm5i++iZZ9ULGwGFHUY0jFr/yzSu3bt+8gyw9xiWuojpBiAfqb3zGqqs+sembQURb0Ndln6xVLIytr7189bYPfdFmgsoCbkR+TciPblKOi2e+5WMaG1SZDTKPtaJg9/OfCwK627PU3AUXPusFxERPwCFO4uiTaymOw12ymAZVZ1lPqUptXFAhlyYe8z2NXIYEVaUqWPPYAii9NjHRQRGa2OAU28n7tgwjDWBy54Rr5SrnIiD4RVxkOHFBO/V/6rFaVfceqjpM1GBL0aDjdhyJM2SprZX1BR5zWrIM5LaiJmgJx1f1UzyGfdTN+k8gtItT0/ikgsL6qRbBtP5fsHusQ3SU/Gc6bOe7C4Ol888773nnCqK4VOxbNKi2Nq56KVl3UbRi8aCaaLz+YbJ/+kxQoXyGsmZw44MIQcg0gwiY6eogHptuvuvbhtF2RObkrgTJFAojE43p8RsvSptBNqhcmcyiMFZ/1eSnrr5xoceIHFXz+LH1Tz9zdPIjO9GCoEqXm+zyYxvE3TfUR74M2b9M5OaMu3SUeixof37N2habY+TWV0Ac9tc33hNHfx46Z9lfRRrbQiuNh5c95xxiojSoKhUKY7gk68AOm4BYEJs8CaoDKSiqkaqm1Ri3ZdK47+N4SWFaCwT0LHyMGgC+Jcguyn1Q4AQpWjrDrVKlfNTXanN/nOZwgloKubxSBpziuRVYLPWTOEEOedFF3xDEZaV7i/J5nPXwyE6CZTUJuKdUn9RB9ZHiaFE8ryT5N/1Xe5GNBjIWAAAAAElFTkSuQmCC';
+exports.selectionLayer = new Vector_1.default({
+  source: new Vector_2.default()
+});
+
+function seletionLayerSetup(map) {
+  map.addLayer(exports.selectionLayer);
+}
+
+exports.seletionLayerSetup = seletionLayerSetup;
+
+var SelectionControl =
+/** @class */
+function (_super) {
+  __extends(SelectionControl, _super);
+
+  function SelectionControl() {
+    return _super !== null && _super.apply(this, arguments) || this;
+  }
+
+  SelectionControl.prototype.render = function () {
+    return React.createElement("div", {
+      className: "toolbar-button",
+      style: {
+        backgroundPosition: "0 -" + this.props.top + "px"
+      },
+      title: this.props.title
+    });
+  };
+
+  return SelectionControl;
+}(React.Component);
+
+exports.SelectionControl = SelectionControl;
+},{"ol/layer/Vector":"node_modules/ol/layer/Vector.js","ol/source/Vector":"node_modules/ol/source/Vector.js","react":"node_modules/react/react.js"}],"ts/selection/box.tsx":[function(require,module,exports) {
+"use strict";
+
+var __extends = this && this.__extends || function () {
+  var _extendStatics = function extendStatics(d, b) {
+    _extendStatics = Object.setPrototypeOf || {
+      __proto__: []
+    } instanceof Array && function (d, b) {
+      d.__proto__ = b;
+    } || function (d, b) {
+      for (var p in b) {
+        if (b.hasOwnProperty(p)) d[p] = b[p];
+      }
+    };
+
+    return _extendStatics(d, b);
+  };
+
+  return function (d, b) {
+    _extendStatics(d, b);
+
+    function __() {
+      this.constructor = d;
+    }
+
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+  };
+}();
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var React = require("react");
+
+var react_redux_1 = require("react-redux");
+
+var selectionLayer_1 = require("./selectionLayer");
+
+var _Box =
+/** @class */
+function (_super) {
+  __extends(_Box, _super);
+
+  function _Box() {
+    return _super !== null && _super.apply(this, arguments) || this;
+  }
+
+  _Box.prototype.render = function () {
+    return React.createElement(selectionLayer_1.SelectionControl, {
+      top: 0,
+      title: "Select by Box"
+    });
+  };
+
+  return _Box;
+}(React.Component);
+
+exports.Box = react_redux_1.connect(function (s) {
+  return {};
+}, function (dispatch) {
+  return {};
+})(_Box);
+
+var _Line =
+/** @class */
+function (_super) {
+  __extends(_Line, _super);
+
+  function _Line() {
+    return _super !== null && _super.apply(this, arguments) || this;
+  }
+
+  _Line.prototype.render = function () {
+    return React.createElement(selectionLayer_1.SelectionControl, {
+      top: 110,
+      title: "Select by Line"
+    });
+  };
+
+  return _Line;
+}(React.Component);
+
+exports.Line = react_redux_1.connect(function (s) {
+  return {};
+}, function (dispatch) {
+  return {};
+})(_Line);
+
+var _Poly =
+/** @class */
+function (_super) {
+  __extends(_Poly, _super);
+
+  function _Poly() {
+    return _super !== null && _super.apply(this, arguments) || this;
+  }
+
+  _Poly.prototype.render = function () {
+    return React.createElement(selectionLayer_1.SelectionControl, {
+      top: 27,
+      title: "Select by Polygon"
+    });
+  };
+
+  return _Poly;
+}(React.Component);
+
+exports.Poly = react_redux_1.connect(function (s) {
+  return {};
+}, function (dispatch) {
+  return {};
+})(_Poly);
+},{"react":"node_modules/react/react.js","react-redux":"node_modules/react-redux/es/index.js","./selectionLayer":"ts/selection/selectionLayer.tsx"}],"ts/crashMap.tsx":[function(require,module,exports) {
 "use strict";
 
 var __extends = this && this.__extends || function () {
@@ -113707,6 +114284,8 @@ var react_redux_1 = require("react-redux");
 
 var SelectionInfo_1 = require("./SelectionInfo");
 
+var ajx = __importStar(require("./ajax"));
+
 require("webmapsjs/dist/import-queryui");
 
 var store = __importStar(require("./store"));
@@ -113734,6 +114313,14 @@ var constEls = __importStar(require("./staticElements"));
 var intf = __importStar(require("./interfaces"));
 
 var Legend_1 = require("./Legend");
+
+var popup_1 = require("./popup");
+
+var operation_1 = require("./selection/operation");
+
+var box_1 = require("./selection/box");
+
+var sel = __importStar(require("./selection/selectionLayer"));
 
 var esriJson = new EsriJSON_1.default();
 store.store.subscribe(function () {
@@ -113887,12 +114474,20 @@ function (_super) {
         center: [-9840124.542661136, 5379280.493658545],
         zoom: 7
       })
-    }); // let popup = new Popup(this.map);
-    //
-    // popup.addVectorOlPopup(this.crashPointsO, (f) => {
-    //     return 'jjjj'
-    // });
+    });
+    var popup = new popup_1.Popup(this.map);
+    popup.addVectorOlPopup(this.crashPointsO, function (f) {
+      var props = f.getProperties();
+      var crashNum = props['id'];
+      return "" + crashNum; // console.log(props);
+      // return 'jjjj'
+    }, function (d) {
+      var id2 = parseInt(d.innerHTML); // console.log(d.innerHTML.search(/\d*/));
 
+      console.log(id2);
+      var h = ajx.getCrashInfo(id2, d);
+      console.log(h);
+    });
     accordionSetup_1.accordionSetup(this.map);
     this.map.addLayer(this.allPointLayer);
     this.map.addLayer(this.crashPointsK);
@@ -113998,6 +114593,7 @@ function (_super) {
     var dragBox = new interaction_js_1.DragBox({
       condition: cond['platformModifierKeyOnly']
     });
+    sel.seletionLayerSetup(this.map);
     this.map.addInteraction(dragBox);
     dragBox.on('boxend', function () {
       // features that intersect the box are added to the collection of
@@ -114063,7 +114659,12 @@ function (_super) {
       mapFunc: function mapFunc() {
         return _this.map;
       }
-    }))));
+    }), React.createElement("div", {
+      id: "toolbar"
+    }, React.createElement("div", {
+      className: "toolbar-button ruler",
+      title: "Measure"
+    }), React.createElement(box_1.Box, null), React.createElement(box_1.Line, null), React.createElement(box_1.Poly, null), React.createElement(operation_1.Operation, null)))));
   };
 
   return _CrashMap;
@@ -114092,7 +114693,7 @@ var CrashMap = react_redux_1.connect(function (s) {
 ReactDom.render(React.createElement(react_redux_1.Provider, {
   store: store.store
 }, React.createElement(CrashMap, null)), document.getElementById('root'));
-},{"react":"node_modules/react/react.js","react-dom":"node_modules/react-dom/index.js","jquery":"node_modules/jquery/dist/jquery.js","react-redux":"node_modules/react-redux/es/index.js","./SelectionInfo":"ts/SelectionInfo.tsx","webmapsjs/dist/import-queryui":"node_modules/webmapsjs/dist/import-queryui.js","./store":"ts/store.ts","ol/WebGLMap.js":"node_modules/ol/WebGLMap.js","./layerSwitcher":"ts/layerSwitcher.tsx","ol/View":"node_modules/ol/View.js","ol/format/EsriJSON":"node_modules/ol/format/EsriJSON.js","./layers":"ts/layers.ts","./accordionSetup":"ts/accordionSetup.ts","./actions":"ts/actions.ts","ol/events/condition":"node_modules/ol/events/condition.js","ol/interaction.js":"node_modules/ol/interaction.js","./staticElements":"ts/staticElements.tsx","./interfaces":"ts/interfaces.ts","./Legend":"ts/Legend.tsx"}],"node_modules/parcel/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+},{"react":"node_modules/react/react.js","react-dom":"node_modules/react-dom/index.js","jquery":"node_modules/jquery/dist/jquery.js","react-redux":"node_modules/react-redux/es/index.js","./SelectionInfo":"ts/SelectionInfo.tsx","./ajax":"ts/ajax.ts","webmapsjs/dist/import-queryui":"node_modules/webmapsjs/dist/import-queryui.js","./store":"ts/store.ts","ol/WebGLMap.js":"node_modules/ol/WebGLMap.js","./layerSwitcher":"ts/layerSwitcher.tsx","ol/View":"node_modules/ol/View.js","ol/format/EsriJSON":"node_modules/ol/format/EsriJSON.js","./layers":"ts/layers.ts","./accordionSetup":"ts/accordionSetup.ts","./actions":"ts/actions.ts","ol/events/condition":"node_modules/ol/events/condition.js","ol/interaction.js":"node_modules/ol/interaction.js","./staticElements":"ts/staticElements.tsx","./interfaces":"ts/interfaces.ts","./Legend":"ts/Legend.tsx","./popup":"ts/popup.ts","./selection/operation":"ts/selection/operation.tsx","./selection/box":"ts/selection/box.tsx","./selection/selectionLayer":"ts/selection/selectionLayer.tsx"}],"node_modules/parcel/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -114120,7 +114721,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "62538" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "52272" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

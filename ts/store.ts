@@ -78,8 +78,16 @@ function selectedFeatures(state: Feature[] = [], action: act.iSetSelectedFeature
 
 }
 
+function operation(state: string = act.OPERATION_UNION, action: act.iSetOperation){
+    if (action.type === act.SET_OPERATION){
+        return action.operation
+    } else {
+        return state;
+    }
+}
+
 export const store = Redux.createStore(
-    Redux.combineReducers({queryResults, layerChecked, selectedFeatures})
+    Redux.combineReducers({queryResults, layerChecked, selectedFeatures, operation})
 );
 
 
@@ -87,6 +95,7 @@ export interface iState {
     queryResults: intf.iQueryResults;
     layerChecked: { [s: string]: boolean };
     selectedFeatures: Feature[];
+    operation: string
 }
 
 export function getState(): iState {
