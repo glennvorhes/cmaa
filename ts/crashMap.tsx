@@ -16,18 +16,31 @@ import VectorLayer from 'ol/layer/Vector.js';
 import EsriJSON from 'ol/format/EsriJSON';
 import * as lyr from './layers';
 import {accordionSetup} from './accordionSetup';
-import * as act from './actions'
+import * as act from './actions';
+
+import * as cnst from './constants';
+import * as cnstEl from './constantEls';
 
 import * as cond from 'ol/events/condition';
 import {DragBox, Select} from 'ol/interaction.js';
 
-import * as constEls from './staticElements';
 import * as intf from './interfaces';
 import {Legend} from './Legend';
 import {Popup} from "./popup";
-import {Operation} from "./selection/operation";
-import {Box, Line, Poly} from './selection/box';
-import * as sel from './selection/selectionLayer';
+import {Selection_operation} from "./selection_operation";
+import {Box, Line, Poly} from './selection';
+import * as sel from './selection';
+import {Loading} from "./loading";
+
+import ScaleLine from 'ol/control/ScaleLine';
+
+import Draw from 'ol/interaction/Draw';
+import * as geomType from 'ol/geom/GeometryType';
+import VectorSource from "ol/source/Vector";
+
+import DoubleClickZoom from 'ol/interaction/DoubleClickZoom';
+import {selectionLayer} from "./constants";
+
 
 const esriJson = new EsriJSON();
 
@@ -41,33 +54,44 @@ store.store.subscribe(() => {
 class _CrashMap extends React.Component<{
     setQueryResults: (r: { [s: string]: { queried: number, mapped: number } }) => any,
     lyrChecked: { [s: string]: boolean },
-    setSelectedCrashes: (features: Feature[]) => any
+    setSelectedCrashes: (features: Feature[]) => any,
+    loading: boolean,
+    setLoading: (b: boolean) => any,
+    setMap: (m: Map) => any
 }, null> {
-
     private map: Map;
     private selectionTimeout: number = null;
-    readonly allPointLayer: VectorLayer;
-    // readonly clusterLayer: VectorLayer;
-
-    readonly crashPointsK: VectorLayer;
-    readonly crashPointsA: VectorLayer;
-    readonly crashPointsB: VectorLayer;
-    readonly crashPointsC: VectorLayer;
-    // readonly crashPointsP: VectorLayer;
-    readonly crashPointsO: VectorLayer;
+    // readonly allPointLayer: VectorLayer;
+    // // readonly clusterLayer: VectorLayer;
+    //
+    // readonly crashPointsK: VectorLayer;
+    // readonly crashPointsA: VectorLayer;
+    // readonly crashPointsB: VectorLayer;
+    // readonly crashPointsC: VectorLayer;
+    // // readonly crashPointsP: VectorLayer;
+    // readonly crashPointsO: VectorLayer;
+    //
+    // readonly selectionLayer: VectorLayer;
 
 
     constructor(props, context) {
         super(props, context);
         this.map = null;
 
-        this.allPointLayer = lyr.crashVector();
-        this.crashPointsK = lyr.crashVector('K', 10);
-        this.crashPointsA = lyr.crashVector('A', 9);
-        this.crashPointsB = lyr.crashVector('B', 8);
-        this.crashPointsC = lyr.crashVector('C', 7);
-        // this.crashPointsP = lyr.crashVector('P', 6);
-        this.crashPointsO = lyr.crashVector('O', 5);
+        // this.allPointLayer = lyr.crashVector();
+        // this.crashPointsK = lyr.crashVector('K', 10);
+        // this.crashPointsA = lyr.crashVector('A', 9);
+        // this.crashPointsB = lyr.crashVector('B', 8);
+        // this.crashPointsC = lyr.crashVector('C', 7);
+        // // this.crashPointsP = lyr.crashVector('P', 6);
+        // this.crashPointsO = lyr.crashVector('O', 5);
+        //
+        // this.selectionLayer = new VectorLayer({
+        //     source: new VectorSource()
+        // });
+
+
+        //
 
 
         // let clusterSource = new Cluster({
@@ -84,7 +108,9 @@ class _CrashMap extends React.Component<{
 
     getCrashesByQueryId(queryId: number) {
 
-        $.post('https://transportal.cee.wisc.edu/applications/arcgis2/rest/services/crash/getCrashByQueryId/GPServer/GetCrashByQueryId/execute',
+        this.props.setLoading(true);
+
+        $.post(cnst.GP_BY_QUERY_ID,
             {queryId: queryId, f: 'json', 'env:outSR': 3857},
             (d) => {
                 let resultObj = {};
@@ -100,8 +126,6 @@ class _CrashMap extends React.Component<{
                     alert('Unknown request error');
                     return;
                 }
-
-                // console.log(resultObj['out_features']);
 
                 let res: { [s: string]: intf.iResultInner } = {};
                 let mappedFeatures = [];
@@ -128,46 +152,48 @@ class _CrashMap extends React.Component<{
                 for (let f of features) {
                     switch (f.getProperties()['injSvr']) {
                         case 'K':
-                            this.crashPointsK.getSource().addFeature(f);
+                            cnst.crashPointsK.getSource().addFeature(f);
                             break;
                         case 'A':
-                            this.crashPointsA.getSource().addFeature(f);
+                            cnst.crashPointsA.getSource().addFeature(f);
                             break;
                         case 'B':
-                            this.crashPointsB.getSource().addFeature(f);
+                            cnst.crashPointsB.getSource().addFeature(f);
                             break;
                         case 'C':
-                            this.crashPointsC.getSource().addFeature(f);
+                            cnst.crashPointsC.getSource().addFeature(f);
                             break;
                         case 'P':
                             // this.crashPointsP.getSource().addFeature(f);
                             break;
                         default:
-                            this.crashPointsO.getSource().addFeature(f);
+                            cnst.crashPointsO.getSource().addFeature(f);
                             break;
                     }
                 }
 
-                let featureCount = this.crashPointsO.getSource().getFeatures().length;
+                let featureCount = cnst.crashPointsO.getSource().getFeatures().length;
 
                 if (featureCount > 0) {
-                    this.map.getView().fit(this.crashPointsO.getSource().getExtent());
+                    this.map.getView().fit(cnst.crashPointsO.getSource().getExtent());
                 }
+
+                this.props.setLoading(false);
             },
             'json');
     }
 
     componentDidUpdate() {
         let lyrs: { [s: string]: VectorLayer } = {
-            K: this.crashPointsK,
-            A: this.crashPointsA,
-            B: this.crashPointsB,
-            C: this.crashPointsC,
+            K: cnst.crashPointsK,
+            A: cnst.crashPointsA,
+            B: cnst.crashPointsB,
+            C: cnst.crashPointsC,
             // P: this.crashPointsP,
-            O: this.crashPointsO,
+            O: cnst.crashPointsO,
         };
 
-        this.crashPointsK.setVisible(false);
+        cnst.crashPointsK.setVisible(false);
 
         for (let l of intf.crashSevList) {
             lyrs[l].setVisible(this.props.lyrChecked[l]);
@@ -184,43 +210,66 @@ class _CrashMap extends React.Component<{
             })
         });
 
+        let dblClickInteraction;
+        // find DoubleClickZoom interaction
+        this.map.getInteractions().getArray().forEach(function (interaction) {
+            if (interaction instanceof DoubleClickZoom) {
+                dblClickInteraction = interaction;
+            }
+        });
+        // remove from map
+        if (dblClickInteraction) {
+            this.map.removeInteraction(dblClickInteraction);
+        }
+
+
+        this.props.setMap(this.map);
+
         let popup = new Popup(this.map);
 
-        popup.addVectorOlPopup(this.crashPointsO, (f) => {
+        popup.addVectorOlPopup(cnst.crashPointsO, (f) => {
             let props = f.getProperties();
             let crashNum = props['id'];
 
             return `${crashNum}`;
 
-
-            // console.log(props);
-
-            // return 'jjjj'
         }, (d) => {
-
             let id2 = parseInt(d.innerHTML);
-            // console.log(d.innerHTML.search(/\d*/));
-            console.log(id2);
+            ajx.getCrashInfo(id2, d);
+        });
 
-            let h = ajx.getCrashInfo(id2, d);
-            console.log(h);
+        accordionSetup(this.map);
+
+        this.map.addLayer(cnst.allPointLayer);
+        this.map.addLayer(cnst.crashPointsK);
+        this.map.addLayer(cnst.crashPointsA);
+        this.map.addLayer(cnst.crashPointsB);
+        this.map.addLayer(cnst.crashPointsC);
+        // this.map.addLayer(this.crashPointsP);
+        this.map.addLayer(cnst.crashPointsO);
+        this.map.addLayer(cnst.selectionLayer);
+        // this.map.addLayer(this.clusterLayer);s
+
+
+        let selectionChangeTimeout: number = null;
+
+        cnst.selectionLayer.getSource().on('change', () => {
+            if (selectionChangeTimeout){
+                clearTimeout(selectionChangeTimeout)
+            }
+
+            selectionChangeTimeout = setTimeout(() => {
+                this.props.setSelectedCrashes(cnst.selectionLayer.getSource().getFeatures());
+                console.log('changed');
+            }, 5);
+
 
         });
 
 
-        accordionSetup(this.map);
-
-        this.map.addLayer(this.allPointLayer);
-        this.map.addLayer(this.crashPointsK);
-        this.map.addLayer(this.crashPointsA);
-        this.map.addLayer(this.crashPointsB);
-        this.map.addLayer(this.crashPointsC);
-        // this.map.addLayer(this.crashPointsP);
-        this.map.addLayer(this.crashPointsO);
-        // this.map.addLayer(this.clusterLayer);
-
-
         glob['map'] = this.map;
+
+        this.map.addControl(new ScaleLine({units: 'us', minWidth: 125}));
 
         let queryId;
         let totalRecords;
@@ -315,79 +364,74 @@ class _CrashMap extends React.Component<{
         // });
 
 
-
-
-
-
-        let select = new Select({
-            multi: true
-        });
-
-        this.map.addInteraction(select);
-
-        let selectedFeatures = select.getFeatures();
-
-        let dragBox = new DragBox({
-            condition: cond['platformModifierKeyOnly']
-        });
-
-        sel.seletionLayerSetup(this.map);
-
-
-        this.map.addInteraction(dragBox);
-
-        dragBox.on('boxend', () => {
-            // features that intersect the box are added to the collection of
-            // selected features
-            let extent = dragBox.getGeometry().getExtent();
-
-            for (let lyr of [
-                this.crashPointsK, this.crashPointsA, this.crashPointsB, this.crashPointsC, this.crashPointsO
-            ]) {
-                lyr.getSource().forEachFeatureIntersectingExtent(extent, (feature) => {
-                    // console.log(feature.getProperties()['id']);
-                    // crashIds.push(feature.getProperties()['id']);
-                    selectedFeatures.push(feature);
-                });
-            }
-        });
-
-        selectedFeatures.on(['add', 'remove'], () => {
-
-            if (this.selectionTimeout) {
-                clearTimeout(this.selectionTimeout);
-            }
-
-            this.selectionTimeout = setTimeout(() => {
-                let selDiv = (document.getElementById('selections') as HTMLDivElement);
-
-                let ids = selectedFeatures.getArray().map(function (feature) {
-                    return feature.get('id');
-                });
-
-                let features: Feature[] = selectedFeatures.getArray().map(function (feature) {
-                    return feature;
-                });
-
-                this.props.setSelectedCrashes(features);
-
-                // if (ids.length > 0) {
-                //     selDiv.innerHTML = ids.join(', ');
-                // } else {
-                //     selDiv.innerHTML = 'No crashes selected';
-                // }
-
-                this.map.getView().setZoom(this.map.getView().getZoom());
-            }, 2)
-
-
-        });
+        // let select = new Select({
+        //     multi: true
+        // });
+        //
+        // this.map.addInteraction(select);
+        //
+        // let selectedFeatures = select.getFeatures();
+        //
+        // let dragBox = new DragBox({
+        //     condition: cond['platformModifierKeyOnly']
+        // });
+        //
+        // sel.seletionLayerSetup(this.map);
+        //
+        //
+        // this.map.addInteraction(dragBox);
+        //
+        // dragBox.on('boxend', () => {
+        //     // features that intersect the box are added to the collection of
+        //     // selected features
+        //     let extent = dragBox.getGeometry().getExtent();
+        //
+        //     for (let lyr of [
+        //         this.crashPointsK, this.crashPointsA, this.crashPointsB, this.crashPointsC, this.crashPointsO
+        //     ]) {
+        //         lyr.getSource().forEachFeatureIntersectingExtent(extent, (feature) => {
+        //             // console.log(feature.getProperties()['id']);
+        //             // crashIds.push(feature.getProperties()['id']);
+        //             selectedFeatures.push(feature);
+        //         });
+        //     }
+        // });
+        //
+        // selectedFeatures.on(['add', 'remove'], () => {
+        //
+        //     if (this.selectionTimeout) {
+        //         clearTimeout(this.selectionTimeout);
+        //     }
+        //
+        //     this.selectionTimeout = setTimeout(() => {
+        //         let selDiv = (document.getElementById('selections') as HTMLDivElement);
+        //
+        //         let ids = selectedFeatures.getArray().map(function (feature) {
+        //             return feature.get('id');
+        //         });
+        //
+        //         let features: Feature[] = selectedFeatures.getArray().map(function (feature) {
+        //             return feature;
+        //         });
+        //
+        //         this.props.setSelectedCrashes(features);
+        //
+        //         // if (ids.length > 0) {
+        //         //     selDiv.innerHTML = ids.join(', ');
+        //         // } else {
+        //         //     selDiv.innerHTML = 'No crashes selected';
+        //         // }
+        //
+        //         this.map.getView().setZoom(this.map.getView().getZoom());
+        //     }, 2)
+        //
+        //
+        // });
     }
 
     render() {
-
         return <div id="app-container">
-            {constEls.header}
+            {cnstEl.header}
             <div id="map-container">
                 <div id="accordion-container-collapsed">
                     <div id="shower">Show&nbsp;&#9650;</div>
@@ -402,30 +446,37 @@ class _CrashMap extends React.Component<{
                         </div>
                         <h3>Selection</h3>
                         <SelectionInfo/>
-                        {/*<div id="selection-container">*/}
-                        {/*<div id="selections">*/}
-                        {/*</div>*/}
-                        {/*<div id="selection-info">*/}
-                        {/*</div>*/}
-                        {/*</div>*/}
-
-                        {constEls.disclamerH3}
-                        {constEls.disclamerDiv}
-                        {constEls.aboutH3}
-                        {constEls.aboutDiv}
+                        <h3>Base Map</h3>
+                        <div>
+                            <LayerSwitcher mapFunc={() => {
+                                return this.map
+                            }} embed={false}/>
+                        </div>
+                        {cnstEl.disclamerH3}
+                        {cnstEl.disclamerDiv}
+                        {cnstEl.aboutH3}
+                        {cnstEl.aboutDiv}
                     </div>
                 </div>
                 <div id="map">
                     {/*<div id="crash-info"/>*/}
-                    <LayerSwitcher mapFunc={() => {
-                        return this.map
-                    }}/>
+                    <div id="search-bar-div">
+                        <input type="text" id="search-bar" placeholder="Search" onKeyUp={
+                            (e) => {
+                                console.log(e)
+                                // (document.getElementById('search-button') as HTMLInputElement).focus();
+                        }
+                        }/>
+                        <input type="button" id="search-button" value="" onClick={() => {
+                            console.log('search')}}/>
+                    </div>
+                    <Loading/>
                     <div id="toolbar">
-                        <div className="toolbar-button ruler" title="Measure"/>
                         <Box/>
                         <Line/>
                         <Poly/>
-                        <Operation/>
+                        <input className="toolbar-button ruler" readOnly={true} title="Measure"/>
+                        {/*<Selection_operation/>*/}
                     </div>
                 </div>
             </div>
@@ -436,7 +487,8 @@ class _CrashMap extends React.Component<{
 let CrashMap = connect(
     (s: store.iState) => {
         return {
-            lyrChecked: s.layerChecked
+            lyrChecked: s.layerChecked,
+            loading: s.loading
         };
     },
     (dispatch) => {
@@ -447,7 +499,14 @@ let CrashMap = connect(
             setSelectedCrashes: (features: Feature[]) => {
                 dispatch({type: act.SET_SELECTED_FEATURES, features: features} as act.iSetSelectedFeatures)
 
+            },
+            setLoading(b: boolean) {
+                dispatch({type: act.SET_LOADING, loading: b} as act.iSetLoading)
+            },
+            setMap(m: Map) {
+                dispatch({type: act.SET_MAP, map: m} as act.iSetMap)
             }
+
         }
     }
 )(_CrashMap);

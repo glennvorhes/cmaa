@@ -36,6 +36,14 @@ export const crashBySevStyle = (sev: string): Style => {
     })
 };
 
+export const selectionStyle = new Style({
+        image: new CircleStyle({
+            radius: 8,
+            // fill: new Fill({color: ''),
+            stroke: new Stroke({color: 'cyan', width: 2})
+        })
+    });
+
 export const vectorLayerStyle = (feature: Feature) => {
     let sev = feature.getProperties()['injSvr'];
     if (!styleCache[sev]) {

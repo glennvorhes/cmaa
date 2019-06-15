@@ -4,6 +4,8 @@ import {iState} from "./store";
 import Feature from 'ol/Feature'
 import $ = require("jquery");
 import {makeGuid} from 'webmapsjs/dist/util/makeGuid';
+import Map from 'ol/Map';
+
 function getCrashInfo(crsh: number) {
 
 
@@ -43,7 +45,7 @@ function getCrashInfo(crsh: number) {
 }
 
 
-class _SelectionInfo extends React.Component<{ features: Feature[] }, {}> {
+class _SelectionInfo extends React.Component<{ features: Feature[], map: Map }, {}> {
 
 
     render() {
@@ -53,10 +55,9 @@ class _SelectionInfo extends React.Component<{ features: Feature[] }, {}> {
 
         let divInfo = document.getElementById('selection-info') as HTMLDivElement;
 
-        if (divInfo){
+        if (divInfo) {
             divInfo.innerHTML = '';
         }
-
 
 
         if (this.props.features.length > 0) {
@@ -64,11 +65,13 @@ class _SelectionInfo extends React.Component<{ features: Feature[] }, {}> {
 
             for (let f of this.props.features) {
 
+                let ext = f.getGeometry().getExtent();
+
                 let props = f.getProperties();
                 let crsh = props['id'];
                 let sev = props['injSvr'];
 
-                spans.push(<span key={makeGuid()} data-crash={crsh} style={
+                spans.push(<span key={makeGuid()} data-crash={crsh} data-x={ext[0]} data-y={ext[1]} style={
                     {
                         display: 'inline-block', margin: '0 4px', cursor: 'pointer', color: 'blue',
                         textDecoration: 'underline'
@@ -77,7 +80,22 @@ class _SelectionInfo extends React.Component<{ features: Feature[] }, {}> {
                     (e) => {
                         let target = e.target as HTMLSpanElement;
                         let crashNum = parseInt(target.getAttribute('data-crash'));
+
+                        let x = parseFloat(target.getAttribute('data-x'));
+                        let y = parseFloat(target.getAttribute('data-y'));
                         getCrashInfo(crashNum);
+
+                        this.props.map.getView().animate({
+                            center: [x, y],
+                            duration: 300
+                        });
+
+
+                        // this.props.map.getView().setCenter([x, y]);
+
+                        if (this.props.map.getView().getZoom() < 12) {
+                            this.props.map.getView().setZoom(12);
+                        }
                     }
                 }>{crsh}:{sev}</span>);
 
@@ -94,16 +112,14 @@ class _SelectionInfo extends React.Component<{ features: Feature[] }, {}> {
             <div id="selection-info" style={{flex: 1, overflowY: 'auto'}}>
             </div>
         </div>
-        //
-        //       display: flex;
-        // flex-direction: column;
     }
 }
 
 
 export const SelectionInfo = connect((s: iState) => {
     return {
-        features: s.selectedFeatures
+        features: s.selectedFeatures,
+        map: s.map
     }
 })(_SelectionInfo);
 

@@ -6,6 +6,8 @@ import * as act from './actions';
 import Redux = require('redux');
 import * as intf from './interfaces';
 import Feature from 'ol/Feature';
+import Map from 'ol/Map';
+
 
 
 function queryResults(state: intf.iQueryResults = {}, action: act.iSetQueryResults) {
@@ -58,7 +60,7 @@ function selectedFeatures(state: Feature[] = [], action: act.iSetSelectedFeature
             }
 
             let indA = intf.crashSevList.indexOf(sevA);
-            let indB = intf.crashSevList.indexOf(sevA);
+            let indB = intf.crashSevList.indexOf(sevB);
 
             if (indA < 0){
                 return 1
@@ -68,7 +70,7 @@ function selectedFeatures(state: Feature[] = [], action: act.iSetSelectedFeature
                 return -1;
             }
 
-            return indA < indB ? 1 : -1;
+            return indA < indB ? -1 : 1;
         });
 
         return action.features;
@@ -86,16 +88,42 @@ function operation(state: string = act.OPERATION_UNION, action: act.iSetOperatio
     }
 }
 
-export const store = Redux.createStore(
-    Redux.combineReducers({queryResults, layerChecked, selectedFeatures, operation})
-);
+function selection(state: string = null, action: act.iSetSelection){
+    if (action.type === act.SET_SELECTION){
+        return action.selection;
+    } else {
+        return state;
+    }
+}
 
+function loading(state: boolean = false, action: act.iSetLoading){
+    if (action.type === act.SET_LOADING){
+        return action.loading;
+    } else {
+        return state;
+    }
+}
+
+function map(state: Map = null, action: act.iSetMap){
+    if (action.type === act.SET_MAP){
+        return action.map
+    } else {
+        return state
+    }
+}
+
+export const store = Redux.createStore(
+    Redux.combineReducers({queryResults, layerChecked, selectedFeatures, operation, loading, selection, map})
+);
 
 export interface iState {
     queryResults: intf.iQueryResults;
     layerChecked: { [s: string]: boolean };
     selectedFeatures: Feature[];
-    operation: string
+    operation: string;
+    loading: boolean;
+    selection: string;
+    map: Map;
 }
 
 export function getState(): iState {
