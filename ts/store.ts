@@ -7,6 +7,7 @@ import Redux = require('redux');
 import * as intf from './interfaces';
 import Feature from 'ol/Feature';
 import Map from 'ol/Map';
+import * as cnst from './constants';
 
 
 
@@ -73,6 +74,8 @@ function selectedFeatures(state: Feature[] = [], action: act.iSetSelectedFeature
             return indA < indB ? -1 : 1;
         });
 
+        cnst.selectionOneLayer.getSource().clear();
+
         return action.features;
     } else {
         return state;
@@ -111,6 +114,8 @@ function map(state: Map = null, action: act.iSetMap){
         return state
     }
 }
+
+
 
 export const store = Redux.createStore(
     Redux.combineReducers({queryResults, layerChecked, selectedFeatures, operation, loading, selection, map})

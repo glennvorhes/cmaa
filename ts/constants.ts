@@ -2,7 +2,7 @@ import * as lyr from './layers';
 import VectorLayer from "ol/layer/Vector";
 import VectorSource from "ol/source/Vector";
 import jsts = require("jsts");
-import {selectionStyle} from './layerStyles';
+import {selectionStyle, selectionOneStyle} from './layerStyles';
 
 
 
@@ -23,6 +23,14 @@ export const selectionLayer = new VectorLayer({
     zIndex: 12,
     style: selectionStyle
 });
+
+export const selectionOneLayer = new VectorLayer({
+    source: new VectorSource(),
+    zIndex: 13,
+    style: selectionOneStyle
+});
+
+
 
 export const crashSevList = ['K', 'A', 'B', 'C', 'O'];
 

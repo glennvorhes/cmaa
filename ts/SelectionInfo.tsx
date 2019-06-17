@@ -1,13 +1,20 @@
 import React = require("react");
 import {connect} from "react-redux";
 import {iState} from "./store";
-import Feature from 'ol/Feature'
+import Feature from 'ol/Feature';
+import Point from 'ol/geom/Point';
+
 import $ = require("jquery");
 import {makeGuid} from 'webmapsjs/dist/util/makeGuid';
 import Map from 'ol/Map';
+import * as cnst from './constants';
+
+/**
+ * crash download
+ * https://transportal.cee.wisc.edu/applications/crash-reports/retrieveCrashReport.do?doctnmbr=170403679
+ */
 
 function getCrashInfo(crsh: number) {
-
 
     $.get('https://transportal.cee.wisc.edu/applications/arcgis2/rest/services/crash/GetCrashProps/GPServer/GetCrashProps/execute',
         {crashNumber: crsh, f: 'json'},
@@ -49,8 +56,6 @@ class _SelectionInfo extends React.Component<{ features: Feature[], map: Map }, 
 
 
     render() {
-
-
         let selectDivContent = <h4>No crashes selected</h4>;
 
         let divInfo = document.getElementById('selection-info') as HTMLDivElement;
@@ -78,6 +83,7 @@ class _SelectionInfo extends React.Component<{ features: Feature[], map: Map }, 
                     }
                 } onClick={
                     (e) => {
+                        cnst.selectionOneLayer.getSource().clear();
                         let target = e.target as HTMLSpanElement;
                         let crashNum = parseInt(target.getAttribute('data-crash'));
 
@@ -85,11 +91,17 @@ class _SelectionInfo extends React.Component<{ features: Feature[], map: Map }, 
                         let y = parseFloat(target.getAttribute('data-y'));
                         getCrashInfo(crashNum);
 
+
+                        let f = new Feature();
+
+                        f.setGeometry(new Point([x, y]));
+
+                        cnst.selectionOneLayer.getSource().addFeature(f);
+
                         this.props.map.getView().animate({
                             center: [x, y],
                             duration: 300
                         });
-
 
                         // this.props.map.getView().setCenter([x, y]);
 

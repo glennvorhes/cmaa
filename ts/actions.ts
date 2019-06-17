@@ -11,6 +11,8 @@ export const SET_OPERATION = 'SET_OPERATION';
 export const SET_LOADING = 'SET_LOADING';
 export const SET_SELECTION = 'SET_SELECTION';
 export const SET_MAP = 'SET_MAP';
+export const SET_BUFFER_DIST = 'SET_BUFFER_DIST';
+
 
 export const OPERATION_UNION = 'OPERATION_UNION';
 export const OPERATION_SUBSET = 'OPERATION_SUBSET';
@@ -48,4 +50,8 @@ export interface iSetSelection extends Redux.Action{
 
 export interface iSetMap extends Redux.Action{
     map: Map;
+}
+
+export interface iSetBuffDistance extends Redux.Action {
+    dist: number;
 }

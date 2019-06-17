@@ -248,6 +248,7 @@ class _CrashMap extends React.Component<{
         // this.map.addLayer(this.crashPointsP);
         this.map.addLayer(cnst.crashPointsO);
         this.map.addLayer(cnst.selectionLayer);
+        this.map.addLayer(cnst.selectionOneLayer);
         // this.map.addLayer(this.clusterLayer);s
 
 

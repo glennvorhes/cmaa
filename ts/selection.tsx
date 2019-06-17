@@ -74,6 +74,7 @@ interface iSelectControlWrap {
 }
 
 
+
 class _Box extends React.Component<iSelectControlWrap, {}> {
     readonly setActive: () => any;
     readonly deactivate: () => any;
@@ -124,7 +125,8 @@ class _Box extends React.Component<iSelectControlWrap, {}> {
     }
 }
 
-class _Line extends React.Component<iSelectControlWrap, {}> {
+class _Line extends React.Component<iSelectControlWrap, { valid: boolean,
+    tooltip: string, buffDistance: number, canChangeDist: boolean }> {
 
     readonly draw: Draw;
     readonly setActive: () => any;
@@ -134,19 +136,22 @@ class _Line extends React.Component<iSelectControlWrap, {}> {
         super(p, c);
         this.draw = new Draw({type: 'LineString'});
 
+        this.state = {valid: true, tooltip: "Line Buffer Distance", buffDistance: 1000, canChangeDist: true};
+
         const parser = new jsts.io.OL3Parser();
 
         const wkt = new WKT();
 
         var reader = new jsts.io.WKTReader();
         var writer = new jsts.io.WKTWriter();
-        // var a = reader.read('POINT (-20 0)');
 
-
-
-        // console.log(a);
+        this.draw.on('drawstart', (e) => {
+            this.setState({canChangeDist: false})
+        });
 
         this.draw.on('drawend', (e) => {
+            this.setState({canChangeDist: true})
+
             this.props.setActive(null);
 
             cnst.selectionLayer.getSource().clear();
@@ -158,7 +163,7 @@ class _Line extends React.Component<iSelectControlWrap, {}> {
 
             var lineJst = reader.read(lineWkt);
 
-            var lineJstBuff = lineJst.buffer(2000, 20, 1);
+            var lineJstBuff = lineJst.buffer(this.state.buffDistance, 20, 1);
 
             let buffWKT = writer['write'](lineJstBuff);
 
@@ -190,13 +195,60 @@ class _Line extends React.Component<iSelectControlWrap, {}> {
     }
 
     render() {
-        return <SelectionControl
-            top={110}
-            title="Select by Line"
-            value={act.SELECTION_LINE}
-            activeSelection={this.props.activeSelection}
-            setActive={this.setActive}
-            deactivate={this.deactivate}/>
+        return <div
+            style={{position: 'relative'}}>
+            <SelectionControl
+                top={110}
+                title="Select by Line"
+                value={act.SELECTION_LINE}
+                activeSelection={this.props.activeSelection}
+                setActive={this.setActive}
+                deactivate={this.deactivate}/>
+            <div style={
+                {
+                    display: this.props.activeSelection === act.SELECTION_LINE ? '' : 'none',
+                    position: 'absolute',
+                    width: '115px',
+                    top: '0',
+                    left: '32px',
+                    backgroundColor: 'lightgray',
+                    padding: '4px',
+                    border: 'solid darkgray 1px',
+                    borderTopRightRadius: '5px',
+                    borderBottomRightRadius: '5px',
+                }
+            }>
+                <label htmlFor="buffer-distance" style={{width: '20px'}}>Buffer (ft)</label>
+                <input id="buffer-distance" style={
+                    {
+                        display: 'inline-block',
+                        width: '30px',
+                        marginLeft: '7px',
+                        backgroundColor: this.state.valid ? '' : '#fa6565'
+                    }
+                }
+                       type="text" defaultValue={this.state.buffDistance.toFixed()}
+                       title={this.state.tooltip}
+                       disabled={!this.state.canChangeDist}
+                       onChange={
+                           (e) => {
+                               let v = e.target.value;
+
+                               if (v.search(/^\d+$/) < 0){
+                                   this.setState({tooltip: "Enter Valid Number", valid: false})
+                               } else {
+                                   let vNum = parseInt(v);
+
+                                   if (vNum > 0 && vNum <= 5000){
+                                       this.setState({tooltip: "Line Buffer Distance", valid: true, buffDistance: vNum})
+                                   } else {
+                                       this.setState({tooltip: "Enter Number 1 - 5000", valid: false})
+                                   }
+                               }
+                           }
+                       }/>
+            </div>
+        </div>
     }
 }
 
@@ -218,15 +270,15 @@ class _Poly extends React.Component<iSelectControlWrap, {}> {
 
             cnst.selectionLayer.getSource().clear();
 
-            for (let lyr of crashLayers){
+            for (let lyr of crashLayers) {
                 lyr.getSource().forEachFeatureIntersectingExtent(selectGeom.getExtent(), (f) => {
-                let ext = f.getGeometry().getExtent();
-                let crd: [number, number] = [ext[0], ext[1]];
+                    let ext = f.getGeometry().getExtent();
+                    let crd: [number, number] = [ext[0], ext[1]];
 
-                if (selectGeom.intersectsCoordinate(crd)) {
-                    cnst.selectionLayer.getSource().addFeature(f);
-                }
-            });
+                    if (selectGeom.intersectsCoordinate(crd)) {
+                        cnst.selectionLayer.getSource().addFeature(f);
+                    }
+                });
             }
 
 
@@ -275,19 +327,27 @@ export const Box = connect(
     }
 )(_Box);
 
+//
+// buffDistance: number;
+// buffDistanceChange: (d: number) => any;
+
 export const Line = connect(
     (s: iState) => {
         return {
             operation: s.operation,
             activeSelection: s.selection,
-            map: s.map
+            map: s.map,
+            // buffDistance: 10
+            // buffDistance: s.buffDistance
+
         }
     },
     (dispatch) => {
         return {
             setActive: (s: string) => {
                 dispatch({type: act.SET_SELECTION, selection: s} as act.iSetSelection);
-            }
+            },
+
         }
     }
 )(_Line);
