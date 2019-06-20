@@ -4,9 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "serve": "node_modules\\.bin\\parcel serve index.html",
-    "build-js": "node_modules\\.bin\\parcel build -d build ts/crashMap.tsx",
-    "build-css": "node_modules\\.bin\\parcel build -d build css/crashMap.less",
+    "serve": "node_modules\\.bin\\parcel serve index_dev.html",
+    "build-js": "node_modules\\.bin\\parcel build --public-url . -d build ts/crashMap.tsx",
+    "build-css": "node_modules\\.bin\\parcel build --public-url . -d build css/crashMap.less",
     "test-serve": "C:\\Python34\\python.exe -m http.server 5001"
   },
   "author": "",

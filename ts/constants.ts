@@ -2,12 +2,12 @@ import * as lyr from './layers';
 import VectorLayer from "ol/layer/Vector";
 import VectorSource from "ol/source/Vector";
 import jsts = require("jsts");
-import {selectionStyle, selectionOneStyle} from './layerStyles';
-
+import {selectionStyle, selectionOneStyle, selectionExtentStyle} from './layerStyles';
 
 
 export const GP_BY_QUERY_ID = 'https://transportal.cee.wisc.edu/applications/arcgis2/rest/services/crash/getCrashByQueryId/GPServer/GetCrashByQueryId/execute';
-
+export const GP_GET_CRASH_PROPS = 'https://transportal.cee.wisc.edu/applications/arcgis2/rest/services/crash/GetCrashProps/GPServer/GetCrashProps/execute';
+export const CRASH_REPORT_DOWNLOAD = 'https://transportal.cee.wisc.edu/applications/crash-reports/retrieveCrashReport.do?doctnmbr=';
 
 export const allPointLayer = lyr.crashVector();
 export const crashPointsK = lyr.crashVector('K', 10);
@@ -22,6 +22,12 @@ export const selectionLayer = new VectorLayer({
     source: new VectorSource(),
     zIndex: 12,
     style: selectionStyle
+});
+
+export const selectionExtentLayer = new VectorLayer({
+    source: new VectorSource(),
+    zIndex: 4,
+    style: selectionExtentStyle()
 });
 
 export const selectionOneLayer = new VectorLayer({

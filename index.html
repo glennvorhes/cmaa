@@ -1,45 +1,35 @@
+
 <!DOCTYPE html>
+
+
+
+
+
+
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
-    <title>CMAA</title>
-    <link rel="stylesheet" href="css/ol.css" type="text/css">
-    <link rel="stylesheet" href="css/crashMap.less"/>
-    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-    <script>
-        let glob = {};
-        glob['one'] = 1
-    </script>
+   <meta charset="UTF-8">
+   <meta http-equiv="X-UA-Compatible" content="chrome=1">
+   <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
+   <title>Crash Data Retrieval Facility - CMAA Map</title>
+
+   <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css" type="text/css">
+   <link rel="stylesheet" href="build/crashMap.css" type="text/css"/>
+
+   <script>
+      let glob = {};
+   </script>
 </head>
-<body>
+<body link="#990000" alink="#cccc66" vlink="#990000" onload="window.focus()">
+
+<form name="crashMapForm" id="crashMapForm" method="post" action="/testing/crash-data/crashMap.do">
+<input type="hidden" name="queryId" value="1132" id="queryId">
+<input type="hidden" name="totalRecords" value="365" id="totalRecords">
+<input type="hidden" name="crashReports" value="true" id="crashReports">
+</form>
+
 <div id="root"></div>
-<script src="https://unpkg.com/jsts@2.0.2/dist/jsts.min.js"></script>
-<script src="ts/crashMap.tsx"></script>
+<script src="build/jsts.js"></script>
+<script src="build/crashMap.js"></script>
 </body>
 </html>
-
-
-<!--<!DOCTYPE html>-->
-<!--<html lang="en">-->
-<!--<head>-->
-    <!--<meta charset="UTF-8">-->
-    <!--<meta http-equiv="X-UA-Compatible" content="chrome=1">-->
-    <!--<meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">-->
-    <!--<title>CMAA</title>-->
-
-    <!--<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css" type="text/css">-->
-    <!--<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/glennvorhes/cmaa@master/dist/ol.css" type="text/css">-->
-    <!--<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/glennvorhes/cmaa@master/dist/crashMap.css" type="text/css"/>-->
-    <!--<script>-->
-        <!--let glob = {};-->
-    <!--</script>-->
-
-
-<!--</head>-->
-<!--<body>-->
-<!--<div id="root"></div>-->
-<!--<script src="https://cdn.jsdelivr.net/gh/glennvorhes/cmaa@master/dist/crashMap.js"></script>-->
-<!--</body>-->
-<!--</html>-->

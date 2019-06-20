@@ -28,7 +28,7 @@ import * as intf from './interfaces';
 import {Legend} from './Legend';
 import {Popup} from "./popup";
 import {Selection_operation} from "./selection_operation";
-import {Box, Line, Poly} from './selection';
+import {Box2, Line2, Poly2, Selection} from './selection';
 import * as sel from './selection';
 import {Loading} from "./loading";
 
@@ -54,7 +54,6 @@ store.store.subscribe(() => {
 class _CrashMap extends React.Component<{
     setQueryResults: (r: { [s: string]: { queried: number, mapped: number } }) => any,
     lyrChecked: { [s: string]: boolean },
-    setSelectedCrashes: (features: Feature[]) => any,
     loading: boolean,
     setLoading: (b: boolean) => any,
     setMap: (m: Map) => any
@@ -227,16 +226,20 @@ class _CrashMap extends React.Component<{
 
         let popup = new Popup(this.map);
 
-        popup.addVectorOlPopup(cnst.crashPointsO, (f) => {
-            let props = f.getProperties();
-            let crashNum = props['id'];
+        for (let ll of [cnst.crashPointsK, cnst.crashPointsA, cnst.crashPointsB,
+            cnst.crashPointsC, cnst.crashPointsO]) {
+            popup.addVectorOlPopup(ll, (f) => {
+                let props = f.getProperties();
+                let crashNum = props['id'];
 
-            return `${crashNum}`;
+                return `${crashNum}`;
 
-        }, (d) => {
-            let id2 = parseInt(d.innerHTML);
-            ajx.getCrashInfo(id2, d);
-        });
+            }, (d) => {
+                // let id2 = parseInt(d.innerHTML);
+                ajx.getCrashInfo(d.innerHTML, d);
+            });
+        }
+
 
         accordionSetup(this.map);
 
@@ -249,23 +252,24 @@ class _CrashMap extends React.Component<{
         this.map.addLayer(cnst.crashPointsO);
         this.map.addLayer(cnst.selectionLayer);
         this.map.addLayer(cnst.selectionOneLayer);
+        this.map.addLayer(cnst.selectionExtentLayer);
         // this.map.addLayer(this.clusterLayer);s
 
 
-        let selectionChangeTimeout: number = null;
-
-        cnst.selectionLayer.getSource().on('change', () => {
-            if (selectionChangeTimeout){
-                clearTimeout(selectionChangeTimeout)
-            }
-
-            selectionChangeTimeout = setTimeout(() => {
-                this.props.setSelectedCrashes(cnst.selectionLayer.getSource().getFeatures());
-                console.log('changed');
-            }, 5);
-
-
-        });
+        // let selectionChangeTimeout: number = null;
+        //
+        // cnst.selectionLayer.getSource().on('change', () => {
+        //     if (selectionChangeTimeout) {
+        //         clearTimeout(selectionChangeTimeout)
+        //     }
+        //
+        //     selectionChangeTimeout = setTimeout(() => {
+        //         this.props.setSelectedCrashes(cnst.selectionLayer.getSource().getFeatures());
+        //         console.log('changed');
+        //     }, 5);
+        //
+        //
+        // });
 
 
         glob['map'] = this.map;
@@ -434,10 +438,10 @@ class _CrashMap extends React.Component<{
         return <div id="app-container">
             {cnstEl.header}
             <div id="map-container">
-                <div id="accordion-container-collapsed">
+                <div id="accordion-container-collapsed" className="collapsed">
                     <div id="shower">Show&nbsp;&#9650;</div>
                 </div>
-                <div id="accordion-container" className="collapsed">
+                <div id="accordion-container">
                     <div id="hider">Hide&#9660;</div>
                     <div id="accordion">
                         <h3>Legend</h3>
@@ -466,16 +470,18 @@ class _CrashMap extends React.Component<{
                             (e) => {
                                 console.log(e)
                                 // (document.getElementById('search-button') as HTMLInputElement).focus();
-                        }
+                            }
                         }/>
                         <input type="button" id="search-button" value="" onClick={() => {
-                            console.log('search')}}/>
+                            console.log('search')
+                        }}/>
                     </div>
                     <Loading/>
                     <div id="toolbar">
-                        <Box/>
-                        <Line/>
-                        <Poly/>
+                        <Selection/>
+                        {/*<Box2/>*/}
+                        {/*<Line2/>*/}
+                        {/*<Poly2/>*/}
                         <input className="toolbar-button ruler" readOnly={true} title="Measure"/>
                         {/*<Selection_operation/>*/}
                     </div>
@@ -497,10 +503,10 @@ let CrashMap = connect(
             setQueryResults: (r: { [s: string]: { queried: number, mapped: number } }) => {
                 dispatch({type: act.SET_QUERY_RESULTS, results: r} as act.iSetQueryResults);
             },
-            setSelectedCrashes: (features: Feature[]) => {
-                dispatch({type: act.SET_SELECTED_FEATURES, features: features} as act.iSetSelectedFeatures)
-
-            },
+            // setSelectedCrashes: (features: Feature[]) => {
+            //     dispatch({type: act.SET_SELECTED_FEATURES, features: features} as act.iSetSelectedFeatures)
+            //
+            // },
             setLoading(b: boolean) {
                 dispatch({type: act.SET_LOADING, loading: b} as act.iSetLoading)
             },

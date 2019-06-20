@@ -80,16 +80,8 @@ function selectedFeatures(state: Feature[] = [], action: act.iSetSelectedFeature
     } else {
         return state;
     }
-
 }
 
-function operation(state: string = act.OPERATION_UNION, action: act.iSetOperation){
-    if (action.type === act.SET_OPERATION){
-        return action.operation
-    } else {
-        return state;
-    }
-}
 
 function selection(state: string = null, action: act.iSetSelection){
     if (action.type === act.SET_SELECTION){
@@ -115,17 +107,14 @@ function map(state: Map = null, action: act.iSetMap){
     }
 }
 
-
-
 export const store = Redux.createStore(
-    Redux.combineReducers({queryResults, layerChecked, selectedFeatures, operation, loading, selection, map})
+    Redux.combineReducers({queryResults, layerChecked, selectedFeatures, loading, selection, map})
 );
 
 export interface iState {
     queryResults: intf.iQueryResults;
     layerChecked: { [s: string]: boolean };
     selectedFeatures: Feature[];
-    operation: string;
     loading: boolean;
     selection: string;
     map: Map;

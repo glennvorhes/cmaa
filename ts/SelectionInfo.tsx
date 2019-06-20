@@ -14,10 +14,10 @@ import * as cnst from './constants';
  * https://transportal.cee.wisc.edu/applications/crash-reports/retrieveCrashReport.do?doctnmbr=170403679
  */
 
-function getCrashInfo(crsh: number) {
+function getCrashInfo(docNum: string) {
 
-    $.get('https://transportal.cee.wisc.edu/applications/arcgis2/rest/services/crash/GetCrashProps/GPServer/GetCrashProps/execute',
-        {crashNumber: crsh, f: 'json'},
+    $.get(cnst.GP_GET_CRASH_PROPS,
+        {docNumber: docNum, f: 'json'},
         (d) => {
             let resultObj = {};
 
@@ -76,7 +76,7 @@ class _SelectionInfo extends React.Component<{ features: Feature[], map: Map }, 
                 let crsh = props['id'];
                 let sev = props['injSvr'];
 
-                spans.push(<span key={makeGuid()} data-crash={crsh} data-x={ext[0]} data-y={ext[1]} style={
+                spans.push(<div key={crsh} style={{display: 'inline-block', margin: '0 4px'}}><span data-crash={crsh} data-x={ext[0]} data-y={ext[1]} style={
                     {
                         display: 'inline-block', margin: '0 4px', cursor: 'pointer', color: 'blue',
                         textDecoration: 'underline'
@@ -85,11 +85,11 @@ class _SelectionInfo extends React.Component<{ features: Feature[], map: Map }, 
                     (e) => {
                         cnst.selectionOneLayer.getSource().clear();
                         let target = e.target as HTMLSpanElement;
-                        let crashNum = parseInt(target.getAttribute('data-crash'));
+                        let docNum = target.getAttribute('data-crash');
 
                         let x = parseFloat(target.getAttribute('data-x'));
                         let y = parseFloat(target.getAttribute('data-y'));
-                        getCrashInfo(crashNum);
+                        getCrashInfo(docNum);
 
 
                         let f = new Feature();
@@ -109,7 +109,9 @@ class _SelectionInfo extends React.Component<{ features: Feature[], map: Map }, 
                             this.props.map.getView().setZoom(12);
                         }
                     }
-                }>{crsh}:{sev}</span>);
+                }>{crsh}:{sev}</span>
+                    <a href={cnst.CRASH_REPORT_DOWNLOAD + crsh} download="download" className="crash-download"/>
+                </div>);
 
             }
 

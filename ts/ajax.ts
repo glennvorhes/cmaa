@@ -1,11 +1,11 @@
 import $ = require("jquery");
+import * as cnst from './constants';
 
 
+export function getCrashInfo(crsh: string, container?: HTMLDivElement) {
 
-export function getCrashInfo(crsh: number, container?: HTMLDivElement) {
-
-    $.get('https://transportal.cee.wisc.edu/applications/arcgis2/rest/services/crash/GetCrashProps/GPServer/GetCrashProps/execute',
-        {crashNumber: crsh, f: 'json'},
+    $.get(cnst.GP_GET_CRASH_PROPS,
+        {docNumber: crsh, f: 'json'},
         (d) => {
             let resultObj = {};
 
@@ -30,7 +30,17 @@ export function getCrashInfo(crsh: number, container?: HTMLDivElement) {
             let outHtml = '<table style="border-collapse: collapse">';
 
             for (let p of propOrder) {
-                outHtml += `<tr><td style="border: solid black 1px">${p}</td><td style="border: solid black 1px">${crashProps[p] || ''}</td></tr>`;
+                outHtml += `<tr>`;
+                outHtml +=  `<td style="border: solid black 1px">${p}</td>`;
+
+                let propVal = crashProps[p] || '';
+
+                if (p === 'DOCTNMBR'){
+                    propVal += `&nbsp;<a href="${cnst.CRASH_REPORT_DOWNLOAD + crashProps[p]}" download="download" class="crash-download"/>`
+                }
+
+                outHtml +=  `<td style="border: solid black 1px">${propVal}</td>`;
+                outHtml +=  `</tr>`;
             }
             outHtml += '</table>';
 

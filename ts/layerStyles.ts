@@ -37,20 +37,71 @@ export const crashBySevStyle = (sev: string): Style => {
 };
 
 export const selectionStyle = new Style({
-        image: new CircleStyle({
-            radius: 8,
-            // fill: new Fill({color: ''),
-            stroke: new Stroke({color: 'cyan', width: 2})
-        })
-    });
+    image: new CircleStyle({
+        radius: 8,
+        // fill: new Fill({color: ''),
+        stroke: new Stroke({color: 'cyan', width: 2})
+    })
+});
+
+export function selectionExtentStyle(): (f: Feature) => Style {
+
+    let cache = {};
+
+    return (f: Feature) => {
+
+        let theType = f.getProperties()['type'] || 'none';
+
+        if (cache[theType]) {
+            return cache[theType];
+        }
+
+        let strokeColor = 'darkgray';
+        let fillColor = 'rgba(125,125,125,0.3)';
+
+        switch (theType) {
+            case 'new':
+            case 'add':
+                strokeColor = 'rgb(255,165,0)';
+                fillColor = 'rgba(255,165,0,0.12)';
+                break;
+
+            case 'subset':
+                strokeColor = 'rgb(0,0,255)';
+                fillColor = 'rgba(0,0,255,0.12)';
+                break;
+            case 'remove':
+                strokeColor = 'rgb(255,0,0)';
+                fillColor = 'rgba(255,0,0,0.12)';
+                break;
+
+            default:
+                break;
+        }
+
+
+        cache[theType] = new Style({
+            stroke: new Stroke({
+                color: strokeColor,
+                width: 2
+            }),
+            fill: new Fill({
+                color: fillColor,
+            })
+        });
+
+        return cache[theType];
+
+    }
+}
 
 export const selectionOneStyle = new Style({
-        image: new CircleStyle({
-            radius: 8,
-            fill: new Fill({color: 'cyan'}),
-            stroke: new Stroke({color: 'cyan', width: 2})
-        })
-    });
+    image: new CircleStyle({
+        radius: 8,
+        fill: new Fill({color: 'cyan'}),
+        stroke: new Stroke({color: 'cyan', width: 2})
+    })
+});
 
 export const vectorLayerStyle = (feature: Feature) => {
     let sev = feature.getProperties()['injSvr'];

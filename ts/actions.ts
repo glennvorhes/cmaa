@@ -18,9 +18,9 @@ export const OPERATION_UNION = 'OPERATION_UNION';
 export const OPERATION_SUBSET = 'OPERATION_SUBSET';
 export const OPERATION_REMOVE = 'OPERATION_REMOVE';
 
-export const SELECTION_BOX = 'SELECTION_BOX';
-export const SELECTION_LINE = 'SELECTION_LINE';
-export const SELECTION_POLYGON = 'SELECTION_POLYGON';
+// export const SELECTION_BOX = 'SELECTION_BOX';
+// export const SELECTION_LINE = 'SELECTION_LINE';
+// export const SELECTION_POLYGON = 'SELECTION_POLYGON';
 
 
 export interface iSetQueryResults extends Redux.Action{
