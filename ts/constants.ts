@@ -17,6 +17,10 @@ export const crashPointsC = lyr.crashVector('C', 7);
 // export const crashPointsP = lyr.crashVector('P', 6);
 export const crashPointsO = lyr.crashVector('O', 5);
 
+export const crashReportDownload = (
+    (document.getElementById('crashReports')
+    ) as HTMLInputElement).value === 'true';
+
 
 export const selectionLayer = new VectorLayer({
     source: new VectorSource(),
@@ -37,9 +41,7 @@ export const selectionOneLayer = new VectorLayer({
 });
 
 
-
 export const crashSevList = ['K', 'A', 'B', 'C', 'O'];
-
 
 
 export const parser = new jsts.io.OL3Parser();

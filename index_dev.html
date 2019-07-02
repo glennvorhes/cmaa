@@ -14,6 +14,13 @@
     </script>
 </head>
 <body>
+
+<form name="crashMapForm" id="crashMapForm" method="post" action="/testing/crash-data/crashMap.do">
+<!--<input type="hidden" name="queryId" value="1284" id="queryId">-->
+<!--<input type="hidden" name="totalRecords" value="298" id="totalRecords">-->
+<input type="hidden" name="crashReports" value="true" id="crashReports">
+</form>
+
 <div id="root"></div>
 <script src="https://unpkg.com/jsts@2.0.2/dist/jsts.min.js"></script>
 <script src="ts/crashMap.tsx"></script>

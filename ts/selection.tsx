@@ -434,7 +434,7 @@ class SelectionMode extends React.Component<{ selectionModeChange: (s: string) =
                 {
                     display: this.state.expanded ? '' : 'none',
                     position: 'absolute',
-                    width: '131px',
+                    width: '132px',
                     top: '-1px',
                     left: '32px',
                     // backgroundColor: 'lightgray',

@@ -4,42 +4,24 @@ import $ = require("jquery");
 import {connect, Provider} from "react-redux";
 import {SelectionInfo} from "./SelectionInfo";
 import * as ajx from './ajax';
-
 import 'webmapsjs/dist/import-queryui';
-
 import * as store from './store'
 import Map from 'ol/WebGLMap.js';
-import Feature from 'ol/Feature';
 import {LayerSwitcher} from './layerSwitcher';
 import View from "ol/View";
 import VectorLayer from 'ol/layer/Vector.js';
 import EsriJSON from 'ol/format/EsriJSON';
-import * as lyr from './layers';
 import {accordionSetup} from './accordionSetup';
 import * as act from './actions';
-
 import * as cnst from './constants';
 import * as cnstEl from './constantEls';
-
-import * as cond from 'ol/events/condition';
-import {DragBox, Select} from 'ol/interaction.js';
-
 import * as intf from './interfaces';
 import {Legend} from './Legend';
 import {Popup} from "./popup";
-import {Selection_operation} from "./selection_operation";
-import {Box2, Line2, Poly2, Selection} from './selection';
-import * as sel from './selection';
+import {Selection} from './selection';
 import {Loading} from "./loading";
-
 import ScaleLine from 'ol/control/ScaleLine';
-
-import Draw from 'ol/interaction/Draw';
-import * as geomType from 'ol/geom/GeometryType';
-import VectorSource from "ol/source/Vector";
-
 import DoubleClickZoom from 'ol/interaction/DoubleClickZoom';
-import {selectionLayer} from "./constants";
 
 
 const esriJson = new EsriJSON();
