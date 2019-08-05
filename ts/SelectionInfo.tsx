@@ -55,6 +55,8 @@ function getCrashInfo(docNum: string) {
 class _SelectionInfo extends React.Component<{ features: Feature[], map: Map }, {}> {
 
 
+
+
     render() {
         let selectDivContent = <h4>No crashes selected</h4>;
 
@@ -75,6 +77,10 @@ class _SelectionInfo extends React.Component<{ features: Feature[], map: Map }, 
                 let props = f.getProperties();
                 let crsh = props['id'];
                 let sev = props['injSvr'];
+
+                let crashDownLoadLink = cnst.allowCrashReportDownload ?
+                    <a href={cnst.CRASH_REPORT_DOWNLOAD + crsh} download="download" className="crash-download"/> :
+                    undefined;
 
                 spans.push(<div key={crsh} style={{display: 'inline-block', margin: '0 4px'}}><span data-crash={crsh} data-x={ext[0]} data-y={ext[1]} style={
                     {
@@ -110,7 +116,8 @@ class _SelectionInfo extends React.Component<{ features: Feature[], map: Map }, 
                         }
                     }
                 }>{crsh}:{sev}</span>
-                    <a href={cnst.CRASH_REPORT_DOWNLOAD + crsh} download="download" className="crash-download"/>
+                    {crashDownLoadLink}
+                    {/*<a href={cnst.CRASH_REPORT_DOWNLOAD + crsh} download="download" className="crash-download"/>*/}
                 </div>);
 
             }

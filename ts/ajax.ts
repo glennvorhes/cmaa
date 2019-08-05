@@ -35,7 +35,7 @@ export function getCrashInfo(crsh: string, container?: HTMLDivElement) {
 
                 let propVal = crashProps[p] || '';
 
-                if (p === 'DOCTNMBR'){
+                if (p === 'DOCTNMBR' && cnst.allowCrashReportDownload){
                     propVal += `&nbsp;<a href="${cnst.CRASH_REPORT_DOWNLOAD + crashProps[p]}" download="download" class="crash-download"/>`
                 }
 

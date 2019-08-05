@@ -17,7 +17,7 @@ export const crashPointsC = lyr.crashVector('C', 7);
 // export const crashPointsP = lyr.crashVector('P', 6);
 export const crashPointsO = lyr.crashVector('O', 5);
 
-export const crashReportDownload = (
+export const allowCrashReportDownload = (
     (document.getElementById('crashReports')
     ) as HTMLInputElement).value === 'true';
 
