@@ -4,13 +4,14 @@ import {toStringHDMS} from 'ol/coordinate.js';
 import {toLonLat} from 'ol/proj.js';
 import Vector from 'ol/layer/Vector';
 import Feature from 'ol/Feature';
+import {getState} from './store';
 
 class _PopupTracker {
-    private cl: (dv: HTMLDivElement) => any;
+    private cl: (dv: HTMLDivElement, data?: Object) => any;
     readonly fn: (f: Feature) => string;
     readonly lyr: Vector;
 
-    constructor(lyr: Vector, fn: (f: Feature) => string, cl: (dv: HTMLDivElement) => any) {
+    constructor(lyr: Vector, fn: (f: Feature) => string, cl: (dv: HTMLDivElement, data?: Object) => any) {
         this.lyr = lyr;
         this.fn = fn;
         this.cl = cl;
@@ -25,8 +26,8 @@ class _PopupTracker {
         return this.fn(f);
     }
 
-    runCallback(contentDiv: HTMLDivElement) {
-        this.cl(contentDiv);
+    runCallback(contentDiv: HTMLDivElement, data?: Object) {
+        this.cl(contentDiv, data);
     }
 }
 
@@ -39,10 +40,16 @@ export class Popup {
     private popupCloser: HTMLAnchorElement;
     private popupContent: HTMLDivElement;
     private map: Map;
-    readonly overlay: Overlay;
+    private overlay: Overlay;
     private popupTrackers: _PopupTracker[] = [];
 
-    constructor(m: Map) {
+    constructor(m?: Map) {
+        if (m){
+            this.init(m);
+        }
+    }
+
+    init(m: Map){
         this.map = m;
         this.mapDiv = this.map.getTargetElement() as HTMLDivElement;
         let popupDiv = document.createElement('div');
@@ -70,8 +77,9 @@ export class Popup {
             this.closePopup();
         };
         this.map.addOverlay(this.overlay);
+
         this.map.on('pointermove', (e) => {
-            if (e['dragging']) {
+            if (e['dragging'] || getState().isSelecting) {
                 return;
             }
             let vLayers: Vector[] = [];
@@ -89,6 +97,10 @@ export class Popup {
             }
         });
         this.map.on('singleclick', (e) => {
+            if (getState().isSelecting) {
+                return;
+            }
+
             let vLayers: Vector[] = [];
             for (let t of this.popupTrackers) {
                 vLayers.push(t.lyr);
@@ -100,25 +112,62 @@ export class Popup {
             }) as Feature[];
             if (feats) {
                 let coordinate = e['coordinate'] as [number, number];
-                let featTrack: Array<{ f: Feature, t: _PopupTracker }> = [];
+                let featTrack: Array<{ feat: Feature, tracker: _PopupTracker }> = [];
                 for (let f of feats) {
                     for (let t of this.popupTrackers) {
                         if (t.layerHasFeature(f)) {
-                            featTrack.push({f: f, t: t})
+                            featTrack.push({feat: f, tracker: t})
                         }
                     }
                 }
-                if (featTrack.length === 0){
-                    return;
-                } else if (featTrack.length === 1) {
-                    this.popupHtml = featTrack[0].t.getHtml(featTrack[0].f);
-                    this.overlay.setPosition(coordinate);
-                    featTrack[0].t.runCallback(this.popupContent);
-                } else {
 
+                let callbackData: Array<{ layerName: string, crashId: string }> = [];
+
+                for (let t of featTrack) {
+                    if (t.tracker.lyr.get('crashLayer')) {
+                        callbackData.push(
+                            {
+                                layerName: t.tracker.lyr.get('name'),
+                                crashId: t.feat.getProperties()['id']
+                            })
+
+                    }
                 }
 
 
+                if (featTrack.length === 0) {
+                    return;
+                } else if (featTrack.length === 1) {
+                    let featTrackObj = featTrack[0];
+
+                    this.popupHtml = featTrackObj.tracker.getHtml(featTrackObj.feat);
+                    this.overlay.setPosition(coordinate);
+                    featTrackObj.tracker.runCallback(
+                        this.popupContent,
+                        {callbackData: callbackData
+                        });
+                } else {
+                    // for (let m of featTrack) {
+                    //     // console.log(m.tracker.lyr.get('name'))
+                    //     // console.log(m);
+                    // }
+
+                    let popContent = `<div class="multipop-header">`;
+                    popContent += `<span id="popup-previous" title="Previous">&#9668;</span>`;
+                    popContent += `<span id="popup-next" title="Next">&#9658;</span>`;
+                    popContent += `<span id="popup-index">1</span>`;
+                    popContent += ` of ${featTrack.length}`;
+                    popContent += `</div>`;
+                    popContent += '<div id="popup-crash-info"></div>'
+
+                    this.popupHtml = popContent;
+
+                    this.overlay.setPosition(coordinate);
+                    let featTrackObj = featTrack[0];
+                    featTrackObj.tracker.runCallback(
+                        this.popupContent,
+                        {callbackData: callbackData
+                        });                }
             } else {
                 this.closePopup();
             }
@@ -129,7 +178,7 @@ export class Popup {
         return this.popupContent.innerHTML;
     }
 
-    set popupHtml(s: string){
+    set popupHtml(s: string) {
         this.popupContent.innerHTML = s;
     }
 
@@ -141,14 +190,14 @@ export class Popup {
 
     addCoordinatePopup() {
         this.map.on('singleclick', (evt) => {
-            var coordinate = evt['coordinate'] as [number, number];
-            var hdms = toStringHDMS(toLonLat(coordinate));
+            let coordinate = evt['coordinate'] as [number, number];
+            let hdms = toStringHDMS(toLonLat(coordinate));
             this.popupContent.innerHTML = `<p>You clicked here:</p><code>${hdms}</code>`;
             this.overlay.setPosition(coordinate);
         });
     }
 
-    addVectorOlPopup(lyr: Vector, fn: (f: Feature) => string, cl: (dv?: HTMLDivElement) => any = (dv: HTMLDivElement) => {
+    addVectorOlPopup(lyr: Vector, fn: (f: Feature) => string, cl: (dv?: HTMLDivElement, data?: Object) => any = (dv: HTMLDivElement) => {
     }) {
         for (let t of this.popupTrackers) {
             if (lyr === t.lyr) {
@@ -156,9 +205,6 @@ export class Popup {
             }
         }
         this.popupTrackers.push(new _PopupTracker(lyr, fn, cl));
-
     }
-
-
 }
 

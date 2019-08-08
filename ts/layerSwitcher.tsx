@@ -741,8 +741,9 @@ export class LayerSwitcher extends React.Component<{
             let layerId = this.state.layers[i];
             let conf = layerConfigs[layerId];
 
-            divList.push(<div key={conf.name} style={{
-                flex: '1',
+            divList.push(
+                <div key={conf.name} style={{
+                flex: '1 1 auto',
                 padding: '4px',
                 margin: '3px',
                 border: 'solid black 1px',

@@ -19,5 +19,10 @@ export function crashVector(sev?: string, z?: number): VectorLayer {
         opt['zIndex'] = z;
     }
 
-    return new VectorLayer(opt);
+    let vectorLayer = new VectorLayer(opt);
+
+    vectorLayer.set('name', sev);
+    vectorLayer.set('crashLayer', true);
+
+    return vectorLayer
 }

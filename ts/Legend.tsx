@@ -4,6 +4,7 @@ import {iState} from './store';
 import * as intf from './interfaces';
 import * as act from './actions';
 import Feature from 'ol/Feature';
+import * as cnst from './constants';
 
 class _Legend extends React.Component<{
     res: intf.iQueryResults,
@@ -124,7 +125,10 @@ export const Legend = connect(
     (dispatch) => {
         return {
             checkChange: (sev: string, chk: boolean) => {
+                cnst.selectionExtentLayer.getSource().clear();
+                cnst.selectionLayer.getSource().clear();
                 dispatch({type: act.SET_LYR_CHECKED, sev: sev, checked: chk} as act.iSetLayerChecked);
+                dispatch({type: act.SET_SELECTED_FEATURES, features: []} as act.iSetSelectedFeatures);
             }
         }
     }

@@ -27,11 +27,12 @@ export function getCrashInfo(crsh: string, container?: HTMLDivElement) {
 
             let crashProps = resultObj['props'];
 
-            let outHtml = '<table style="border-collapse: collapse">';
+            // let outHtml = '<div class="crash-attribute-table-container">';
+            let outHtml = '<table class="crash-attribute-table" style="border-collapse: collapse">';
 
             for (let p of propOrder) {
                 outHtml += `<tr>`;
-                outHtml +=  `<td style="border: solid black 1px">${p}</td>`;
+                outHtml +=  `<td>${p}</td>`;
 
                 let propVal = crashProps[p] || '';
 
@@ -39,7 +40,7 @@ export function getCrashInfo(crsh: string, container?: HTMLDivElement) {
                     propVal += `&nbsp;<a href="${cnst.CRASH_REPORT_DOWNLOAD + crashProps[p]}" download="download" class="crash-download"/>`
                 }
 
-                outHtml +=  `<td style="border: solid black 1px">${propVal}</td>`;
+                outHtml +=  `<td>${propVal}</td>`;
                 outHtml +=  `</tr>`;
             }
             outHtml += '</table>';
@@ -51,7 +52,6 @@ export function getCrashInfo(crsh: string, container?: HTMLDivElement) {
 
             return outHtml;
 
-            // (document.getElementById('selection-info') as HTMLDivElement).innerHTML = outHtml;
         },
         'json');
 }

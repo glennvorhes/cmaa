@@ -55,8 +55,6 @@ function getCrashInfo(docNum: string) {
 class _SelectionInfo extends React.Component<{ features: Feature[], map: Map }, {}> {
 
 
-
-
     render() {
         let selectDivContent = <h4>No crashes selected</h4>;
 
@@ -82,47 +80,70 @@ class _SelectionInfo extends React.Component<{ features: Feature[], map: Map }, 
                     <a href={cnst.CRASH_REPORT_DOWNLOAD + crsh} download="download" className="crash-download"/> :
                     undefined;
 
-                spans.push(<div key={crsh} style={{display: 'inline-block', margin: '0 4px'}}><span data-crash={crsh} data-x={ext[0]} data-y={ext[1]} style={
-                    {
-                        display: 'inline-block', margin: '0 4px', cursor: 'pointer', color: 'blue',
-                        textDecoration: 'underline'
-                    }
-                } onClick={
-                    (e) => {
-                        cnst.selectionOneLayer.getSource().clear();
-                        let target = e.target as HTMLSpanElement;
-                        let docNum = target.getAttribute('data-crash');
+                spans.push(<div key={crsh} style={{display: 'inline-block', margin: '0 4px'}}>
+                    <span data-crash={crsh}
+                          data-x={ext[0]}
+                          data-y={ext[1]}
+                          style={
+                              {
+                                  display: 'inline-block',
+                                  margin: '0 4px',
+                                  cursor: 'pointer',
+                                  color: 'blue',
+                                  textDecoration: 'underline'
+                              }
+                          } onClick={
+                        (e) => {
+                            cnst.selectionOneLayer.getSource().clear();
+                            let target = e.target as HTMLSpanElement;
+                            let docNum = target.getAttribute('data-crash');
 
-                        let x = parseFloat(target.getAttribute('data-x'));
-                        let y = parseFloat(target.getAttribute('data-y'));
-                        getCrashInfo(docNum);
+                            let x = parseFloat(target.getAttribute('data-x'));
+                            let y = parseFloat(target.getAttribute('data-y'));
+                            getCrashInfo(docNum);
 
 
-                        let f = new Feature();
+                            let f = new Feature();
 
-                        f.setGeometry(new Point([x, y]));
+                            f.setGeometry(new Point([x, y]));
 
-                        cnst.selectionOneLayer.getSource().addFeature(f);
+                            cnst.selectionOneLayer.getSource().addFeature(f);
 
-                        this.props.map.getView().animate({
-                            center: [x, y],
-                            duration: 300
-                        });
+                            this.props.map.getView().animate({
+                                center: [x, y],
+                                duration: 300
+                            });
 
-                        // this.props.map.getView().setCenter([x, y]);
+                            // this.props.map.getView().setCenter([x, y]);
 
-                        if (this.props.map.getView().getZoom() < 12) {
-                            this.props.map.getView().setZoom(12);
+                            if (this.props.map.getView().getZoom() < 12) {
+                                this.props.map.getView().setZoom(12);
+                            }
                         }
-                    }
-                }>{crsh}:{sev}</span>
+                    }>{crsh}:{sev}</span>
                     {crashDownLoadLink}
                     {/*<a href={cnst.CRASH_REPORT_DOWNLOAD + crsh} download="download" className="crash-download"/>*/}
                 </div>);
 
             }
 
-            selectDivContent = <div>{spans}</div>
+            selectDivContent = <div>
+                <a style={
+                    {
+                        display: 'block',
+                        cursor: 'pointer',
+                        textDecoration: 'underline',
+                        color: 'blue',
+                        marginBottom: '5px'
+                    }
+                }
+                   onClick={(e) => {
+                       e.preventDefault();
+                       alert('Not yet implemented')
+                   }}
+                >Download Crash Table</a>
+                {spans}
+            </div>
         }
 
 

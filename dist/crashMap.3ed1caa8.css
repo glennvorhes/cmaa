@@ -338,10 +338,6 @@
 .ol-zoom {
   left: 32px;
 }
-#popup-content {
-  max-height: 140px;
-  overflow-y: auto;
-}
 header {
   display: flex;
   background: #cecece;
@@ -444,6 +440,12 @@ header {
 #accordion-container-collapsed.collapsed #shower {
   display: none;
 }
+#unmapped-list {
+  background-color: #808080;
+}
+#unmapped-list p {
+  margin: 7px 0;
+}
 #map {
   height: 100%;
   flex: 1;
@@ -471,7 +473,7 @@ header {
 #toolbar {
   position: absolute;
   left: 0;
-  top: 160px;
+  top: 100px;
   background-color: white;
   z-index: 5;
 }
@@ -501,6 +503,10 @@ header {
 #toolbar .ruler {
   background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAcCAMAAABBJv+bAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAMAUExURQAAABJKfXZTMHdUMnhWM3lWNHxaN31bOn5dO35dPH9fPQBEgQRHgwBMjwpMhgNNkAlRkg1UlBNSix1Tgh9VhRhblwxboRVhpBxmpyNekypnnjJjjzhhhTRqmz1xnyRqqDBroDJ6uU9zklF6nkx9qkx+q0B8sUiIv1SDrVqGrV2Ir12PumSOs2eQtHCRrnaUr3+XrXCXuXSZunyevHmix4JaM4hdN4pfOYFhPophNotgOoxiPINkQo5mQ45sRZhyTJ16Tpp2Vpx2UKB7VpyEa6yHVrGNX7qVXqiGYKiHa6+NZ6aNca2PcbOPaLGQarWTbrGXdrebe7iadLuge8ihZMKkftOoYtmxbd+6euC7e+C7fOC8fYWdspWrv6WZjaaajaaajqebj6ibj76jgbyiib20q4Grz4qsyoev0qC3zam8zai8z6e90LTAzLPK3rnF0LvN3MaqgMmrhMqthcqth8iuicauksqwi86zkMy1lcuzm9OzgdG0hty6g9u9i9O3kNS7lNW6ltnBnt3Cmt7EndTApNfDqN7FotHHvNXLvt7OueTPr+vTq+vUrOLRueLSufLbs/LctPbcsPbdsfbes/bft/fhuvTgvvfivcbGxsnJycrKyszNz8/Pz8fN08fP1cbO1svP08jP1s3P0c/R0s7V3NrPwd/Tw9DQ0NHR0dLS09PU1NfX19PW2NPX3NbY2tba3dfc39jY2NnZ2dra2tra29rc3dzc3N3d3d7e3t7f38XX58rZ5cvb6Nbf59vg5N/g4N/g4d/h49zh5tvk69rk7d7j6OPXxenZwujbx+veyOzfyuDc2PDfw+3j0u/l1O7l1e/m1u3m2vfjwfTiw/flxvPmz/fnyvjpzvDm1/Hn2PPo1vHo2Pjr1Pjt2eDg4OLi4+Pk5uXl5ebm5+fn6OPo6+Lo7Onp6ejp6uvr6+vr7O3t7e7u7u/v7/nw4PX19fb29gAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAd+058AAAEAdFJOU////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////wBT9wclAAAACXBIWXMAAA7DAAAOwwHHb6hkAAAAGHRFWHRTb2Z0d2FyZQBwYWludC5uZXQgNC4xLjb9TgnoAAABnklEQVQ4T2P4jxfQSfrobhhjL5QBBHDpPWmKRyCsDPW8ZxAWXPppupq4xD4I20RMXrsAwoRKHzNUEOQVUNHI/H9YR0OKl19UNQcsDpXeaCwnxM2npZv9Yr+Rriw3j6Rm1hOwBER664ZYZRHhpQ8O7Np18KE+o7Re/voDYAmI9Pa5W+fHyCyYM2v2rJlrDZRyt61ceR8sAXXa/81LFi469Ort2zevH6+bt3jFzucQYZj0/wdbVq16+eHD+/fbV67e/ggqiJD+/3jH9jcg6Qdbd0G1AgFE+vwdELh1EwwuAsGFc5fAEmDp02ER0dFRIBAJA+F1COmTIdfu3b1x/erlGdOmTpk8CQRqaxDSx91vv7t3ourslent/r0TJzT79kyoLkRIL3c91dXX5tld0Vhi3VJcX2TVUuwWjJBe5tCfUlbp2OTsF2re4OQFIiwDENKddq0+gcm25fYeQWalEMLUGyHdwWLDzsnFbMHKxsEEJZhcENJnksAgMTExAQTi4+Pj4lIR0v+3b9++FQi2bNmyGQg2AcEa1CjBAWgo/f8/ANaAlM11xIPuAAAAAElFTkSuQmCC') no-repeat;
   margin-top: 15px;
+}
+#toolbar .zoom-extent {
+  background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABcAAAAWCAYAAAArdgcFAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAYdEVYdFNvZnR3YXJlAHBhaW50Lm5ldCA0LjEuNv1OCegAAASySURBVEhLtZX5T9N3GMf9E3b84IzMxGxmumSGiZmKxnnApqCDqogcHigt0FWOUa6CpQhyFcrZltsyDilFoZZLvAAREMSCGCFuU1k0c+p0Ip5Z8tqXJWaD1v20/fD64fPO87zyyfN5vvnOAf437IazuXTtOhesV+i1dtJn7REi+3WzsRu+Yej6IOVNx1HoiwnNTkaukRCZHUWsrpZySy8Do2NCmf3eaeyG02irlURkbiQyV4VCm4hKH8Lh8kOE5pXgn9bBZnkFO6IS0FbrhHL7DpugrctEjNofWZoHcTol2cfPo2u5SmHzEBrzKIl1Y8j0PUiy0wlJFxGa6o4iS8Llq31C+0zXjEP/8CApZaX4qY4gKygjrf4ihs671PdPcqx3korOR6ibLiMvKiFEEAalrSPwsBP+0cvR16YJin+R59W1sj+zCXGBFWX9PbQdjzENTNEy8pyW4ec0DDyhqH0QZUUsMfptxBZvIrLQGUmyI1KVO6YWg6B5i1xW2I93hpXoqjvktD2iuncKy8gLzo69pHP8Je2jz6juuY3aGE2+xYfScwGkGd2JyF3B9rBFqEuiBI0dednJHgJzBzhQeANVw31Kzk9itj6n96dXjNx5zbBA5/gDdOZ4FEU7keUGEZwjR6rxJFSzEp+YxcjTfbGcbhR0s+Rxwoz9MroILr7NkcbfONr9lLarLxiaeM2N+38wfu8V3WMT5JuCSK70IbpYiiQvk11qE26x8biGrMQ77EsKDNm28mBVOF6HG5EU3SRZkJd3PaVZmHOfcPPhn6e49OMNWi7XYOoLp/ailKKOEBJrwgjISmBbvC8bxJ+x6cDnpBTE28qlSj9ECg17cgeJMz4kv+MJx/qfCXN+wZnR27RZT9JsTaDrVgLnbkbTaA1G2+qFXLcBceoyvgpaiMs+R5Ly4mzlSs23iKKC2J5iRFrxK6rjjynomKTq4hQ13ReEG6vpmUik81Y87WMRGPsDhf33IsngIuy7IJcsxE28msyiDFt5WW2+8Ci+uCm0+BXc5aDhAYr6R6SYfye9qRp9hz8tY0GYR4Kp6d2LrnU7R6pd/9oUP8UnrN87j93feVJzwmQrbz/TzAHFVjbK/HBXNeBTcA9x6QMOVj5EVtpKjCGCkrMe6E99Q9aJr0msXEt4rhN7lItxD57Pcs93kCr8OX+h21Y+TaImFFGoKy7hMlwTL+GhnmBn3i/szLmGT3YdgfmR7MuJwjd1D/5Ja/GNX8QWqQPOXu/i4udIRmGyoPnbN0Neb64h5JA/a/Z74SQ9weqYK6xTjrMx6QfWHxpkdWQtK8KOsUySyhqJGy6B83D2fg+nrXM5mCDBcqpZ0LxFPk1WsR5XcQxLd1fx6T4zSyWncZR2CnSxNPgcSwJa+dinjCU7RCwTvc9KkQPuAev53jjz059mxmGa4ZERDHVNeIdn8aFbOvO3aFkgKmfBtqM4eJTxgZuWua5yHNat4AuPjwhVSjE3NwmtMz3T2ARvaDh5ipzSBgKF7dkcmMaqXUk4esazyiuBreJoIpKUFBkKaW63COX2HXbDNwwMDmFqakV31IhaV0VqvoEsbSXFlTVY2toYEn59s3v+id3wv4E5fwKPr4GKbbDOKQAAAABJRU5ErkJggg==') no-repeat;
+  background-position: 3px 3px;
 }
 #toolbar .clear-selection {
   background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAYdEVYdFNvZnR3YXJlAHBhaW50Lm5ldCA0LjEuNv1OCegAAAJRSURBVDhPrZPLTxpRFMb93+qmVsUHL191ZRcGq5ICrU0VFFdUkAVscAHCDJWkWhxYuXFBSNBE4sZoCLLQBAguMGIUeXydc1JNpjObPm7yZe7r/Oac797bA+C/SHPyb6QYfFlegcPxCTa7A3b7R9hsdlitH7C4aMX8gqz5BczNzcNieS9rjuefY18gsZiARTlIjH/Dzk6CN62tubG39wPJZBL7+xIkKYVUipTmPQaDUQ2KyqDlFRdKpRKur6/h9XohiiKq1SoajQYeHh7QbDZxf3+PWq2GfD4Pvd6gBgliHCsyiCCVSgXxeByJRAJnZ2cMeXx8xM3NDS4uLpDJZHh9cFCnARJEOJ0uhlBALpeDIAhyaXsMubu7477b7YbH4+H+wMCgGkQeEYgg9Xqdv+l0GoFAAIeHhwiFQpzh8fExyuUyWzAyPKoGRWMxBhHk2ZNiscjm+v1+1tHREW5vbymYfdIGRWWQa1VhLJVUKBSwtbWFYDDIWVDrdrt8CMNDIzRUgra3o3JGqy+QVquFdrvNYDLc5/Ox0Z1Oh+epPJ1uSA2KRAjkUkAoiP5O5ayvr+Pk5ISzfHp6wtXVlbbZkcg2H//vEGqUVTgcRjab5ZLoLl1eXqL/TT8tK0HhcEQGOVUQalTuwcEB3/DT01M+kPPzc/S97qNlJYgymp21/HoCKX4OkiTx09j9vovNTT+Wlj5j4+sGBPmqkPm9r3rVINLMzDtMT09jauotJienMDE+ifGxCYyZx2AymWE0muT3ZYB+VM8ym81ymAboX6Q5+edCz0/++d3gIcMpowAAAABJRU5ErkJggg==') no-repeat;
@@ -554,6 +560,35 @@ header {
 }
 #dummy {
   color: orange;
+  cursor: not-allowed;
+}
+.ol-popup {
+  cursor: default;
+}
+.multipop-header {
+  margin-top: 7px;
+  padding: 3px 0 3px 3px;
+  background-color: lightblue;
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+.multipop-header span {
+  cursor: pointer;
+  padding: 0 3px;
+}
+#popup-content {
+  height: 250px;
+  overflow-y: auto;
+  margin-top: 9px;
+}
+.crash-attribute-table {
+  border-collapse: collapse;
+  width: 262px;
+}
+.crash-attribute-table td {
+  border: solid black 1px;
 }
 
 

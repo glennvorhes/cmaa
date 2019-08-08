@@ -41,10 +41,9 @@ export const disclamerDiv = <div>
     reported crash locations on the DT4000 crash report.
 
     <br/><br/>
-    See the February 2019
-    <a href="/documents/applications/crash-data/WISLR_Crash_Mapping_Update_201902.pdf" target="_blank">WISLR
+    See the February 2019 <a href="/documents/applications/crash-data/WISLR_Crash_Mapping_Update_201902.pdf" target="_blank">WISLR
         Crash Mapping Update</a> summary document for additional information about the crash
-    mapping data source.
+    mapping data source.<br/><br/>
 </div>;
 
 export const aboutH3 = <h3>About</h3>;
@@ -96,4 +95,12 @@ export const aboutDiv = <div>
     way to formulate a query selection, especially for intersection based queries. <b>Based on the
     particular search criteria, your results may differ from official crash counts reported by
     WisDOT.</b>
+
+    <p><b>Disclaimer</b></p>
+
+    {disclamerDiv}
 </div>;
+
+export const helpH3 = <h3>Help</h3>;
+
+export const helpDiv = <div></div>;

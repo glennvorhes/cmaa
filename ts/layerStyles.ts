@@ -14,14 +14,12 @@ import Feature from "ol/feature";
 
 export const crashOrder: string[] = ['K', 'A', 'B', 'C', 'P', 'O'];
 
-let colors = {
+export const crashColors = {
     K: '#ff3f4f',
     A: '#fba25b',
     B: '#fbea5b',
     C: '#5858ff',
-    P: '#61d961',
     O: '#61d961',
-    // O: '#b6b6b6'
 };
 
 let styleCache = {};
@@ -30,7 +28,7 @@ export const crashBySevStyle = (sev: string): Style => {
     return new Style({
         image: new CircleStyle({
             radius: 7,
-            fill: new Fill({color: colors[sev] || 'grey'}),
+            fill: new Fill({color: crashColors[sev] || 'grey'}),
             stroke: new Stroke({color: 'black', width: 0.5})
         })
     })
@@ -109,7 +107,7 @@ export const vectorLayerStyle = (feature: Feature) => {
         styleCache[sev] = new Style({
             image: new CircleStyle({
                 radius: 7,
-                fill: new Fill({color: colors[sev] || 'grey'}),
+                fill: new Fill({color: crashColors[sev] || 'grey'}),
                 stroke: new Stroke({color: 'black', width: 0.5})
             })
         })

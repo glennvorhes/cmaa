@@ -83,17 +83,33 @@ function selectedFeatures(state: Feature[] = [], action: act.iSetSelectedFeature
 }
 
 
-function selection(state: string = null, action: act.iSetSelection){
-    if (action.type === act.SET_SELECTION){
-        return action.selection;
+// function selection(state: string = null, action: act.iSetSelection){
+//     if (action.type === act.SET_SELECTION){
+//         return action.selection;
+//     } else {
+//         return state;
+//     }
+// }
+
+function loading(state: boolean = false, action: act.iSetLoading){
+    if (action.type === act.SET_LOADING){
+        return action.loading;
     } else {
         return state;
     }
 }
 
-function loading(state: boolean = false, action: act.iSetLoading){
-    if (action.type === act.SET_LOADING){
-        return action.loading;
+function cluster(state: boolean = false, action: act.iSetCluster){
+    if (action.type === act.SET_CLUSTER){
+        return action.cluster;
+    } else {
+        return state;
+    }
+}
+
+function isSelecting(state: boolean = false, action: act.iSetIsSelecting){
+    if (action.type === act.SET_IS_SELECTING){
+        return action.isSelecting;
     } else {
         return state;
     }
@@ -108,7 +124,8 @@ function map(state: Map = null, action: act.iSetMap){
 }
 
 export const store = Redux.createStore(
-    Redux.combineReducers({queryResults, layerChecked, selectedFeatures, loading, selection, map})
+    Redux.combineReducers({queryResults, layerChecked,
+        selectedFeatures, loading, map, isSelecting, cluster})
 );
 
 export interface iState {
@@ -118,6 +135,8 @@ export interface iState {
     loading: boolean;
     selection: string;
     map: Map;
+    isSelecting: boolean;
+    cluster: boolean;
 }
 
 export function getState(): iState {

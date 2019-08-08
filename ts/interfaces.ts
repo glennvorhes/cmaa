@@ -3,6 +3,7 @@
 export interface iResultInner {
     queried: number;
     mapped: number;
+    unmappedList: string[];
 }
 
 export interface iQueryResults {
@@ -10,7 +11,7 @@ export interface iQueryResults {
     A?: iResultInner;
     B?: iResultInner;
     C?: iResultInner;
-    P?: iResultInner;
+    // P?: iResultInner;
     O?: iResultInner;
 }
 
