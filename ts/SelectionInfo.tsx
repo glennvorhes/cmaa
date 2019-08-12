@@ -94,6 +94,7 @@ class _SelectionInfo extends React.Component<{ features: Feature[], map: Map }, 
                               }
                           } onClick={
                         (e) => {
+
                             cnst.selectionOneLayer.getSource().clear();
                             let target = e.target as HTMLSpanElement;
                             let docNum = target.getAttribute('data-crash');
@@ -102,6 +103,8 @@ class _SelectionInfo extends React.Component<{ features: Feature[], map: Map }, 
                             let y = parseFloat(target.getAttribute('data-y'));
                             getCrashInfo(docNum);
 
+                            console.log(x, y)
+
 
                             let f = new Feature();
 
@@ -109,16 +112,16 @@ class _SelectionInfo extends React.Component<{ features: Feature[], map: Map }, 
 
                             cnst.selectionOneLayer.getSource().addFeature(f);
 
+                            if (this.props.map.getView().getZoom() < 12) {
+                                this.props.map.getView().setZoom(12);
+                            }
+
                             this.props.map.getView().animate({
                                 center: [x, y],
                                 duration: 300
                             });
 
-                            // this.props.map.getView().setCenter([x, y]);
 
-                            if (this.props.map.getView().getZoom() < 12) {
-                                this.props.map.getView().setZoom(12);
-                            }
                         }
                     }>{crsh}:{sev}</span>
                     {crashDownLoadLink}

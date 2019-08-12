@@ -6,12 +6,11 @@ import Map from 'ol/Map';
 import {searchIndicator, allPointLayer} from './constants';
 import Point from 'ol/geom/Point';
 import Feature from 'ol/Feature';
-import SortedFeatures from "webmapsjs/dist/olHelpers/SortedFeatures";
+import {SortedFeatures} from "./sortedFeatures";
 
 class _Search extends React.Component<{ map: Map }, {}> {
 
     sorted: SortedFeatures;
-
     textInput: HTMLInputElement;
 
     constructor(p, c) {
@@ -21,11 +20,11 @@ class _Search extends React.Component<{ map: Map }, {}> {
 
         this.state = {};
         this.initSorted()
-
     }
 
     initSorted() {
         this.sorted = new SortedFeatures(allPointLayer.getSource().getFeatures(), 'id');
+
     }
 
     componentDidMount() {
@@ -44,7 +43,8 @@ class _Search extends React.Component<{ map: Map }, {}> {
 
     getLoc() {
 
-        // CQL0L368WC
+        // console.log('here');
+
 
         searchIndicator.getSource().clear();
 
@@ -56,11 +56,14 @@ class _Search extends React.Component<{ map: Map }, {}> {
             this.initSorted();
         }
 
+        // console.log('here2');
+
         let searchInfo = this.textInput.value.trim();
 
         if (!searchInfo) {
             return;
         }
+
 
         let foundCrash = false;
 
@@ -70,7 +73,7 @@ class _Search extends React.Component<{ map: Map }, {}> {
             if (f) {
                 let fExt = f.getGeometry().getExtent();
                 this.props.map.getView().setCenter([fExt[0], fExt[1]]);
-                this.props.map.getView().setZoom(16);
+                this.props.map.getView().setZoom(10);
                 searchIndicator.getSource().addFeature(f);
                 foundCrash = true;
 
@@ -78,12 +81,15 @@ class _Search extends React.Component<{ map: Map }, {}> {
             }
         }
 
+        // console.log('here4')
+
         if (!foundCrash) {
+
+            // console.log('here5');
             $.get('https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/findAddressCandidates',
                 {
                     f: 'json',
                     SingleLine: searchInfo,
-                    // SingleLine: 'wacky not',
                     searchExtent: {
                         xmin: -10354584,
                         ymin: 5233180,
@@ -95,6 +101,7 @@ class _Search extends React.Component<{ map: Map }, {}> {
                     },
                     outSR: 102100
                 }, (d) => {
+                    // console.log(d);
                     if (d['candidates'] && d['candidates']['length'] > 0) {
                         let cand = d['candidates'][0];
 
@@ -154,4 +161,4 @@ export const Search = connect((s: iState) => {
     };
 }, (dispatch) => {
     return {}
-})(_Search)
+})(_Search);

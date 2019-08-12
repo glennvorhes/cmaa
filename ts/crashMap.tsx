@@ -185,7 +185,7 @@ class _CrashMap extends React.Component<{
 
                 let featureCount = cnst.allPointLayer.getSource().getFeatures().length;
 
-                if (featureCount === 1){
+                if (featureCount === 1) {
                     let ext1 = cnst.allPointLayer.getSource().getFeatures()[0].getGeometry().getExtent();
                     this.map.getView().setCenter([ext1[0], ext1[1]])
                     this.map.getView().setZoom(7);
@@ -398,11 +398,18 @@ class _CrashMap extends React.Component<{
 
     render() {
 
+        let unmappedInfo = document.getElementById('unmapped-info') as HTMLDivElement;
+
         let unMappedSpans = [];
 
-        for (let sv of ['K', 'A', 'B', 'C', 'O']){
-            for (let c of this.state.unmappedList[sv]){
-                unMappedSpans.push(<span key={`umapped-${c}`}>
+        for (let sv of ['K', 'A', 'B', 'C', 'O']) {
+            for (let c of this.state.unmappedList[sv]) {
+                unMappedSpans.push(<span key={`umapped-${c}`} data-docnum={c} onClick={
+                    (e) => {
+                        let docNum = (e.target as HTMLSpanElement).getAttribute('data-docnum');
+                        ajx.getCrashInfo(docNum, unmappedInfo)
+                    }
+                }>
                     {`${c}:${sv}`}
                     <a href={cnst.CRASH_REPORT_DOWNLOAD + c} download="download"
                        className="crash-download" title="Download crash report"/>
@@ -441,14 +448,22 @@ class _CrashMap extends React.Component<{
                             }} embed={false}/>
                         </div>
                         <h3>Unmapped Crashes</h3>
-                        <div id="unmapped-list">
-                            {unMappedSpans}
+                        <div id="unmapped-container" style={{display: 'flex', flexDirection: 'column', padding: 0}}>
+                            <div id="unmapped-list" style={{flex: 1, overflowY: 'auto', borderBottom: 'solid black 1px'}}>
+                                {unMappedSpans}
+                            </div>
+                            <div id="unmapped-info" style={{flex: 1, overflowY: 'auto'}}>
+                            </div>
+                        </div>
+                        {/*<div id="unmapped-list">*/}
+
+                            {/*{unMappedSpans}*/}
                             {/*<p style={{color: crashColors.K}}>{unmappedK}</p>*/}
                             {/*<p style={{color: crashColors.A}}>{unmappedA}</p>*/}
                             {/*<p style={{color: crashColors.B}}>{unmappedB}</p>*/}
                             {/*<p style={{color: crashColors.C}}>{unmappedC}</p>*/}
                             {/*<p style={{color: crashColors.O}}>{unmappedO}</p>*/}
-                        </div>
+                        {/*</div>*/}
                         {/*{cnstEl.disclamerH3}*/}
                         {/*{cnstEl.disclamerDiv}*/}
                         {cnstEl.helpH3}

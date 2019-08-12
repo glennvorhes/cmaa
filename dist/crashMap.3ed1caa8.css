@@ -443,6 +443,12 @@ header {
 #unmapped-list span {
   display: inline-block;
   margin-right: 6px;
+  color: blue;
+  text-decoration: underline;
+  cursor: pointer;
+}
+#unmapped-list span a {
+  margin-left: 4px;
 }
 #map {
   height: 100%;

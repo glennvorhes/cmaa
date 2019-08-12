@@ -16,6 +16,8 @@ import {OSM, Vector as VectorSource} from 'ol/source';
 import {Circle as CircleStyle, Fill, Stroke, Style} from 'ol/style';
 import Feature from 'ol/Feature';
 import * as act from "./actions";
+import {measureDrawStyle, measureStyle} from "./layerStyles";
+import * as cnst from './constants';
 
 export const MEASURE_TOOL = 'MEASURE_TOOL';
 
@@ -42,13 +44,6 @@ var measureTooltip;
 
 
 /**
- * Message to show when the user is drawing a polygon.
- * @type {string}
- */
-var continuePolygonMsg = 'Click to continue drawing the polygon';
-
-
-/**
  * Message to show when the user is drawing a line.
  * @type {string}
  */
@@ -72,63 +67,13 @@ function formatLength(line) {
     }
 }
 
-/**
- * Creates a new help tooltip
- */
-
-
-// /**
-//  * Format area output.
-//  * @param {module:ol/geom/Polygon~Polygon} polygon The polygon.
-//  * @return {string} Formatted area.
-//  */
-// function formatArea(polygon) {
-//     var area = sphere['getArea'](polygon);
-//     var output;
-//     if (area > 10000) {
-//         output = (Math.round(area / 1000000 * 100) / 100) +
-//             ' ' + 'km<sup>2</sup>';
-//     } else {
-//         output = (Math.round(area * 100) / 100) +
-//             ' ' + 'm<sup>2</sup>';
-//     }
-//     return output;
-// }
-
-//
-// /**
-//  * Handle pointer move.
-//  * @param {module:ol/MapBrowserEvent~MapBrowserEvent} evt The event.
-//  */
-// var pointerMoveHandler = function (evt) {
-//     if (evt.dragging) {
-//         return;
-//     }
-//     /** @type {string} */
-//     var helpMsg = 'Click to start drawing';
-//
-//     if (sketch) {
-//         var geom = (sketch.getGeometry());
-//         if (geom instanceof Polygon) {
-//             helpMsg = continuePolygonMsg;
-//         } else if (geom instanceof LineString) {
-//             helpMsg = continueLineMsg;
-//         }
-//     }
-//
-//     helpTooltipElement.innerHTML = helpMsg;
-//     helpTooltip.setPosition(evt.coordinate);
-//
-//     helpTooltipElement.classList.remove('hidden');
-// };
-
 
 class _Measure extends React.Component<{ map: Map, activeTool: string, setActiveTool: (s: string) => any }, { enabled: boolean }> {
     sketch: Feature;
     initialized: boolean;
     draw: Draw;
-    source: VectorSource;
-    vector: VectorLayer;
+    // source: VectorSource;
+    // vector: VectorLayer;
     helpTooltipElement: HTMLDivElement;
 
     constructor(p, c) {
@@ -137,65 +82,31 @@ class _Measure extends React.Component<{ map: Map, activeTool: string, setActive
         this.initialized = false;
         this.sketch = null;
 
-        this.source = new VectorSource();
-
-        this.vector = new VectorLayer({
-            source: this.source,
-            style: new Style({
-                fill: new Fill({
-                    color: 'rgba(255, 255, 255, 0.2)'
-                }),
-                stroke: new Stroke({
-                    color: '#42ff55',
-                    width: 2
-                }),
-                image: new CircleStyle({
-                    radius: 7,
-                    fill: new Fill({
-                        color: '#ffcc33'
-                    })
-                })
-            })
-        });
+        // this.source = new VectorSource();
+        //
+        // this.vector = new VectorLayer({
+        //     source: this.source,
+        //     style: measureStyle
+        // });
 
         this.draw = new Draw({
-            source: this.source,
+            source: cnst.drawVectorLayer.getSource(),
             type: "LineString",
-            style: new Style({
-                fill: new Fill({
-                    color: 'rgba(255, 255, 255, 0.2)'
-                }),
-                stroke: new Stroke({
-                    color: 'rgba(0, 0, 0, 0.5)',
-                    lineDash: [10, 10],
-                    width: 2
-                }),
-                image: new CircleStyle({
-                    radius: 5,
-                    stroke: new Stroke({
-                        color: 'rgba(0, 0, 0, 0.7)'
-                    }),
-                    fill: new Fill({
-                        color: 'rgba(255, 255, 255, 0.2)'
-                    })
-                })
-            })
+            style: measureDrawStyle
         });
 
-        var listener;
+        let listener;
         this.draw.on('drawstart',
             (evt) => {
                 // set sketch
                 this.sketch = evt['feature'] as Feature;
 
-                console.log(this.sketch);
-
                 /** @type {module:ol/coordinate~Coordinate|undefined} */
                 var tooltipCoord = evt['coordinate'];
 
                 listener = this.sketch.getGeometry().on('change', (evt) => {
-                    var geom = evt.target;
-                    var output;
+                    let geom = evt.target;
+                    let output;
                     if (geom instanceof Polygon) {
                         // output = formatArea(geom);
                         tooltipCoord = geom.getInteriorPoint().getCoordinates();
@@ -269,13 +180,6 @@ class _Measure extends React.Component<{ map: Map, activeTool: string, setActive
             return;
         }
 
-        // if (!this.state.enabled){
-        //     return;
-        // }
-
-        // console.log(this.sketch);
-
-
         /** @type {string} */
         var helpMsg = 'Click to start drawing';
 
@@ -299,31 +203,13 @@ class _Measure extends React.Component<{ map: Map, activeTool: string, setActive
 
     };
 
-    // addInteraction() {
-    //     if (this.props.map) {
-    //         this.props.map.addInteraction(this.draw);
-    //     }
-    //
-    //     this.createMeasureTooltip();
-    //     this.createHelpTooltip();
-    //
-    //
-    // }
-
-    componentDidMount() {
-        // this.createHelpTooltip();
-        // this.createMeasureTooltip();
-        // this.addInteraction()
-        // this.componentDidUpdate()
-    }
-
     componentDidUpdate() {
         if (this.initialized) {
             return;
         }
 
         if (this.props.map) {
-            this.props.map.addLayer(this.vector);
+            this.props.map.addLayer(cnst.drawVectorLayer);
             this.createHelpTooltip();
             this.createMeasureTooltip();
 

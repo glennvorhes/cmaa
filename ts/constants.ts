@@ -4,7 +4,13 @@ import VectorLayer from "ol/layer/Vector";
 import VectorSource from "ol/source/Vector";
 import ClusterSource from "ol/source/Cluster";
 import jsts = require("jsts");
-import {selectionStyle, selectionOneStyle, selectionExtentStyle, searchIndicatorStyle} from './layerStyles';
+import {
+    selectionStyle,
+    selectionOneStyle,
+    selectionExtentStyle,
+    searchIndicatorStyle,
+    clusterStyle, measureStyle
+} from './layerStyles';
 import {Popup} from "./popup";
 import {Circle as CircleStyle, Fill, Stroke, Style, Text} from "ol/style";
 
@@ -17,13 +23,16 @@ export const popup = new Popup();
 
 
 export const allPointLayer = lyr.crashVector();
+
+allPointLayer.set('loaded', false);
+
 export const crashPointsK = lyr.crashVector('K', 10);
 export const crashPointsA = lyr.crashVector('A', 9);
 export const crashPointsB = lyr.crashVector('B', 8);
 export const crashPointsC = lyr.crashVector('C', 7);
 export const crashPointsO = lyr.crashVector('O', 5);
 
-export const crashLayerDict: {[s: string]: VectorLayer} = {
+export const crashLayerDict: { [s: string]: VectorLayer } = {
     K: crashPointsK,
     A: crashPointsA,
     B: crashPointsB,
@@ -62,7 +71,6 @@ export const selectionOneLayer = new VectorLayer({
 
 export const clusterSource = new VectorSource();
 
-let clusterStyleCache = {};
 
 export const clusterLayer = new VectorLayer({
     // minResolution: 150,
@@ -72,38 +80,26 @@ export const clusterLayer = new VectorLayer({
         source: clusterSource
     }),
     zIndex: 20,
-    style: (feature) => {
-        let size = feature.get('features').length;
-        let style = clusterStyleCache[size];
-        if (!style) {
-            style = new Style({
-                image: new CircleStyle({
-                    radius: 12,
-                    stroke: new Stroke({
-                        color: '#fff'
-                    }),
-                    fill: new Fill({
-                        color: '#3399CC'
-                    })
-                }),
-                text: new Text({
-                    text: size.toString(),
-                    fill: new Fill({
-                        color: '#fff'
-                    }),
-                    font: '14px sans-serif',
-                    offsetX: 0,
-                    offsetY: 2
-                })
-            });
-            clusterStyleCache[size] = style;
-        }
-        return style;
-    }
+    style: clusterStyle
 });
 
 
 export const crashSevList = ['K', 'A', 'B', 'C', 'O'];
+
+export const crashOrder: string[] = ['K', 'A', 'B', 'C', 'P', 'O'];
+
+export const crashColors = {
+    K: '#ff3f4f',
+    A: '#fba25b',
+    B: '#fbea5b',
+    C: '#5858ff',
+    O: '#61d961',
+};
+
+export const drawVectorLayer = new VectorLayer({
+    source: new VectorSource(),
+    style: measureStyle
+});
 
 
 export const parser = new jsts.io.OL3Parser();

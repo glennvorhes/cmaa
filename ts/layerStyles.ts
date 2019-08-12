@@ -177,3 +177,71 @@ export const searchIndicatorStyle = new Style({
                 })
             })
         });
+
+
+export const measureStyle = new Style({
+                fill: new Fill({
+                    color: 'rgba(255, 255, 255, 0.2)'
+                }),
+                stroke: new Stroke({
+                    color: '#42ff55',
+                    width: 2
+                }),
+                image: new CircleStyle({
+                    radius: 7,
+                    fill: new Fill({
+                        color: '#ffcc33'
+                    })
+                })
+            });
+
+export const measureDrawStyle = new Style({
+                fill: new Fill({
+                    color: 'rgba(255, 255, 255, 0.2)'
+                }),
+                stroke: new Stroke({
+                    color: 'rgba(0, 0, 0, 0.5)',
+                    lineDash: [10, 10],
+                    width: 2
+                }),
+                image: new CircleStyle({
+                    radius: 5,
+                    stroke: new Stroke({
+                        color: 'rgba(0, 0, 0, 0.7)'
+                    }),
+                    fill: new Fill({
+                        color: 'rgba(255, 255, 255, 0.2)'
+                    })
+                })
+            });
+
+let clusterStyleCache = {};
+
+export const clusterStyle = (feature) => {
+        let size = feature.get('features').length;
+        let style = clusterStyleCache[size];
+        if (!style) {
+            style = new Style({
+                image: new CircleStyle({
+                    radius: 12,
+                    stroke: new Stroke({
+                        color: '#fff'
+                    }),
+                    fill: new Fill({
+                        color: '#3399CC'
+                    })
+                }),
+                text: new Text({
+                    text: size.toString(),
+                    fill: new Fill({
+                        color: '#fff'
+                    }),
+                    font: '14px sans-serif',
+                    offsetX: 0,
+                    offsetY: 2
+                })
+            });
+            clusterStyleCache[size] = style;
+        }
+        return style;
+    };
