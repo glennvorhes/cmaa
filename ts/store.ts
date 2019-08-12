@@ -49,6 +49,14 @@ function layerChecked(state: { [s: string]: boolean } = _lyrChecked, action: act
     }
 }
 
+function activeTool(state: string = null, action: act.iSetSelectedTool){
+    if (action.type === act.SET_ACTIVE_TOOL){
+        return action.tool
+    } else {
+        return state
+    }
+}
+
 function selectedFeatures(state: Feature[] = [], action: act.iSetSelectedFeatures) {
     if (action.type === act.SET_SELECTED_FEATURES){
 
@@ -125,7 +133,7 @@ function map(state: Map = null, action: act.iSetMap){
 
 export const store = Redux.createStore(
     Redux.combineReducers({queryResults, layerChecked,
-        selectedFeatures, loading, map, isSelecting, cluster})
+        selectedFeatures, loading, map, isSelecting, cluster, activeTool})
 );
 
 export interface iState {
@@ -137,6 +145,7 @@ export interface iState {
     map: Map;
     isSelecting: boolean;
     cluster: boolean;
+    activeTool: string;
 }
 
 export function getState(): iState {

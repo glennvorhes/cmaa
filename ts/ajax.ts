@@ -21,9 +21,15 @@ export function getCrashInfo(crsh: string, container?: HTMLDivElement) {
                 return;
             }
 
+            // let propOrder = ["DOCTNMBR", "CRSHDATE", "CNTYNAME", "MUNINAME", "MUNITYPE",
+            //     "ONHWY", "ONSTR", "ATHWY", "ATSTR", "INTDIR", "INTDIS", "INJSVR", "TOTVEH", "TOTINJ",
+            //     "TOTFATL", "CMAALAT", "CMAALONG"];
+
             let propOrder = ["DOCTNMBR", "CRSHDATE", "CNTYNAME", "MUNINAME", "MUNITYPE",
-                "ONHWY", "ONSTR", "ATHWY", "ATSTR", "INTDIR", "INTDIS", "INJSVR", "TOTVEH", "TOTINJ",
-                "TOTFATL", "CMAALAT", "CMAALONG"];
+                "ONHWY", "ONSTR", "ATHWY", "ATSTR", "INTDIR", "INTDIS", "INJSVR", "TOTVEH",
+                // "TOTINJ", "TOTFATL",
+                "TOTINJ_K", "TOTINJ_A", "TOTINJ_B", "TOTINJ_C", "TOTINJ_O", "MNRCOLL",
+                "CMAALAT", "CMAALONG"];
 
             let crashProps = resultObj['props'];
 
@@ -32,20 +38,24 @@ export function getCrashInfo(crsh: string, container?: HTMLDivElement) {
 
             for (let p of propOrder) {
                 outHtml += `<tr>`;
-                outHtml +=  `<td>${p}</td>`;
+                outHtml += `<td>${p}</td>`;
 
                 let propVal = crashProps[p] || '';
 
-                if (p === 'DOCTNMBR' && cnst.allowCrashReportDownload){
+                if (typeof crashProps[p] === 'number' && crashProps[p] === 0){
+                    propVal = 0;
+                }
+
+                if (p === 'DOCTNMBR' && cnst.allowCrashReportDownload) {
                     propVal += `&nbsp;<a href="${cnst.CRASH_REPORT_DOWNLOAD + crashProps[p]}" download="download" class="crash-download"/>`
                 }
 
-                outHtml +=  `<td>${propVal}</td>`;
-                outHtml +=  `</tr>`;
+                outHtml += `<td>${propVal}</td>`;
+                outHtml += `</tr>`;
             }
             outHtml += '</table>';
 
-            if (container){
+            if (container) {
                 container.innerHTML = outHtml
             }
 

@@ -103,4 +103,6 @@ export const aboutDiv = <div>
 
 export const helpH3 = <h3>Help</h3>;
 
-export const helpDiv = <div></div>;
+export const helpDiv = <div>
+    Coming soon
+</div>;

@@ -6,6 +6,7 @@ import Map from 'ol/Map';
 export const SET_QUERY_RESULTS = 'SET_QUERY_RESULTS';
 export const SET_LYR_CHECKED = 'SET_LYR_CHECKED';
 export const SET_SELECTED_FEATURES = 'SET_SELECTED_FEATURES';
+export const SET_ACTIVE_TOOL = 'SET_ACTIVE_TOOL';
 export const SET_IS_SELECTING = 'SET_IS_SELECTING';
 export const SET_OPERATION = 'SET_OPERATION';
 export const SET_LOADING = 'SET_LOADING';
@@ -35,6 +36,10 @@ export interface iSetLayerChecked extends Redux.Action{
 
 export interface iSetSelectedFeatures extends Redux.Action{
     features: Feature[];
+}
+
+export interface iSetSelectedTool extends Redux.Action{
+    tool: string;
 }
 
 export interface iSetOperation extends Redux.Action{

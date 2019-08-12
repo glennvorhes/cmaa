@@ -26,6 +26,8 @@ import {iQueryResults, iResultInner} from "./interfaces";
 import {crashColors} from './layerStyles'
 import Feature from 'ol/Feature';
 import {LayerToggle} from './layerToggle';
+import {Search} from './search';
+import {Measure} from "./measure";
 
 
 const esriJson = new EsriJSON();
@@ -52,7 +54,9 @@ class _CrashMap extends React.Component<{
     setLoading: (b: boolean) => any,
     setMap: (m: Map) => any,
     setCluster: (c: boolean) => any,
-    clusterShown: boolean
+    clusterShown: boolean,
+    // isSelecting: boolean,
+    activeTool: string
 }, {
     originalExtent: {
         center: [number, number], zoom: number
@@ -68,10 +72,16 @@ class _CrashMap extends React.Component<{
 }> {
     private map: Map;
     private selectionTimeout: number = null;
+    private dblClickInteraction: DoubleClickZoom;
+    private lastIsSelecting: boolean;
+    private lastActiveTool: string;
 
     constructor(props, context) {
         super(props, context);
         this.map = null;
+        this.lastIsSelecting = false;
+        this.lastActiveTool = null;
+        this.dblClickInteraction = null;
 
         this.state = {
             originalExtent: {
@@ -149,6 +159,9 @@ class _CrashMap extends React.Component<{
                 for (let f of features) {
                     allFeaturesArr.push(f);
 
+                    cnst.allPointLayer.getSource().addFeature(f);
+
+
                     switch (f.getProperties()['injSvr']) {
                         case 'K':
                             cnst.crashPointsK.getSource().addFeature(f);
@@ -170,9 +183,14 @@ class _CrashMap extends React.Component<{
 
                 cnst.clusterSource.addFeatures(allFeaturesArr);
 
-                let featureCount = cnst.crashPointsO.getSource().getFeatures().length;
+                let featureCount = cnst.allPointLayer.getSource().getFeatures().length;
 
-                if (featureCount > 0) {
+                if (featureCount === 1){
+                    let ext1 = cnst.allPointLayer.getSource().getFeatures()[0].getGeometry().getExtent();
+                    this.map.getView().setCenter([ext1[0], ext1[1]])
+                    this.map.getView().setZoom(7);
+
+                } else if (featureCount > 0) {
                     this.map.getView().fit(cnst.crashPointsO.getSource().getExtent());
                 }
 
@@ -190,56 +208,26 @@ class _CrashMap extends React.Component<{
             'json');
     }
 
-    componentDidUpdate() {
-        let lyrs: { [s: string]: VectorLayer } = {
-            K: cnst.crashPointsK,
-            A: cnst.crashPointsA,
-            B: cnst.crashPointsB,
-            C: cnst.crashPointsC,
-            O: cnst.crashPointsO,
-        };
-
-
-        cnst.clusterSource.clear();
-
-        let onFeaturesArr: Feature[] = [];
-
-        for (let l of intf.crashSevList) {
-            if (!this.props.clusterShown) {
-                lyrs[l].setVisible(this.props.lyrChecked[l]);
-            }
-
-            if (this.props.lyrChecked[l]){
-                onFeaturesArr.push(...lyrs[l].getSource().getFeatures())
-            }
-        }
-
-        cnst.clusterSource.addFeatures(onFeaturesArr);
-    }
-
     componentDidMount() {
 
         this.map = new Map({
             target: document.getElementById('map'),
             view: new View({
                 center: this.state.originalExtent.center,
-                zoom: this.state.originalExtent.zoom
+                zoom: this.state.originalExtent.zoom,
+                maxResolution: 2000
             })
         });
 
         cnst.popup.init(this.map);
 
-        let dblClickInteraction;
+        // let dblClickInteraction;
         // find DoubleClickZoom interaction
-        this.map.getInteractions().getArray().forEach(function (interaction) {
+        this.map.getInteractions().getArray().forEach((interaction) => {
             if (interaction instanceof DoubleClickZoom) {
-                dblClickInteraction = interaction;
+                this.dblClickInteraction = interaction as DoubleClickZoom;
             }
         });
-        // remove from map
-        if (dblClickInteraction) {
-            this.map.removeInteraction(dblClickInteraction);
-        }
 
         this.props.setMap(this.map);
 
@@ -263,7 +251,7 @@ class _CrashMap extends React.Component<{
 
 
                         return function (inc: number) {
-                            if (index + inc < 0 || index + inc === maxIndex){
+                            if (index + inc < 0 || index + inc === maxIndex) {
                                 return;
                             }
                             index += inc;
@@ -301,6 +289,7 @@ class _CrashMap extends React.Component<{
         this.map.addLayer(cnst.selectionExtentLayer);
 
         this.map.addLayer(cnst.clusterLayer);
+        this.map.addLayer(cnst.searchIndicator);
 
 
         // let selectionChangeTimeout: number = null;
@@ -368,13 +357,66 @@ class _CrashMap extends React.Component<{
         this.getCrashesByQueryId(queryId);
     }
 
+    componentDidUpdate() {
+        if (this.lastActiveTool != this.props.activeTool) {
+            if (this.dblClickInteraction) {
+                if (this.props.activeTool !== null) {
+                    this.map.removeInteraction(this.dblClickInteraction);
+                } else {
+                    this.map.addInteraction(this.dblClickInteraction);
+                }
+            }
+            this.lastActiveTool = this.props.activeTool
+        }
+
+        let lyrs: { [s: string]: VectorLayer } = {
+            K: cnst.crashPointsK,
+            A: cnst.crashPointsA,
+            B: cnst.crashPointsB,
+            C: cnst.crashPointsC,
+            O: cnst.crashPointsO,
+        };
+
+
+        cnst.clusterSource.clear();
+
+        let onFeaturesArr: Feature[] = [];
+
+        for (let l of intf.crashSevList) {
+            if (!this.props.clusterShown) {
+                lyrs[l].setVisible(this.props.lyrChecked[l]);
+            }
+
+            if (this.props.lyrChecked[l]) {
+                onFeaturesArr.push(...lyrs[l].getSource().getFeatures())
+            }
+        }
+
+        cnst.clusterSource.addFeatures(onFeaturesArr);
+    }
+
+
     render() {
 
-        let unmappedK = this.state.unmappedList.K.join(', ');
-        let unmappedA = this.state.unmappedList.A.join(', ');
-        let unmappedB = this.state.unmappedList.B.join(', ');
-        let unmappedC = this.state.unmappedList.C.join(', ');
-        let unmappedO = this.state.unmappedList.O.join(', ');
+        let unMappedSpans = [];
+
+        for (let sv of ['K', 'A', 'B', 'C', 'O']){
+            for (let c of this.state.unmappedList[sv]){
+                unMappedSpans.push(<span key={`umapped-${c}`}>
+                    {`${c}:${sv}`}
+                    <a href={cnst.CRASH_REPORT_DOWNLOAD + c} download="download"
+                       className="crash-download" title="Download crash report"/>
+
+                </span>)
+            }
+        }
+
+        //
+        // let unmappedK = this.state.unmappedList.K.join(', ');
+        // let unmappedA = this.state.unmappedList.A.join(', ');
+        // let unmappedB = this.state.unmappedList.B.join(', ');
+        // let unmappedC = this.state.unmappedList.C.join(', ');
+        // let unmappedO = this.state.unmappedList.O.join(', ');
 
         return <div id="app-container">
             {cnstEl.header}
@@ -400,11 +442,12 @@ class _CrashMap extends React.Component<{
                         </div>
                         <h3>Unmapped Crashes</h3>
                         <div id="unmapped-list">
-                            <p style={{color: crashColors.K}}>{unmappedK}</p>
-                            <p style={{color: crashColors.A}}>{unmappedA}</p>
-                            <p style={{color: crashColors.B}}>{unmappedB}</p>
-                            <p style={{color: crashColors.C}}>{unmappedC}</p>
-                            <p style={{color: crashColors.O}}>{unmappedO}</p>
+                            {unMappedSpans}
+                            {/*<p style={{color: crashColors.K}}>{unmappedK}</p>*/}
+                            {/*<p style={{color: crashColors.A}}>{unmappedA}</p>*/}
+                            {/*<p style={{color: crashColors.B}}>{unmappedB}</p>*/}
+                            {/*<p style={{color: crashColors.C}}>{unmappedC}</p>*/}
+                            {/*<p style={{color: crashColors.O}}>{unmappedO}</p>*/}
                         </div>
                         {/*{cnstEl.disclamerH3}*/}
                         {/*{cnstEl.disclamerDiv}*/}
@@ -416,23 +459,9 @@ class _CrashMap extends React.Component<{
                 </div>
                 <div id="map">
                     {/*<div id="crash-info"/>*/}
-                    <div id="search-bar-div">
-                        <input type="text" id="search-bar" placeholder="Search" onKeyUp={
-                            (e) => {
-                                console.log(e)
-                                // (document.getElementById('search-button') as HTMLInputElement).focus();
-                            }
-                        }/>
-                        <input type="button" id="search-button" value="" onClick={() => {
-                            console.log('search')
-                        }}/>
-                    </div>
+                    <Search/>
                     <Loading/>
                     <div id="toolbar">
-                        <LayerToggle layerChecked={this.props.lyrChecked} clusterShown={(shown) => {
-                            this.props.setCluster(shown);
-                            // this.setState({clusterShown: shown});
-                        }}/>
                         <input className="toolbar-button zoom-extent" readOnly={true}
                                title="Zoom to initial extent"
                                onClick={() => {
@@ -441,8 +470,11 @@ class _CrashMap extends React.Component<{
                                }
                                }
                         />
+                        <LayerToggle layerChecked={this.props.lyrChecked} clusterShown={(shown) => {
+                            this.props.setCluster(shown);
+                        }}/>
                         <Selection/>
-                        <input className="toolbar-button ruler" readOnly={true} title="Measure"/>
+                        <Measure/>
                     </div>
                 </div>
             </div>
@@ -455,7 +487,9 @@ let CrashMap = connect(
         return {
             lyrChecked: s.layerChecked,
             loading: s.loading,
-            clusterShown: s.cluster
+            clusterShown: s.cluster,
+            // isSelecting: s.isSelecting,
+            activeTool: s.activeTool
         };
     },
     (dispatch) => {

@@ -10,8 +10,9 @@ export class LayerToggle extends React.Component<{ layerChecked: { [s: string]: 
     }
 
     render() {
-        return <input className="toolbar-button zoom-extent" readOnly={true}
-                      title="Toggle Layers"
+        return <input className="toolbar-button toggle-cluster" readOnly={true}
+                      title={`Toggle Layers - ${this.state.showCluster ? 'Clusters Shown' : 'Points Shown'}`}
+                      style={{backgroundPosition: this.state.showCluster ? '2px 2px': '-30px 2px'}}
                       onClick={
                           () => {
                               let newShowCluster = !this.state.showCluster;

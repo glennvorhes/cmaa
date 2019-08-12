@@ -79,7 +79,8 @@ export class Popup {
         this.map.addOverlay(this.overlay);
 
         this.map.on('pointermove', (e) => {
-            if (e['dragging'] || getState().isSelecting) {
+            let s = getState();
+            if (e['dragging'] || s.isSelecting || s.activeTool !== null) {
                 return;
             }
             let vLayers: Vector[] = [];
@@ -97,7 +98,8 @@ export class Popup {
             }
         });
         this.map.on('singleclick', (e) => {
-            if (getState().isSelecting) {
+            let s = getState();
+            if (s.isSelecting || s.activeTool !== null) {
                 return;
             }
 

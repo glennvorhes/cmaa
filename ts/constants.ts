@@ -4,7 +4,7 @@ import VectorLayer from "ol/layer/Vector";
 import VectorSource from "ol/source/Vector";
 import ClusterSource from "ol/source/Cluster";
 import jsts = require("jsts");
-import {selectionStyle, selectionOneStyle, selectionExtentStyle} from './layerStyles';
+import {selectionStyle, selectionOneStyle, selectionExtentStyle, searchIndicatorStyle} from './layerStyles';
 import {Popup} from "./popup";
 import {Circle as CircleStyle, Fill, Stroke, Style, Text} from "ol/style";
 
@@ -40,6 +40,12 @@ export const selectionLayer = new VectorLayer({
     source: new VectorSource(),
     zIndex: 12,
     style: selectionStyle
+});
+
+export const searchIndicator = new VectorLayer({
+    source: new VectorSource(),
+    zIndex: 25,
+    style: searchIndicatorStyle
 });
 
 export const selectionExtentLayer = new VectorLayer({

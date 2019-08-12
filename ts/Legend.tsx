@@ -5,6 +5,7 @@ import * as intf from './interfaces';
 import * as act from './actions';
 import Feature from 'ol/Feature';
 import * as cnst from './constants';
+import {crashColors} from "./layerStyles";
 
 class _Legend extends React.Component<{
     res: intf.iQueryResults,
@@ -70,6 +71,10 @@ class _Legend extends React.Component<{
             O: oCount
         };
 
+        let totalQueried = 0;
+        let totalMapped = 0;
+        let totalSelected = 0;
+
         for (let i = 0; i < intf.crashSevList.length; i++) {
             let sv = intf.crashSevList[i];
 
@@ -79,8 +84,13 @@ class _Legend extends React.Component<{
                 continue;
             }
 
+
+            totalQueried += resInfo.queried;
+            totalMapped += resInfo.mapped;
+            totalSelected += lookup[sv];
+
             rws.push(<tr key={sv}>
-                <td>
+                <td style={{backgroundColor: crashColors[sv]}}>
                     <input type="checkbox" checked={this.props.lyrChecked[sv]} onChange={(e) => {
                         this.props.checkChange(sv, e.target.checked);
                         // console.log(e.target.checked);
@@ -89,7 +99,6 @@ class _Legend extends React.Component<{
                 <td>
                     {sv}
                 </td>
-
                 <td>
                     {resInfo.queried}
                 </td>
@@ -102,6 +111,13 @@ class _Legend extends React.Component<{
             </tr>)
 
         }
+
+        rws.push(<tr key={'legend-total'}>
+            <td colSpan={2}>Total</td>
+            <td>{totalQueried}</td>
+            <td>{totalMapped}</td>
+            <td>{totalSelected}</td>
+        </tr>);
 
         return <div id="legend-table-container">
             <table id="legend-table">

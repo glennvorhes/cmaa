@@ -164,3 +164,16 @@ export const clusterSyle = (feature) => {
     }
     return style;
 };
+
+
+export const searchIndicatorStyle = new Style({
+            image: new CircleStyle({
+                radius: 14,
+                stroke: new Stroke({
+                    color: '#000000'
+                }),
+                fill: new Fill({
+                    color: 'rgba(204,36,104,0.6)'
+                })
+            })
+        });
