@@ -450,6 +450,9 @@ header {
 #unmapped-list span a {
   margin-left: 4px;
 }
+.about-div ul {
+  padding-left: 17px;
+}
 #map {
   height: 100%;
   flex: 1;
@@ -538,7 +541,6 @@ header {
   z-index: 4;
   top: 12px;
   left: 75px;
-  background-color: white;
 }
 #search-bar-div #search-bar-text {
   height: 25px;
@@ -546,6 +548,7 @@ header {
   border: solid black 1px;
   padding-left: 5px;
   width: 200px;
+  vertical-align: top;
 }
 #search-bar-div #search-button {
   height: 29px;
@@ -558,6 +561,7 @@ header {
   background-position: 5px 3px;
   border: solid black 1px;
   cursor: pointer;
+  background-color: white;
 }
 #search-bar-div #search-button:hover {
   background-color: lightgray;

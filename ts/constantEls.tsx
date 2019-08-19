@@ -41,64 +41,64 @@ export const disclamerDiv = <div>
     reported crash locations on the DT4000 crash report.
 
     <br/><br/>
-    See the February 2019 <a href="/documents/applications/crash-data/WISLR_Crash_Mapping_Update_201902.pdf" target="_blank">WISLR
-        Crash Mapping Update</a> summary document for additional information about the crash
+    See the February 2019 <a href="/documents/applications/crash-data/WISLR_Crash_Mapping_Update_201902.pdf"
+                             target="_blank">WISLR
+    Crash Mapping Update</a> summary document for additional information about the crash
     mapping data source.<br/><br/>
 </div>;
 
 export const aboutH3 = <h3>About</h3>;
 
-export const aboutDiv = <div>
-    <b>About the WisTransPortal Crash Database</b>
+export const aboutDiv = <div className="about-div">
+    <b>About the CMAA Crash Map</b>
     <p>
-        The WisTransPortal system contains a complete database of Wisconsin crash data from 1994 through
-        the
-        current year. This database contains information on all police reported crashes in Wisconsin,
-        including
-        the location of each crash, vehicles involved, and general crash attributes. Personal data have
-        been
-        removed. The TOPS Lab maintains this database for research purposes and as a service to the
-        Wisconsin
-        Department of Transportation (WisDOT).
+        The Crash Mapping and Analysis (CMAA) system provides an interactive mapping tool to display and select
+        Wisconsin traffic crashes from the WisTransPortal database. The CMAA is updated on a nightly basis with
+        preliminary Wisconsin DT4000 crash data. In order for a crash to be displayed on the CMAA crash map, it must be
+        geo-coded to a latitude and longitude coordinate pair corresponding to the location of the crash on the roadway.
+        Crashes that have not been geo-coded are counted in the total number of crashes returned for a particular search
+        but will not be displayed on the map. Unmapped crashes will be listed in the “Unmapped Crashes” section of the
+        CMAA left-side panel.
     </p>
-
-    <p><b>"Preliminary" and "Final" Crash Data</b></p>
+    <p><b>CMAA Data Source</b></p>
     <p>
-        Crash records for all police reported crashes from 1994 through the current year are available.
-        The
-        WisTransPortal crash database is updated on a nightly basis from extracts provided by WisDOT
-        Division of State Patrol (DSP) Bureau of Transportation Safety (BOTS). The database includes
-        both "preliminary" and "final year" crash data. Preliminary data represents the latest set of
-        available crash records for the current year and generally includes crash reports transmitted by
-        law enforcement as recently as the previous day. All preliminary data are subject to ongoing
-        review and editing and may not be suitable for analysis purposes. Final year data represents
-        the official closed WisDOT crash file for a given year.
+        The CMAA crash map includes Wisconsin traffic crashes from 1998 to the present data. Crash location
+        geo-coordinates are taken from the following sources:
     </p>
-
-    <p><b>Wisconsin "Reportable" Crashes</b></p>
+    <ul>
+        <li>2017 - Present: Geo-coordinates provided by law enforcement on the Wisconsin DT4000 police crash report.
+        </li>
+        <li>2005 - 2016: WisTransPortal automated geo-processing of Wisconsin MV4000 crash locations by the UW TOPS
+            Lab.
+        </li>
+        <li>1998 - 2004: Latitude and longitude values derived from WisDOT GIS shape files of State Trunk Highway
+            reference point “RP” coded crashes. Local road crashes are not included.
+        </li>
+    </ul>
+    <p><b>Naming Conventions</b></p>
     <p>
-        A reportable crash is defined as a crash resulting in injury or death of any person, any damage
-        to
-        government-owned non-vehicle property to an apparent extent of $200 or more, or total damage to
-        property owned by any one person to an apparent extent of $1000 or more. (This definition went
-        into
-        effect 1/1/96). It is important to note, however, that not all reportable crashes are reported.
-        In
-        order for a crash to be in the database, a crash report must have been completed by a police
-        officer.
+        The CMAA displays the crash latitude and longitude coordinates under the names CMAALAT and CMAALONG,
+        respectively. These names correspond to the WisTransPortal “DT4000” data source. In order to maintain backwards
+        compatibility, the WisTransPortal element names for the CMAA locations differ depending on which data source is
+        being used.
     </p>
-
-    <p><b>Differences Between WisTransPortal and WisDOT Crash Statistics</b></p>
-
-    This facility provides a user interface to query and retrieve crash records based on high level
-    attributes such as date range, location, and first harmful event. Often there may be more than one
-    way to formulate a query selection, especially for intersection based queries. <b>Based on the
-    particular search criteria, your results may differ from official crash counts reported by
-    WisDOT.</b>
+    <ul>
+        <li>MV4000 – WISLR_LATDECDG, WISLR_LONDECDG</li>
+        <li>DT40000 – CMAALAT, CMAALONG</li>
+    </ul>
+    <p>
+        Although the elements names differ, the underlying values are the same and represent the best available crash
+        locations in the WisTransPortal.
+    </p>
 
     <p><b>Disclaimer</b></p>
 
-    {disclamerDiv}
+    The CMAA crash map is maintained by UW TOPS Lab on behalf of the Wisconsin Department of Transportation for research
+    and planning purposes. Any other use, while not prohibited, is the sole responsibility of the user.
+
+    {/*<p><b>Disclaimer</b></p>*/}
+
+    {/*{disclamerDiv}*/}
 </div>;
 
 export const helpH3 = <h3>Help</h3>;

@@ -18,6 +18,7 @@ import {Circle as CircleStyle, Fill, Stroke, Style, Text} from "ol/style";
 export const GP_BY_QUERY_ID = 'https://transportal.cee.wisc.edu/applications/arcgis2/rest/services/crash/getCrashByQueryId/GPServer/GetCrashByQueryId/execute';
 export const GP_GET_CRASH_PROPS = 'https://transportal.cee.wisc.edu/applications/arcgis2/rest/services/crash/GetCrashProps/GPServer/GetCrashProps/execute';
 export const CRASH_REPORT_DOWNLOAD = 'https://transportal.cee.wisc.edu/applications/crash-reports/retrieveCrashReport.do?doctnmbr=';
+export const CRASH_TABLE_DOWNLOAD = 'https://transportal.cee.wisc.edu/testing/crash-data/retrieveCrashData.do';
 
 export const popup = new Popup();
 

@@ -7,6 +7,7 @@ import {searchIndicator, allPointLayer} from './constants';
 import Point from 'ol/geom/Point';
 import Feature from 'ol/Feature';
 import {SortedFeatures} from "./sortedFeatures";
+import {proj4326, proj3857} from 'webmapsjs/dist/olHelpers/projections';
 
 class _Search extends React.Component<{ map: Map }, {}> {
 
@@ -43,9 +44,6 @@ class _Search extends React.Component<{ map: Map }, {}> {
 
     getLoc() {
 
-        // console.log('here');
-
-
         searchIndicator.getSource().clear();
 
         if (!this.textInput || !this.props.map) {
@@ -56,7 +54,6 @@ class _Search extends React.Component<{ map: Map }, {}> {
             this.initSorted();
         }
 
-        // console.log('here2');
 
         let searchInfo = this.textInput.value.trim();
 
@@ -65,7 +62,35 @@ class _Search extends React.Component<{ map: Map }, {}> {
         }
 
 
-        let foundCrash = false;
+        let searchRes = searchInfo.match(/-?\d+(\.\d+)?(\s+|\s?,\s?)-?\d+(\.\d+)?/);
+
+        if (searchRes) {
+            let searchParts = searchInfo.split(/\s?,\s?/);
+
+            if (searchParts.length === 1) {
+                searchParts = searchInfo.split(/\s+/);
+            }
+
+            let p = new Point([parseFloat(searchParts[1]), parseFloat(searchParts[0])]);
+            let f = new Feature(p);
+            f.getGeometry().transform(proj4326, proj3857);
+
+            let fExt = f.getGeometry().getExtent();
+
+
+            if (this.props.map.getView().getZoom() < 8){
+                this.props.map.getView().setZoom(8);
+            }
+
+            this.props.map.getView().setCenter([fExt[0], fExt[1]]);
+
+            searchIndicator.getSource().addFeature(f);
+
+            this.clearIndicator(3000);
+
+            return;
+        }
+
 
         if (this.sorted.sortedFeatures.length > 0) {
             let f = this.sorted.getFeature(searchInfo, true);
@@ -75,37 +100,39 @@ class _Search extends React.Component<{ map: Map }, {}> {
                 this.props.map.getView().setCenter([fExt[0], fExt[1]]);
                 this.props.map.getView().setZoom(10);
                 searchIndicator.getSource().addFeature(f);
-                foundCrash = true;
+                // foundCrash = true;
 
                 this.clearIndicator(3000);
+                return;
             }
         }
 
-        // console.log('here4')
+        // if (!foundCrash) {
 
-        if (!foundCrash) {
+        $.get('https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/findAddressCandidates',
+            {
+                f: 'json',
+                SingleLine: searchInfo,
+                searchExtent: {
+                    xmin: -10354584,
+                    ymin: 5233180,
+                    xmax: -9656612,
+                    ymax: 5957887,
+                    spatialReference: {
+                        wkid: 102100
+                    }
+                },
+                outSR: 102100
+            }, (d) => {
+                if (d['candidates'] && d['candidates']['length'] > 0) {
+                    let cand = d['candidates'][0];
 
-            // console.log('here5');
-            $.get('https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/findAddressCandidates',
-                {
-                    f: 'json',
-                    SingleLine: searchInfo,
-                    searchExtent: {
-                        xmin: -10354584,
-                        ymin: 5233180,
-                        xmax: -9656612,
-                        ymax: 5957887,
-                        spatialReference: {
-                            wkid: 102100
-                        }
-                    },
-                    outSR: 102100
-                }, (d) => {
-                    // console.log(d);
-                    if (d['candidates'] && d['candidates']['length'] > 0) {
-                        let cand = d['candidates'][0];
+                    let loc = cand['location'] as { x: number, y: number };
 
-                        let loc = cand['location'] as { x: number, y: number };
+
+                    if (isNaN(loc.x) || isNaN(loc.y) || typeof loc.x === 'string' || typeof loc.y === 'string') {
+                        // pass
+                    } else {
                         let ext = cand['extent'] as { xmin: number, ymin: number, xmax: number, ymax: number };
 
                         this.props.map.getView().setCenter([loc.x, loc.y]);
@@ -121,9 +148,10 @@ class _Search extends React.Component<{ map: Map }, {}> {
 
                         this.clearIndicator(3000);
                     }
+                }
 
-                }, 'json');
-        }
+            }, 'json');
+
     }
 
 
@@ -134,21 +162,12 @@ class _Search extends React.Component<{ map: Map }, {}> {
                     //enter key
                     if (e.keyCode == 13) {
                         this.getLoc()
-                        // console.log('enter')
-                    } else {
-                        // console.log(e.keyCode)
-
                     }
-                    // let target = (e.target as HTMLInputElement)
 
-
-                    // console.log(e)
-                    // (document.getElementById('search-button') as HTMLInputElement).focus();
                 }
             }/>
             <input type="button" id="search-button" value="" onClick={() => {
                 this.getLoc();
-                // console.log('search')
             }}/>
         </div>
     }

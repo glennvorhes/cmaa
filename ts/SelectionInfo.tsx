@@ -5,9 +5,9 @@ import Feature from 'ol/Feature';
 import Point from 'ol/geom/Point';
 
 import $ = require("jquery");
-import {makeGuid} from 'webmapsjs/dist/util/makeGuid';
 import Map from 'ol/Map';
 import * as cnst from './constants';
+
 
 /**
  * crash download
@@ -51,8 +51,50 @@ function getCrashInfo(docNum: string) {
         'json');
 }
 
+interface iColPresetPairs {
+    index: number;
+    value: string;
+}
 
-class _SelectionInfo extends React.Component<{ features: Feature[], map: Map }, {}> {
+class _SelectionInfo extends React.Component<{ features: Feature[], map: Map }, { selectedPreset: string }> {
+    dataSource: string;
+    colPresetList: string[];
+
+    constructor(p, c) {
+        super(p, c);
+
+        this.dataSource = (document.getElementById('dataSource') as HTMLInputElement).value;
+
+        this.state = {
+            selectedPreset: (document.getElementById('activeColumnList') as HTMLInputElement).value
+        };
+
+        let colPresetPairs: iColPresetPairs[] = [];
+
+        let colPresets = document.getElementsByName('columnListOptions');
+
+        for (let i = 0; i < colPresets.length; i++) {
+            let el = colPresets[i] as HTMLInputElement;
+            let ind = parseInt(el.id.replace('columnListOptions', ''));
+            colPresetPairs.push({index: ind, value: el.value});
+
+        }
+
+        colPresetPairs.sort((a: iColPresetPairs, b: iColPresetPairs) => {
+            if (a.index == b.index) {
+                return 0;
+            } else {
+                return a.index < b.index ? -1 : 1;
+            }
+        });
+
+        this.colPresetList = [];
+
+        for (let pr of colPresetPairs) {
+            this.colPresetList.push(pr.value);
+        }
+
+    }
 
 
     render() {
@@ -64,6 +106,7 @@ class _SelectionInfo extends React.Component<{ features: Feature[], map: Map }, 
             divInfo.innerHTML = '';
         }
 
+        let docNumList: string[] = [];
 
         if (this.props.features.length > 0) {
             let spans = [];
@@ -75,6 +118,8 @@ class _SelectionInfo extends React.Component<{ features: Feature[], map: Map }, 
                 let props = f.getProperties();
                 let crsh = props['id'];
                 let sev = props['injSvr'];
+
+                docNumList.push(crsh);
 
                 let crashDownLoadLink = cnst.allowCrashReportDownload ?
                     <a href={cnst.CRASH_REPORT_DOWNLOAD + crsh} download="download" className="crash-download"/> :
@@ -103,7 +148,7 @@ class _SelectionInfo extends React.Component<{ features: Feature[], map: Map }, 
                             let y = parseFloat(target.getAttribute('data-y'));
                             getCrashInfo(docNum);
 
-                            console.log(x, y)
+                            // console.log(x, y)
 
 
                             let f = new Feature();
@@ -130,21 +175,59 @@ class _SelectionInfo extends React.Component<{ features: Feature[], map: Map }, 
 
             }
 
+            let options = [];
+
+            for (let opt of this.colPresetList) {
+                options.push(<option key={opt} value={opt}>{opt}</option>)
+            }
+
+
             selectDivContent = <div>
-                <a style={
-                    {
-                        display: 'block',
-                        cursor: 'pointer',
-                        textDecoration: 'underline',
-                        color: 'blue',
-                        marginBottom: '5px'
-                    }
-                }
-                   onClick={(e) => {
-                       e.preventDefault();
-                       alert('Not yet implemented')
-                   }}
-                >Download Crash Table</a>
+                <form name="crashQueryForm"
+                      id="crashQueryForm"
+                      method="post"
+                      action={cnst.CRASH_TABLE_DOWNLOAD}
+                      style={{display: 'inline-block'}}
+                      target="_blank"
+                >
+                    <input type="hidden" name="dataSource" value={this.dataSource}/>
+                    <input type="hidden" name="columnList" value={this.state.selectedPreset}/>
+                    <input type="hidden" name="docKeySelection" value={docNumList.join(',')}/>
+                    <input type="submit" value="Download Table"/>
+                </form>
+                {/*docKeySelection: docNumList.join(',')*/}
+                {/*columnList: this.state.selectedPreset,*/}
+
+                {/*<a style={*/}
+                {/*{*/}
+                {/*display: 'block',*/}
+                {/*cursor: 'pointer',*/}
+                {/*textDecoration: 'underline',*/}
+                {/*color: 'blue',*/}
+                {/*marginBottom: '5px'*/}
+                {/*}*/}
+                {/*}*/}
+                {/*onClick={(e) => {*/}
+                {/*e.preventDefault();*/}
+
+                {/*// this.props.*/}
+                {/*//     docNumList*/}
+
+                {/*$.post(cnst.CRASH_TABLE_DOWNLOAD, {*/}
+                {/*dataSource:  this.dataSource,*/}
+                {/*columnList: this.state.selectedPreset,*/}
+                {/*docKeySelection: docNumList.join(',')*/}
+
+
+                {/*});*/}
+                {/*// alert('Not yet implemented')*/}
+                {/*}}*/}
+                {/*>Download Crash Table</a>*/}
+                <select style={{width: '190px'}} value={this.state.selectedPreset} onChange={(e) => {
+                    this.setState({selectedPreset: e.target.value})
+                }}>
+                    {options}
+                </select>
                 {spans}
             </div>
         }
