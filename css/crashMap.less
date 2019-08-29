@@ -153,7 +153,7 @@ header {
   }
 }
 
-.about-div ul{
+.about-div ul {
   padding-left: 17px;
 }
 
@@ -264,7 +264,6 @@ header {
   z-index: 4;
   top: 12px;
   left: 75px;
-
 
   #search-bar-text {
     height: 25px;
@@ -382,6 +381,74 @@ header {
   border-top-color: #ffcc33;
 }
 
-.hidden-help-tooltip{
+.hidden-help-tooltip {
   display: none;
+}
+
+#help-div {
+  h3 {
+    margin: 7px 0;
+  }
+
+  p {
+    margin: 7px 0;
+
+    label {
+      position: relative;
+      margin: 4px;
+      //height: 30px;
+      //vertical-align: center;
+      //display: inline-block;
+    }
+  }
+}
+
+.help-selection-mode {
+  background: url(@venn) no-repeat;
+  background-size: 124px;
+  display: inline-block;
+  width: 30px;
+  height: 30px;
+
+}
+
+.help-selection-tools {
+  background: url(@iconImg) no-repeat;
+  //background: url(@venn) no-repeat;
+  //background-size: 124px;
+  display: inline-block;
+  width: 30px;
+  height: 30px;
+}
+
+.help-measure {
+  background: url(@rulerIcon) no-repeat;
+  display: inline-block;
+  width: 30px;
+  height: 30px;
+}
+
+.help-extent {
+  background: url(@globeIcon) no-repeat;
+  display: inline-block;
+  width: 30px;
+  height: 30px;
+}
+
+.help-cluster {
+  background: url(@clusterToggle) no-repeat;
+  display: inline-block;
+  width: 30px;
+  height: 30px;
+  background-size: 53px;
+}
+
+.help-clear-selection {
+  background: url(@selectNone) no-repeat;
+  display: inline-block;
+  width: 30px;
+  height: 30px;
+
+  background-size: 26px;
+  //background-size: 53px;
 }

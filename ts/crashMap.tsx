@@ -28,6 +28,7 @@ import Feature from 'ol/Feature';
 import {LayerToggle} from './layerToggle';
 import {Search} from './search';
 import {Measure} from "./measure";
+import * as fileSaver from 'file-saver';
 
 
 const esriJson = new EsriJSON();
@@ -108,6 +109,7 @@ class _CrashMap extends React.Component<{
         $.post(cnst.GP_BY_QUERY_ID,
             {queryId: queryId, f: 'json', 'env:outSR': 3857},
             (d) => {
+
                 let resultObj = {};
 
                 for (let r of d.results) {
@@ -187,11 +189,11 @@ class _CrashMap extends React.Component<{
 
                 if (featureCount === 1) {
                     let ext1 = cnst.allPointLayer.getSource().getFeatures()[0].getGeometry().getExtent();
-                    this.map.getView().setCenter([ext1[0], ext1[1]])
+                    this.map.getView().setCenter([ext1[0], ext1[1]]);
                     this.map.getView().setZoom(7);
 
                 } else if (featureCount > 0) {
-                    this.map.getView().fit(cnst.crashPointsO.getSource().getExtent());
+                    this.map.getView().fit(cnst.allPointLayer.getSource().getExtent());
                 }
 
                 this.props.setLoading(false);
@@ -344,6 +346,9 @@ class _CrashMap extends React.Component<{
                 //small query
                 queryId = 1023;
                 totalRecords = 393;
+
+                // //TODO switch back
+                // queryId = 1615;
                 // //big query
                 // queryId = 1057;
                 // totalRecords = 45519;
@@ -355,6 +360,7 @@ class _CrashMap extends React.Component<{
         }
 
         this.getCrashesByQueryId(queryId);
+
     }
 
     componentDidUpdate() {
@@ -418,12 +424,6 @@ class _CrashMap extends React.Component<{
             }
         }
 
-        //
-        // let unmappedK = this.state.unmappedList.K.join(', ');
-        // let unmappedA = this.state.unmappedList.A.join(', ');
-        // let unmappedB = this.state.unmappedList.B.join(', ');
-        // let unmappedC = this.state.unmappedList.C.join(', ');
-        // let unmappedO = this.state.unmappedList.O.join(', ');
 
         return <div id="app-container">
             {cnstEl.header}
@@ -437,7 +437,29 @@ class _CrashMap extends React.Component<{
                         <h3>Legend</h3>
                         <div>
                             <Legend/>
-                            {/*<img src="/legend.png"/>*/}
+                            <button style={{marginTop: '10px'}} onClick={() => {
+                                (this.map.getTargetElement() as HTMLDivElement).focus();
+
+                                let zoom = this.map.getView().getZoom();
+                                this.map.getView().setZoom(zoom + 1);
+                                this.map.getView().setZoom(zoom);
+                                this.map.updateSize();
+
+                                this.map.once('postcompose', (event) => {
+                                    let canvas: HTMLCanvasElement = (event['glContext'].canvas_ as HTMLCanvasElement);
+
+                                    if (navigator.msSaveBlob) {
+                                        navigator.msSaveBlob(canvas['msToBlob'](), 'map.png');
+                                    } else {
+                                        canvas.toBlob((blob) => {
+                                            fileSaver.saveAs(blob, 'map.png');
+                                        });
+                                    }
+                                });
+                                this.map.renderSync();
+
+                            }}>Save Image
+                            </button>
                         </div>
                         <h3>Selection</h3>
                         <SelectionInfo/>
@@ -449,23 +471,13 @@ class _CrashMap extends React.Component<{
                         </div>
                         <h3>Unmapped Crashes</h3>
                         <div id="unmapped-container" style={{display: 'flex', flexDirection: 'column', padding: 0}}>
-                            <div id="unmapped-list" style={{flex: 1, overflowY: 'auto', borderBottom: 'solid black 1px'}}>
+                            <div id="unmapped-list"
+                                 style={{flex: 1, overflowY: 'auto', borderBottom: 'solid black 1px'}}>
                                 {unMappedSpans}
                             </div>
                             <div id="unmapped-info" style={{flex: 1, overflowY: 'auto'}}>
                             </div>
                         </div>
-                        {/*<div id="unmapped-list">*/}
-
-                            {/*{unMappedSpans}*/}
-                            {/*<p style={{color: crashColors.K}}>{unmappedK}</p>*/}
-                            {/*<p style={{color: crashColors.A}}>{unmappedA}</p>*/}
-                            {/*<p style={{color: crashColors.B}}>{unmappedB}</p>*/}
-                            {/*<p style={{color: crashColors.C}}>{unmappedC}</p>*/}
-                            {/*<p style={{color: crashColors.O}}>{unmappedO}</p>*/}
-                        {/*</div>*/}
-                        {/*{cnstEl.disclamerH3}*/}
-                        {/*{cnstEl.disclamerDiv}*/}
                         {cnstEl.helpH3}
                         {cnstEl.helpDiv}
                         {cnstEl.aboutH3}

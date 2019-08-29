@@ -49,60 +49,234 @@ export const disclamerDiv = <div>
 
 export const aboutH3 = <h3>About</h3>;
 
-export const aboutDiv = <div className="about-div">
+// export const aboutDiv = <div className="about-div">
+//     <b>About the CMAA Crash Map</b>
+//     <p>
+//         The Crash Mapping and Analysis (CMAA) system provides an interactive mapping tool to display and select
+//         Wisconsin traffic crashes from the WisTransPortal database. The CMAA is updated on a nightly basis with
+//         preliminary Wisconsin DT4000 crash data. In order for a crash to be displayed on the CMAA crash map, it must be
+//         geo-coded to a latitude and longitude coordinate pair corresponding to the location of the crash on the roadway.
+//         Crashes that have not been geo-coded are counted in the total number of crashes returned for a particular search
+//         but will not be displayed on the map. Unmapped crashes will be listed in the “Unmapped Crashes” section of the
+//         CMAA left-side panel.
+//     </p>
+//     <p><b>CMAA Data Source</b></p>
+//     <p>
+//         The CMAA crash map includes Wisconsin traffic crashes from 1998 to the present data. Crash location
+//         geo-coordinates are taken from the following sources:
+//     </p>
+//     <ul>
+//         <li>2017 - Present: Geo-coordinates provided by law enforcement on the Wisconsin DT4000 police crash report.
+//         </li>
+//         <li>2005 - 2016: WisTransPortal automated geo-processing of Wisconsin MV4000 crash locations by the UW TOPS
+//             Lab.
+//         </li>
+//         <li>1998 - 2004: Latitude and longitude values derived from WisDOT GIS shape files of State Trunk Highway
+//             reference point “RP” coded crashes. Local road crashes are not included.
+//         </li>
+//     </ul>
+//     <p><b>Naming Conventions</b></p>
+//     <p>
+//         The CMAA displays the crash latitude and longitude coordinates under the names CMAALAT and CMAALONG,
+//         respectively. These names correspond to the WisTransPortal “DT4000” data source. In order to maintain backwards
+//         compatibility, the WisTransPortal element names for the CMAA locations differ depending on which data source is
+//         being used.
+//     </p>
+//     <ul>
+//         <li>MV4000 – WISLR_LATDECDG, WISLR_LONDECDG</li>
+//         <li>DT40000 – CMAALAT, CMAALONG</li>
+//     </ul>
+//     <p>
+//         Although the elements names differ, the underlying values are the same and represent the best available crash
+//         locations in the WisTransPortal.
+//     </p>
+//
+//     <p><b>Disclaimer</b></p>
+//
+//     The CMAA crash map is maintained by UW TOPS Lab on behalf of the Wisconsin Department of Transportation for research
+//     and planning purposes. Any other use, while not prohibited, is the sole responsibility of the user.
+//
+//     {/*<p><b>Disclaimer</b></p>*/}
+//
+//     {/*{disclamerDiv}*/}
+// </div>;
+
+export const aboutDiv = <div>
     <b>About the CMAA Crash Map</b>
     <p>
-        The Crash Mapping and Analysis (CMAA) system provides an interactive mapping tool to display and select
-        Wisconsin traffic crashes from the WisTransPortal database. The CMAA is updated on a nightly basis with
-        preliminary Wisconsin DT4000 crash data. In order for a crash to be displayed on the CMAA crash map, it must be
-        geo-coded to a latitude and longitude coordinate pair corresponding to the location of the crash on the roadway.
-        Crashes that have not been geo-coded are counted in the total number of crashes returned for a particular search
-        but will not be displayed on the map. Unmapped crashes will be listed in the “Unmapped Crashes” section of the
-        CMAA left-side panel.
+        The WisTransPortal CMAA crash map provides an interactive "Crash Mapping and Analysis" tool
+        to display and select Wisconsin traffic crashes from the WisTransPortal database. The CMAA
+        retrieves data in real-time from the WisTransPortal which is updated on a nightly
+        basis from preliminaty Wisconsin DT4000 crash extracts provided by the Wisconsin Department
+        of Transportation (WisDOT). The TOPS Lab maintains the CMAA crash map for research
+        purposes and as a service to WisDOT.
     </p>
     <p><b>CMAA Data Source</b></p>
     <p>
-        The CMAA crash map includes Wisconsin traffic crashes from 1998 to the present data. Crash location
-        geo-coordinates are taken from the following sources:
-    </p>
+        The WisTransPortal database includes geo-coded Wisconsin traffic crashes from 1998 to the
+        present day. In order for a crash to be displayed on the CMAA crash map, however, it must
+        be geo-coded in the WisTransPortal database with latitude and longitude coordinates. Crashes
+        that have not been geo-coded are counted in the total number of crashes returned for a
+        particular query but will not be displayed on the map. Unmapped crashes will be listed in the
+        "Unmapped Crashes" section of the CMAA interface.
+    </p><p>
+    CMAA crash geo-coordinates are taken from the following sources:
+</p>
     <ul>
         <li>2017 - Present: Geo-coordinates provided by law enforcement on the Wisconsin DT4000 police crash report.
         </li>
         <li>2005 - 2016: WisTransPortal automated geo-processing of Wisconsin MV4000 crash locations by the UW TOPS
             Lab.
         </li>
-        <li>1998 - 2004: Latitude and longitude values derived from WisDOT GIS shape files of State Trunk Highway
-            reference point “RP” coded crashes. Local road crashes are not included.
+        <li>1998 - 2004: Latitude and longitude coordinates derived from WisDOT GIS shape files of State Trunk Highway
+            reference point "RP" coded crashes. Local road crashes are not included.
         </li>
     </ul>
     <p><b>Naming Conventions</b></p>
     <p>
-        The CMAA displays the crash latitude and longitude coordinates under the names CMAALAT and CMAALONG,
-        respectively. These names correspond to the WisTransPortal “DT4000” data source. In order to maintain backwards
-        compatibility, the WisTransPortal element names for the CMAA locations differ depending on which data source is
-        being used.
+        In order to maintain backwards compatibility, the WisTransPortal maintains two sets of element names for
+        the CMAA latitude and longitude coordinate values depending on which data source is being used:
     </p>
     <ul>
-        <li>MV4000 – WISLR_LATDECDG, WISLR_LONDECDG</li>
-        <li>DT40000 – CMAALAT, CMAALONG</li>
+        <li>MV4000 - WISLR_LATDECDG, WISLR_LONDECDG</li>
+        <li>DT40000 - CMAALAT, CMAALONG</li>
     </ul>
+    <p>Although the two sets of element names differ, they refer to the same coordinate values and
+        represent the best available crash geo-coordinate locations in the WisTransPortal.
+        By convention, the CMAA uses the "DT4000" names when it displays crash information. </p>
+    <p><b>System Requirements</b></p>
     <p>
-        Although the elements names differ, the underlying values are the same and represent the best available crash
-        locations in the WisTransPortal.
+        The CMAA crash map is designed to work with all primary web browsers used by WisDOT. As
+        of the intial CMAA release, that includes IE 11, Edge, and Chrome.
     </p>
-
     <p><b>Disclaimer</b></p>
-
-    The CMAA crash map is maintained by UW TOPS Lab on behalf of the Wisconsin Department of Transportation for research
-    and planning purposes. Any other use, while not prohibited, is the sole responsibility of the user.
-
-    {/*<p><b>Disclaimer</b></p>*/}
-
-    {/*{disclamerDiv}*/}
+    <p>
+        The CMAA crash map is maintained by UW TOPS Lab on behalf of the Wisconsin
+        Department of Transportation for research and planning purposes. Any
+        other use, while not prohibited, is the sole responsibility of the user.
+    </p>
+    <p>
+        See the WisTransPortal
+        <a href="http://transportal.cee.wisc.edu/documents/database/crash-data.html" target="_blank">Crash
+            Database Documentation</a> or contact the TOPS Lab
+        at <a href="mailto:crash-data@topslab.wisc.edu">crash-data@topslab.wisc.edu</a> for additional information.
+    </p>
 </div>;
 
 export const helpH3 = <h3>Help</h3>;
 
-export const helpDiv = <div>
-    Coming soon
+export const helpDiv = <div id="help-div">
+
+    <h3>Initial Extent</h3>
+
+    <div>
+        <span style={{backgroundPosition: '0 0'}} className="help-extent"/>
+        <p>
+            Set the map to initial extent of the crashes
+        </p>
+    </div>
+
+    <h3>Cluster Toggle</h3>
+
+    <div>
+        <span style={{backgroundPosition: '-23px 0'}} className="help-cluster"/>
+        <span style={{backgroundPosition: '2px 0'}} className="help-cluster"/>
+        <p>
+            Toggle the crash point layer to display as individual points or as clusters.
+        </p>
+    </div>
+
+    <h3>Clear Selection</h3>
+
+    <div>
+        <span style={{backgroundPosition: '3px 0'}} className="help-clear-selection"/>
+        <p>
+            Clear all selected crashes. This button also currently clears markup from the measure tool.
+        </p>
+    </div>
+
+    <h3>Selection Tools</h3>
+
+    <div>
+        Selections can be made by use of a rectangular extent, free form polygon, or a line buffered to user defined
+        lateral distance. The selection tools are disabled when the measure tool is active.
+    </div>
+
+    <div>
+        <span style={{backgroundPosition: '-1px 0'}} className="help-selection-tools"/>
+        <label>Select by rectangular extent</label>
+        <p>
+            Single click to define corners of the rectangular extent
+        </p>
+    </div>
+
+    <div>
+        <span style={{backgroundPosition: '-1px -108px'}} className="help-selection-tools"/>
+        <label>Select by buffered line</label>
+        <p>
+            Lateral distance in feet can be set when the tool is activated. Use single clicks to
+            define the vertices and double click to end the line.
+        </p>
+    </div>
+
+    <div>
+        <span style={{backgroundPosition: '-1px -24px'}} className="help-selection-tools"/>
+        <label>Select by polygon</label>
+        <p>
+            Use single clicks to define the vertices and double click to finish the polygon. Avoid
+            self intersections of the polygon.
+        </p>
+    </div>
+
+
+    <h3>Selection Methods</h3>
+
+    <div>
+        Selection methods are available to create new selections as well as to add to an existing selection
+        or subset or remove from the existing selection
+    </div>
+
+    <div>
+        <span style={{backgroundPosition: '-1px 0'}} className="help-selection-mode"/>
+        <label>New Selection</label>
+        <p>
+            Crashes within the extent will be selected. Any previously selected crashes not within the new
+            extent will not be included in the selection.
+        </p>
+    </div>
+
+    <div>
+        <span style={{backgroundPosition: '-32px 0'}} className="help-selection-mode"/>
+        <label>Add to selection</label>
+        <p>
+            Crashes within the new selection extent will be added to the existing selection.
+        </p>
+    </div>
+
+    <div>
+        <span style={{backgroundPosition: '-93px 0'}} className="help-selection-mode"/>
+        <label>Subset selection</label>
+        <p>
+            The remaining selection will be only those crashes that were previously selected and are within
+            the defined selection extent.
+        </p>
+    </div>
+    <div>
+        <span style={{backgroundPosition: '-62px 0'}} className="help-selection-mode"/>
+        <label>Remove from selection</label>
+        <p>
+            Selected crashes within the defined extent will be unselected.
+        </p>
+    </div>
+
+    <h3>Measure Tool</h3>
+
+    <div>
+        <span style={{backgroundPosition: '0 0'}} className="help-measure"/>
+        <p>
+            Measure distances on the map. Measure sketch lines and labels can be cleared using 'Clear Selection'
+        </p>
+    </div>
+
+
 </div>;
