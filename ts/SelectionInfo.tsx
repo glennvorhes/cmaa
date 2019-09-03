@@ -56,7 +56,8 @@ interface iColPresetPairs {
     value: string;
 }
 
-class _SelectionInfo extends React.Component<{ features: Feature[], map: Map }, { selectedPreset: string }> {
+class _SelectionInfo extends React.Component<{ features: Feature[], map: Map, unmapped: string[] },
+    { selectedPreset: string, downloadUnmapped: boolean }> {
     dataSource: string;
     colPresetList: string[];
 
@@ -66,7 +67,8 @@ class _SelectionInfo extends React.Component<{ features: Feature[], map: Map }, 
         this.dataSource = (document.getElementById('dataSource') as HTMLInputElement).value;
 
         this.state = {
-            selectedPreset: (document.getElementById('activeColumnList') as HTMLInputElement).value
+            selectedPreset: (document.getElementById('activeColumnList') as HTMLInputElement).value,
+            downloadUnmapped: false
         };
 
         let colPresetPairs: iColPresetPairs[] = [];
@@ -98,7 +100,17 @@ class _SelectionInfo extends React.Component<{ features: Feature[], map: Map }, 
 
 
     render() {
-        let selectDivContent = <h4>No crashes selected</h4>;
+
+
+        let selectDivContent = <div>
+            <h4 style={{margin: '3px 0 0 0'}}>No crashes selected</h4>
+            <label htmlFor="download-unmapped">Include Unmapped</label>
+            <input id="download-unmapped" type="checkbox" checked={this.state.downloadUnmapped} onChange={
+                () => {
+                    this.setState({downloadUnmapped: !this.state.downloadUnmapped})
+                }
+            }/>
+        </div>;
 
         let divInfo = document.getElementById('selection-info') as HTMLDivElement;
 
@@ -108,7 +120,13 @@ class _SelectionInfo extends React.Component<{ features: Feature[], map: Map }, 
 
         let docNumList: string[] = [];
 
-        if (this.props.features.length > 0) {
+        if (this.state.downloadUnmapped){
+            for (let c of this.props.unmapped){
+                docNumList.push(c);
+            }
+        }
+
+        if (this.props.features.length > 0 || this.state.downloadUnmapped) {
             let spans = [];
 
             for (let f of this.props.features) {
@@ -147,8 +165,6 @@ class _SelectionInfo extends React.Component<{ features: Feature[], map: Map }, 
                             let x = parseFloat(target.getAttribute('data-x'));
                             let y = parseFloat(target.getAttribute('data-y'));
                             getCrashInfo(docNum);
-
-                            // console.log(x, y)
 
 
                             let f = new Feature();
@@ -194,50 +210,31 @@ class _SelectionInfo extends React.Component<{ features: Feature[], map: Map }, 
                     <input type="hidden" name="columnList" value={this.state.selectedPreset}/>
                     <input type="hidden" name="docKeySelection" value={docNumList.join(',')}/>
                     <input type="submit" value="Download Table"/>
+
+
                 </form>
-                {/*docKeySelection: docNumList.join(',')*/}
-                {/*columnList: this.state.selectedPreset,*/}
 
-                {/*<a style={*/}
-                {/*{*/}
-                {/*display: 'block',*/}
-                {/*cursor: 'pointer',*/}
-                {/*textDecoration: 'underline',*/}
-                {/*color: 'blue',*/}
-                {/*marginBottom: '5px'*/}
-                {/*}*/}
-                {/*}*/}
-                {/*onClick={(e) => {*/}
-                {/*e.preventDefault();*/}
-
-                {/*// this.props.*/}
-                {/*//     docNumList*/}
-
-                {/*$.post(cnst.CRASH_TABLE_DOWNLOAD, {*/}
-                {/*dataSource:  this.dataSource,*/}
-                {/*columnList: this.state.selectedPreset,*/}
-                {/*docKeySelection: docNumList.join(',')*/}
-
-
-                {/*});*/}
-                {/*// alert('Not yet implemented')*/}
-                {/*}}*/}
-                {/*>Download Crash Table</a>*/}
-                <select style={{width: '190px'}} value={this.state.selectedPreset} onChange={(e) => {
+                <select style={{width: '166px'}} value={this.state.selectedPreset} onChange={(e) => {
                     this.setState({selectedPreset: e.target.value})
                 }}>
                     {options}
-                </select>
+                </select><br/>
+                <label htmlFor="download-unmapped">Include Unmapped</label>
+                <input id="download-unmapped" type="checkbox" checked={this.state.downloadUnmapped} onChange={
+                    () => {
+                        this.setState({downloadUnmapped: !this.state.downloadUnmapped})
+                    }
+                }/><br/>
                 {spans}
             </div>
         }
 
 
-        return <div id="selection-container" style={{display: 'flex', flexDirection: 'column', padding: 0}}>
-            <div id="selections" style={{flex: 1, overflowY: 'auto', borderBottom: 'solid black 1px'}}>
+        return <div id="selection-container">
+            <div id="selections">
                 {selectDivContent}
             </div>
-            <div id="selection-info" style={{flex: 1, overflowY: 'auto'}}>
+            <div id="selection-info">
             </div>
         </div>
     }
@@ -247,7 +244,8 @@ class _SelectionInfo extends React.Component<{ features: Feature[], map: Map }, 
 export const SelectionInfo = connect((s: iState) => {
     return {
         features: s.selectedFeatures,
-        map: s.map
+        map: s.map,
+        unmapped: s.unmappedList
     }
 })(_SelectionInfo);
 

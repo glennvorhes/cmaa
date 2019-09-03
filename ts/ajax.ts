@@ -37,6 +37,10 @@ export function getCrashInfo(crsh: string, container?: HTMLDivElement) {
             let outHtml = '<table class="crash-attribute-table" style="border-collapse: collapse">';
 
             for (let p of propOrder) {
+                if (p === 'TOTINJ_O'){
+                    continue;
+                }
+
                 outHtml += `<tr>`;
                 outHtml += `<td>${p}</td>`;
 

@@ -10,7 +10,6 @@ import Map from 'ol/Map';
 import * as cnst from './constants';
 
 
-
 function queryResults(state: intf.iQueryResults = {}, action: act.iSetQueryResults) {
     if (action.type === act.SET_QUERY_RESULTS) {
 
@@ -36,7 +35,7 @@ function layerChecked(state: { [s: string]: boolean } = _lyrChecked, action: act
         let retObj = {};
 
         for (let s of intf.crashSevList) {
-            if (action.sev === s){
+            if (action.sev === s) {
                 retObj[s] = action.checked;
             } else {
                 retObj[s] = state[s];
@@ -49,8 +48,8 @@ function layerChecked(state: { [s: string]: boolean } = _lyrChecked, action: act
     }
 }
 
-function activeTool(state: string = null, action: act.iSetSelectedTool){
-    if (action.type === act.SET_ACTIVE_TOOL){
+function activeTool(state: string = null, action: act.iSetSelectedTool) {
+    if (action.type === act.SET_ACTIVE_TOOL) {
         return action.tool
     } else {
         return state
@@ -58,24 +57,24 @@ function activeTool(state: string = null, action: act.iSetSelectedTool){
 }
 
 function selectedFeatures(state: Feature[] = [], action: act.iSetSelectedFeatures) {
-    if (action.type === act.SET_SELECTED_FEATURES){
+    if (action.type === act.SET_SELECTED_FEATURES) {
 
         action.features.sort((a: Feature, b: Feature) => {
             let sevA = a.getProperties()['injSvr'];
             let sevB = b.getProperties()['injSvr'];
 
-            if (sevA === sevB){
+            if (sevA === sevB) {
                 return 0
             }
 
             let indA = intf.crashSevList.indexOf(sevA);
             let indB = intf.crashSevList.indexOf(sevB);
 
-            if (indA < 0){
+            if (indA < 0) {
                 return 1
             }
 
-            if (indB < 0){
+            if (indB < 0) {
                 return -1;
             }
 
@@ -99,41 +98,76 @@ function selectedFeatures(state: Feature[] = [], action: act.iSetSelectedFeature
 //     }
 // }
 
-function loading(state: boolean = false, action: act.iSetLoading){
-    if (action.type === act.SET_LOADING){
+function loading(state: boolean = false, action: act.iSetLoading) {
+    if (action.type === act.SET_LOADING) {
         return action.loading;
     } else {
         return state;
     }
 }
 
-function cluster(state: boolean = false, action: act.iSetCluster){
-    if (action.type === act.SET_CLUSTER){
+function cluster(state: boolean = false, action: act.iSetCluster) {
+    if (action.type === act.SET_CLUSTER) {
         return action.cluster;
     } else {
         return state;
     }
 }
 
-function isSelecting(state: boolean = false, action: act.iSetIsSelecting){
-    if (action.type === act.SET_IS_SELECTING){
+function isSelecting(state: boolean = false, action: act.iSetIsSelecting) {
+    if (action.type === act.SET_IS_SELECTING) {
         return action.isSelecting;
     } else {
         return state;
     }
 }
 
-function map(state: Map = null, action: act.iSetMap){
-    if (action.type === act.SET_MAP){
+function map(state: Map = null, action: act.iSetMap) {
+    if (action.type === act.SET_MAP) {
         return action.map
     } else {
         return state
     }
 }
 
+function unmappedList(state: string[] = [], action: act.iSetUnmapped) {
+    if (action.type === act.SET_UNMAPPED) {
+        let returnArr: string[] = [];
+
+        for (let c of action.unmappedLookup.K) {
+            returnArr.push(c);
+        }
+
+        for (let c of action.unmappedLookup.A) {
+            returnArr.push(c);
+        }
+
+        for (let c of action.unmappedLookup.B) {
+            returnArr.push(c);
+        }
+
+        for (let c of action.unmappedLookup.C) {
+            returnArr.push(c);
+        }
+
+        for (let c of action.unmappedLookup.O) {
+            returnArr.push(c);
+        }
+
+        return returnArr;
+
+
+    } else {
+        return state;
+    }
+
+}
+
 export const store = Redux.createStore(
-    Redux.combineReducers({queryResults, layerChecked,
-        selectedFeatures, loading, map, isSelecting, cluster, activeTool})
+    Redux.combineReducers({
+        queryResults, layerChecked,
+        selectedFeatures, loading, map, isSelecting, cluster, activeTool, unmappedList
+    })
 );
 
 export interface iState {
@@ -146,6 +180,7 @@ export interface iState {
     isSelecting: boolean;
     cluster: boolean;
     activeTool: string;
+    unmappedList: string[];
 }
 
 export function getState(): iState {

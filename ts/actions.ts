@@ -13,6 +13,7 @@ export const SET_LOADING = 'SET_LOADING';
 export const SET_CLUSTER = 'SET_CLUSTER';
 export const SET_SELECTION = 'SET_SELECTION';
 export const SET_MAP = 'SET_MAP';
+export const SET_UNMAPPED = 'SET_UNMAPPED';
 export const SET_BUFFER_DIST = 'SET_BUFFER_DIST';
 
 
@@ -64,6 +65,10 @@ export interface iSetSelection extends Redux.Action{
 
 export interface iSetMap extends Redux.Action{
     map: Map;
+}
+
+export interface iSetUnmapped extends Redux.Action{
+    unmappedLookup: {K: string[], A: string[], B: string[], C: string[], O: string[]}
 }
 
 export interface iSetBuffDistance extends Redux.Action {

@@ -29,6 +29,8 @@ import {LayerToggle} from './layerToggle';
 import {Search} from './search';
 import {Measure} from "./measure";
 import * as fileSaver from 'file-saver';
+import TileLayer from 'ol/layer/Tile.js';
+import BingMaps from 'ol/source/BingMaps.js';
 
 
 const esriJson = new EsriJSON();
@@ -57,7 +59,8 @@ class _CrashMap extends React.Component<{
     setCluster: (c: boolean) => any,
     clusterShown: boolean,
     // isSelecting: boolean,
-    activeTool: string
+    activeTool: string,
+    setUnmapped: (l: { [s: string]: string[] }) => any
 }, {
     originalExtent: {
         center: [number, number], zoom: number
@@ -69,10 +72,8 @@ class _CrashMap extends React.Component<{
         C: string[],
         O: string[]
     },
-    // clusterShown: boolean
 }> {
     private map: Map;
-    private selectionTimeout: number = null;
     private dblClickInteraction: DoubleClickZoom;
     private lastIsSelecting: boolean;
     private lastActiveTool: string;
@@ -90,7 +91,6 @@ class _CrashMap extends React.Component<{
                 zoom: 7
             },
             unmappedList: {K: [], A: [], B: [], C: [], O: []},
-            // clusterShown: false
         }
     }
 
@@ -140,15 +140,20 @@ class _CrashMap extends React.Component<{
                     }
                 }
 
+                let unmappedLookup = {
+                    K: res.K ? res.K.unmappedList : [],
+                    A: res.A ? res.A.unmappedList : [],
+                    B: res.B ? res.B.unmappedList : [],
+                    C: res.C ? res.C.unmappedList : [],
+                    O: res.O ? res.O.unmappedList : [],
+                };
+
                 this.setState({
-                    unmappedList: {
-                        K: res.K ? res.K.unmappedList : [],
-                        A: res.A ? res.A.unmappedList : [],
-                        B: res.B ? res.B.unmappedList : [],
-                        C: res.C ? res.C.unmappedList : [],
-                        O: res.O ? res.O.unmappedList : [],
-                    }
+                    unmappedList: unmappedLookup
                 });
+
+                this.props.setUnmapped(unmappedLookup);
+
 
                 resultObj['out_features']['features'] = mappedFeatures;
 
@@ -215,11 +220,12 @@ class _CrashMap extends React.Component<{
         this.map = new Map({
             target: document.getElementById('map'),
             view: new View({
-                center: this.state.originalExtent.center,
-                zoom: this.state.originalExtent.zoom,
+                center: [-9840124.542661136, 5379280.493658545],
+                zoom: 7,
                 maxResolution: 2000
             })
         });
+
 
         cnst.popup.init(this.map);
 
@@ -435,34 +441,37 @@ class _CrashMap extends React.Component<{
                     <div id="hider">Hide&#9660;</div>
                     <div id="accordion">
                         <h3>Legend</h3>
-                        <div>
-                            <Legend/>
-                            <button style={{marginTop: '10px'}} onClick={() => {
-                                (this.map.getTargetElement() as HTMLDivElement).focus();
+                        <div className="legend-container">
+                            <div id='legend-container-outer'>
+                                <Legend/>
+                                <button style={{marginTop: '10px'}} onClick={() => {
+                                    (this.map.getTargetElement() as HTMLDivElement).focus();
 
-                                let zoom = this.map.getView().getZoom();
-                                this.map.getView().setZoom(zoom + 1);
-                                this.map.getView().setZoom(zoom);
-                                this.map.updateSize();
+                                    let zoom = this.map.getView().getZoom();
+                                    this.map.getView().setZoom(zoom + 1);
+                                    this.map.getView().setZoom(zoom);
+                                    this.map.updateSize();
 
-                                this.map.once('postcompose', (event) => {
-                                    let canvas: HTMLCanvasElement = (event['glContext'].canvas_ as HTMLCanvasElement);
+                                    this.map.once('postcompose', (event) => {
+                                        let canvas: HTMLCanvasElement = (event['glContext'].canvas_ as HTMLCanvasElement);
 
-                                    if (navigator.msSaveBlob) {
-                                        navigator.msSaveBlob(canvas['msToBlob'](), 'map.png');
-                                    } else {
-                                        canvas.toBlob((blob) => {
-                                            fileSaver.saveAs(blob, 'map.png');
-                                        });
-                                    }
-                                });
-                                this.map.renderSync();
+                                        if (navigator.msSaveBlob) {
+                                            navigator.msSaveBlob(canvas['msToBlob'](), 'map.png');
+                                        } else {
+                                            canvas.toBlob((blob) => {
+                                                fileSaver.saveAs(blob, 'map.png');
+                                            });
+                                        }
+                                    });
+                                    this.map.renderSync();
 
-                            }}>Save Image
-                            </button>
+                                }}>Save Image
+                                </button>
+                            </div>
+                            <SelectionInfo/>
                         </div>
-                        <h3>Selection</h3>
-                        <SelectionInfo/>
+
+
                         <h3>Base Map</h3>
                         <div>
                             <LayerSwitcher mapFunc={() => {
@@ -470,12 +479,11 @@ class _CrashMap extends React.Component<{
                             }} embed={false}/>
                         </div>
                         <h3>Unmapped Crashes</h3>
-                        <div id="unmapped-container" style={{display: 'flex', flexDirection: 'column', padding: 0}}>
-                            <div id="unmapped-list"
-                                 style={{flex: 1, overflowY: 'auto', borderBottom: 'solid black 1px'}}>
+                        <div id="unmapped-container">
+                            <div id="unmapped-list">
                                 {unMappedSpans}
                             </div>
-                            <div id="unmapped-info" style={{flex: 1, overflowY: 'auto'}}>
+                            <div id="unmapped-info">
                             </div>
                         </div>
                         {cnstEl.helpH3}
@@ -532,7 +540,12 @@ let CrashMap = connect(
             },
             setCluster: (b: boolean) => {
                 dispatch({type: act.SET_CLUSTER, cluster: b} as act.iSetCluster);
+            },
+            setUnmapped: (l: { [s: string]: string[] }) => {
+                dispatch({type: act.SET_UNMAPPED, unmappedLookup: l})
             }
+
+
         }
     }
 )(_CrashMap);

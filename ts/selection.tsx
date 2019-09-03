@@ -243,7 +243,7 @@ class Line extends React.Component<iSelectControlWrap, {
         super(p, c);
         this.draw = new Draw({type: 'LineString'});
 
-        this.state = {valid: true, tooltip: "Line Buffer Distance", buffDistance: 1000, canChangeDist: true};
+        this.state = {valid: true, tooltip: "Line Buffer Distance", buffDistance: 250, canChangeDist: true};
 
         // const parser = new jsts.io.OL3Parser();
 

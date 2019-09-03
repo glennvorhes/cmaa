@@ -139,7 +139,7 @@ export const aboutDiv = <div>
     </p>
     <ul>
         <li>MV4000 - WISLR_LATDECDG, WISLR_LONDECDG</li>
-        <li>DT40000 - CMAALAT, CMAALONG</li>
+        <li>DT4000 - CMAALAT, CMAALONG</li>
     </ul>
     <p>Although the two sets of element names differ, they refer to the same coordinate values and
         represent the best available crash geo-coordinate locations in the WisTransPortal.
