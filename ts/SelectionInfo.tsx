@@ -7,6 +7,7 @@ import Point from 'ol/geom/Point';
 import $ = require("jquery");
 import Map from 'ol/Map';
 import * as cnst from './constants';
+import * as fileSaver from "file-saver";
 
 
 /**
@@ -51,6 +52,30 @@ function getCrashInfo(docNum: string) {
         'json');
 }
 
+const saveImageButton = <button style={{marginTop: '10px'}} onClick={() => {
+    (this.map.getTargetElement() as HTMLDivElement).focus();
+
+    let zoom = this.map.getView().getZoom();
+    this.map.getView().setZoom(zoom + 1);
+    this.map.getView().setZoom(zoom);
+    this.map.updateSize();
+
+    this.map.once('postcompose', (event) => {
+        let canvas: HTMLCanvasElement = (event['glContext'].canvas_ as HTMLCanvasElement);
+
+        if (navigator.msSaveBlob) {
+            navigator.msSaveBlob(canvas['msToBlob'](), 'map.png');
+        } else {
+            canvas.toBlob((blob) => {
+                fileSaver.saveAs(blob, 'map.png');
+            });
+        }
+    });
+    this.map.renderSync();
+
+}}>Save Image
+</button>;
+
 interface iColPresetPairs {
     index: number;
     value: string;
@@ -60,6 +85,7 @@ class _SelectionInfo extends React.Component<{ features: Feature[], map: Map, un
     { selectedPreset: string, downloadUnmapped: boolean }> {
     dataSource: string;
     colPresetList: string[];
+    downloadImageButton: any;
 
     constructor(p, c) {
         super(p, c);
@@ -96,6 +122,30 @@ class _SelectionInfo extends React.Component<{ features: Feature[], map: Map, un
             this.colPresetList.push(pr.value);
         }
 
+        this.downloadImageButton = <button style={{marginLeft: '55px'}} onClick={() => {
+                (this.props.map.getTargetElement() as HTMLDivElement).focus();
+
+                let zoom = this.props.map.getView().getZoom();
+                this.props.map.getView().setZoom(zoom + 1);
+                this.props.map.getView().setZoom(zoom);
+                this.props.map.updateSize();
+
+                this.props.map.once('postcompose', (event) => {
+                    let canvas: HTMLCanvasElement = (event['glContext'].canvas_ as HTMLCanvasElement);
+
+                    if (navigator.msSaveBlob) {
+                        navigator.msSaveBlob(canvas['msToBlob'](), 'map.png');
+                    } else {
+                        canvas.toBlob((blob) => {
+                            fileSaver.saveAs(blob, 'map.png');
+                        });
+                    }
+                });
+                this.props.map.renderSync();
+
+            }}>Save Image
+            </button>
+
     }
 
 
@@ -110,6 +160,30 @@ class _SelectionInfo extends React.Component<{ features: Feature[], map: Map, un
                     this.setState({downloadUnmapped: !this.state.downloadUnmapped})
                 }
             }/>
+            {this.downloadImageButton}
+            {/*<button style={{marginTop: '10px'}} onClick={() => {*/}
+                {/*(this.props.map.getTargetElement() as HTMLDivElement).focus();*/}
+
+                {/*let zoom = this.props.map.getView().getZoom();*/}
+                {/*this.props.map.getView().setZoom(zoom + 1);*/}
+                {/*this.props.map.getView().setZoom(zoom);*/}
+                {/*this.props.map.updateSize();*/}
+
+                {/*this.props.map.once('postcompose', (event) => {*/}
+                    {/*let canvas: HTMLCanvasElement = (event['glContext'].canvas_ as HTMLCanvasElement);*/}
+
+                    {/*if (navigator.msSaveBlob) {*/}
+                        {/*navigator.msSaveBlob(canvas['msToBlob'](), 'map.png');*/}
+                    {/*} else {*/}
+                        {/*canvas.toBlob((blob) => {*/}
+                            {/*fileSaver.saveAs(blob, 'map.png');*/}
+                        {/*});*/}
+                    {/*}*/}
+                {/*});*/}
+                {/*this.props.map.renderSync();*/}
+
+            {/*}}>Save Image*/}
+            {/*</button>*/}
         </div>;
 
         let divInfo = document.getElementById('selection-info') as HTMLDivElement;
@@ -120,8 +194,8 @@ class _SelectionInfo extends React.Component<{ features: Feature[], map: Map, un
 
         let docNumList: string[] = [];
 
-        if (this.state.downloadUnmapped){
-            for (let c of this.props.unmapped){
+        if (this.state.downloadUnmapped) {
+            for (let c of this.props.unmapped) {
                 docNumList.push(c);
             }
         }
@@ -214,7 +288,7 @@ class _SelectionInfo extends React.Component<{ features: Feature[], map: Map, un
 
                 </form>
 
-                <select style={{width: '166px'}} value={this.state.selectedPreset} onChange={(e) => {
+                <select style={{width: '160px'}} value={this.state.selectedPreset} onChange={(e) => {
                     this.setState({selectedPreset: e.target.value})
                 }}>
                     {options}
@@ -224,7 +298,32 @@ class _SelectionInfo extends React.Component<{ features: Feature[], map: Map, un
                     () => {
                         this.setState({downloadUnmapped: !this.state.downloadUnmapped})
                     }
-                }/><br/>
+                }/>
+                            {this.downloadImageButton}
+                {/*<button style={{marginTop: '10px'}} onClick={() => {*/}
+                    {/*(this.props.map.getTargetElement() as HTMLDivElement).focus();*/}
+
+                    {/*let zoom = this.props.map.getView().getZoom();*/}
+                    {/*this.props.map.getView().setZoom(zoom + 1);*/}
+                    {/*this.props.map.getView().setZoom(zoom);*/}
+                    {/*this.props.map.updateSize();*/}
+
+                    {/*this.props.map.once('postcompose', (event) => {*/}
+                        {/*let canvas: HTMLCanvasElement = (event['glContext'].canvas_ as HTMLCanvasElement);*/}
+
+                        {/*if (navigator.msSaveBlob) {*/}
+                            {/*navigator.msSaveBlob(canvas['msToBlob'](), 'map.png');*/}
+                        {/*} else {*/}
+                            {/*canvas.toBlob((blob) => {*/}
+                                {/*fileSaver.saveAs(blob, 'map.png');*/}
+                            {/*});*/}
+                        {/*}*/}
+                    {/*});*/}
+                    {/*this.props.map.renderSync();*/}
+
+                {/*}}>Save Image*/}
+                {/*</button>*/}
+                <br/>
                 {spans}
             </div>
         }

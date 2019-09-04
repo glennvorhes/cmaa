@@ -29,9 +29,6 @@ import {LayerToggle} from './layerToggle';
 import {Search} from './search';
 import {Measure} from "./measure";
 import * as fileSaver from 'file-saver';
-import TileLayer from 'ol/layer/Tile.js';
-import BingMaps from 'ol/source/BingMaps.js';
-
 
 const esriJson = new EsriJSON();
 
@@ -320,52 +317,52 @@ class _CrashMap extends React.Component<{
 
         this.map.addControl(new ScaleLine({units: 'us', minWidth: 125}));
 
-        let queryId;
-        let totalRecords;
-        let crashReports;
-
-        let queryIdInput = window.parent.document.getElementById('queryId');
-        let totalRecordsInput = window.parent.document.getElementById('totalRecords');
-        let crashReportsInput = window.parent.document.getElementById('crashReports');
-
-
-        // let queryIdUrlParam = window.location.href.match(/queryId=\d+/);
+        // let queryId;
+        // let totalRecords;
+        // let crashReports;
         //
-        // if (queryIdUrlParam) {
-        //     queryId = parseInt(queryIdUrlParam[0].match(/\d+/)[0])
+        // let queryIdInput = window.parent.document.getElementById('queryId');
+        // let totalRecordsInput = window.parent.document.getElementById('totalRecords');
+        // let crashReportsInput = window.parent.document.getElementById('crashReports');
+        //
+        //
+        // // let queryIdUrlParam = window.location.href.match(/queryId=\d+/);
+        // //
+        // // if (queryIdUrlParam) {
+        // //     queryId = parseInt(queryIdUrlParam[0].match(/\d+/)[0])
+        // // }
+        // // else
+        // if (queryIdInput) {
+        //     queryId = parseInt((queryIdInput as HTMLInputElement).value);
+        //     totalRecords = parseInt((totalRecordsInput as HTMLInputElement).value);
+        //     crashReports = (crashReportsInput as HTMLInputElement).value.trim().toLowerCase() === 'true';
+        // } else {
+        //     queryIdInput = document.getElementById('queryId');
+        //     totalRecordsInput = document.getElementById('totalRecords');
+        //     crashReportsInput = document.getElementById('crashReports');
+        //
+        //     if (queryIdInput) {
+        //         queryId = parseInt((queryIdInput as HTMLInputElement).value);
+        //         totalRecords = parseInt((totalRecordsInput as HTMLInputElement).value);
+        //         crashReports = (crashReportsInput as HTMLInputElement).value.trim().toLowerCase() === 'true';
+        //     } else {
+        //         //small query
+        //         queryId = 1023;
+        //         totalRecords = 393;
+        //
+        //         // //TODO switch back
+        //         // queryId = 1615;
+        //         // //big query
+        //         // queryId = 1057;
+        //         // totalRecords = 45519;
+        //         // //full state
+        //         // queryId = 1058;
+        //         // totalRecords = 122645;
+        //         // crashReports = true;
+        //     }
         // }
-        // else
-        if (queryIdInput) {
-            queryId = parseInt((queryIdInput as HTMLInputElement).value);
-            totalRecords = parseInt((totalRecordsInput as HTMLInputElement).value);
-            crashReports = (crashReportsInput as HTMLInputElement).value.trim().toLowerCase() === 'true';
-        } else {
-            queryIdInput = document.getElementById('queryId');
-            totalRecordsInput = document.getElementById('totalRecords');
-            crashReportsInput = document.getElementById('crashReports');
 
-            if (queryIdInput) {
-                queryId = parseInt((queryIdInput as HTMLInputElement).value);
-                totalRecords = parseInt((totalRecordsInput as HTMLInputElement).value);
-                crashReports = (crashReportsInput as HTMLInputElement).value.trim().toLowerCase() === 'true';
-            } else {
-                //small query
-                queryId = 1023;
-                totalRecords = 393;
-
-                // //TODO switch back
-                // queryId = 1615;
-                // //big query
-                // queryId = 1057;
-                // totalRecords = 45519;
-                // //full state
-                // queryId = 1058;
-                // totalRecords = 122645;
-                // crashReports = true;
-            }
-        }
-
-        this.getCrashesByQueryId(queryId);
+        this.getCrashesByQueryId(cnst.queryId);
 
     }
 
@@ -444,29 +441,29 @@ class _CrashMap extends React.Component<{
                         <div className="legend-container">
                             <div id='legend-container-outer'>
                                 <Legend/>
-                                <button style={{marginTop: '10px'}} onClick={() => {
-                                    (this.map.getTargetElement() as HTMLDivElement).focus();
+                                {/*<button style={{marginTop: '10px'}} onClick={() => {*/}
+                                    {/*(this.map.getTargetElement() as HTMLDivElement).focus();*/}
 
-                                    let zoom = this.map.getView().getZoom();
-                                    this.map.getView().setZoom(zoom + 1);
-                                    this.map.getView().setZoom(zoom);
-                                    this.map.updateSize();
+                                    {/*let zoom = this.map.getView().getZoom();*/}
+                                    {/*this.map.getView().setZoom(zoom + 1);*/}
+                                    {/*this.map.getView().setZoom(zoom);*/}
+                                    {/*this.map.updateSize();*/}
 
-                                    this.map.once('postcompose', (event) => {
-                                        let canvas: HTMLCanvasElement = (event['glContext'].canvas_ as HTMLCanvasElement);
+                                    {/*this.map.once('postcompose', (event) => {*/}
+                                        {/*let canvas: HTMLCanvasElement = (event['glContext'].canvas_ as HTMLCanvasElement);*/}
 
-                                        if (navigator.msSaveBlob) {
-                                            navigator.msSaveBlob(canvas['msToBlob'](), 'map.png');
-                                        } else {
-                                            canvas.toBlob((blob) => {
-                                                fileSaver.saveAs(blob, 'map.png');
-                                            });
-                                        }
-                                    });
-                                    this.map.renderSync();
+                                        {/*if (navigator.msSaveBlob) {*/}
+                                            {/*navigator.msSaveBlob(canvas['msToBlob'](), 'map.png');*/}
+                                        {/*} else {*/}
+                                            {/*canvas.toBlob((blob) => {*/}
+                                                {/*fileSaver.saveAs(blob, 'map.png');*/}
+                                            {/*});*/}
+                                        {/*}*/}
+                                    {/*});*/}
+                                    {/*this.map.renderSync();*/}
 
-                                }}>Save Image
-                                </button>
+                                {/*}}>Save Image*/}
+                                {/*</button>*/}
                             </div>
                             <SelectionInfo/>
                         </div>

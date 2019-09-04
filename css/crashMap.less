@@ -91,7 +91,7 @@ header {
     }
 
     > div {
-      padding: 10px;
+      padding: 5px;
       border-bottom: none;
     }
 
@@ -178,17 +178,21 @@ header {
   display: flex;
   flex-direction: column;
 
-  > div {
-    //border-bottom: solid black 1px;
-    min-height: 50px;
-    flex: 1;
-    overflow-y: auto;
-  }
+  //> div {
+  //  //border-bottom: solid black 1px;
+  //  min-height: 50px;
+  //  flex: 1;
+  //  overflow-y: auto;
+  //}
 
 }
 
-#legend-container-outer, #selections{
+#legend-container-outer, #selections {
   border-bottom: solid black 1px;
+}
+
+#legend-container-outer{
+  height: 157px;
 }
 
 .legend-table-container {
@@ -222,18 +226,18 @@ header {
   }
 }
 
-#unmapped-container{
+#unmapped-container {
   display: flex;
   flex-direction: column;
   padding: 0;
 
   > div {
     flex: 1;
-   overflow-y: auto;
+    overflow-y: auto;
   }
 }
 
-#uunmapped-list{
+#uunmapped-list {
   border-bottom: solid black 1px;
 }
 
@@ -303,7 +307,14 @@ header {
   }
 }
 
-.loading-gif {
+//.loading-gif {
+//  position: absolute;
+//  top: 60px;
+//  left: 50px;
+//  z-index: 5;
+//}
+
+.loading-gif-container {
   position: absolute;
   top: 60px;
   left: 50px;

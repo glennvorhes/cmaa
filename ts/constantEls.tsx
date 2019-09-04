@@ -257,6 +257,7 @@ export const helpDiv = <div id="help-div">
         <span style={{backgroundPosition: '-93px 0'}} className="help-selection-mode"/>
         <label>Subset selection</label>
         <p>
+            Select only crashes that are within an existing selection.
             The remaining selection will be only those crashes that were previously selected and are within
             the defined selection extent.
         </p>

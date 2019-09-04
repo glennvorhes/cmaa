@@ -9,7 +9,7 @@
     "build-css": "node_modules\\.bin\\parcel build --public-url . -d build css/crashMap.less",
     "test-serve": "C:\\Python34\\python.exe -m http.server 5001"
   },
-  "author": "",
+  "author": "Glenn Vorhes",
   "license": "ISC",
   "devDependencies": {
     "@types/file-saver": "^2.0.1",

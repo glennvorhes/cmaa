@@ -400,7 +400,7 @@ header {
   border-top-right-radius: 0;
 }
 #accordion-container #accordion > div {
-  padding: 10px;
+  padding: 5px;
   border-bottom: none;
 }
 #accordion-container #accordion .ui-state-active,
@@ -472,14 +472,12 @@ header {
   display: flex;
   flex-direction: column;
 }
-.legend-container > div {
-  min-height: 50px;
-  flex: 1;
-  overflow-y: auto;
-}
 #legend-container-outer,
 #selections {
   border-bottom: solid black 1px;
+}
+#legend-container-outer {
+  height: 157px;
 }
 .legend-table-container {
   flex: 1;
@@ -570,7 +568,7 @@ header {
   background-size: 124px;
   display: inline-block;
 }
-.loading-gif {
+.loading-gif-container {
   position: absolute;
   top: 60px;
   left: 50px;
