@@ -84,8 +84,8 @@ class _CrashMap extends React.Component<{
 
         this.state = {
             originalExtent: {
-                center: [-9840124.542661136, 5379280.493658545],
-                zoom: 7
+                center: [-9950741.719619062, 5572860.553334906],
+                zoom: 0.67
             },
             unmappedList: {K: [], A: [], B: [], C: [], O: []},
         }
@@ -106,6 +106,16 @@ class _CrashMap extends React.Component<{
         $.post(cnst.GP_BY_QUERY_ID,
             {queryId: queryId, f: 'json', 'env:outSR': 3857},
             (d) => {
+                this.props.setLoading(false);
+
+                if (d.results) {
+                    for (let r of d.results) {
+                        if (r.paramName === 'message') {
+                            console.log(r.value);
+                            break;
+                        }
+                    }
+                }
 
                 let resultObj = {};
 
@@ -162,9 +172,7 @@ class _CrashMap extends React.Component<{
 
                 for (let f of features) {
                     allFeaturesArr.push(f);
-
                     cnst.allPointLayer.getSource().addFeature(f);
-
 
                     switch (f.getProperties()['injSvr']) {
                         case 'K':
@@ -198,7 +206,6 @@ class _CrashMap extends React.Component<{
                     this.map.getView().fit(cnst.allPointLayer.getSource().getExtent());
                 }
 
-                this.props.setLoading(false);
 
                 this.setState({
                     originalExtent: {
@@ -217,13 +224,13 @@ class _CrashMap extends React.Component<{
         this.map = new Map({
             target: document.getElementById('map'),
             view: new View({
-                center: [-9840124.542661136, 5379280.493658545],
-                zoom: 7,
+                center: this.state.originalExtent.center,
+                zoom: this.state.originalExtent.zoom,
                 maxResolution: 2000
             })
         });
 
-
+        glob['map'] = this.map;
         cnst.popup.init(this.map);
 
         // let dblClickInteraction;
@@ -296,71 +303,7 @@ class _CrashMap extends React.Component<{
         this.map.addLayer(cnst.clusterLayer);
         this.map.addLayer(cnst.searchIndicator);
 
-
-        // let selectionChangeTimeout: number = null;
-        //
-        // cnst.selectionLayer.getSource().on('change', () => {
-        //     if (selectionChangeTimeout) {
-        //         clearTimeout(selectionChangeTimeout)
-        //     }
-        //
-        //     selectionChangeTimeout = setTimeout(() => {
-        //         this.props.setSelectedCrashes(cnst.selectionLayer.getSource().getFeatures());
-        //         console.log('changed');
-        //     }, 5);
-        //
-        //
-        // });
-
-
-        glob['map'] = this.map;
-
         this.map.addControl(new ScaleLine({units: 'us', minWidth: 125}));
-
-        // let queryId;
-        // let totalRecords;
-        // let crashReports;
-        //
-        // let queryIdInput = window.parent.document.getElementById('queryId');
-        // let totalRecordsInput = window.parent.document.getElementById('totalRecords');
-        // let crashReportsInput = window.parent.document.getElementById('crashReports');
-        //
-        //
-        // // let queryIdUrlParam = window.location.href.match(/queryId=\d+/);
-        // //
-        // // if (queryIdUrlParam) {
-        // //     queryId = parseInt(queryIdUrlParam[0].match(/\d+/)[0])
-        // // }
-        // // else
-        // if (queryIdInput) {
-        //     queryId = parseInt((queryIdInput as HTMLInputElement).value);
-        //     totalRecords = parseInt((totalRecordsInput as HTMLInputElement).value);
-        //     crashReports = (crashReportsInput as HTMLInputElement).value.trim().toLowerCase() === 'true';
-        // } else {
-        //     queryIdInput = document.getElementById('queryId');
-        //     totalRecordsInput = document.getElementById('totalRecords');
-        //     crashReportsInput = document.getElementById('crashReports');
-        //
-        //     if (queryIdInput) {
-        //         queryId = parseInt((queryIdInput as HTMLInputElement).value);
-        //         totalRecords = parseInt((totalRecordsInput as HTMLInputElement).value);
-        //         crashReports = (crashReportsInput as HTMLInputElement).value.trim().toLowerCase() === 'true';
-        //     } else {
-        //         //small query
-        //         queryId = 1023;
-        //         totalRecords = 393;
-        //
-        //         // //TODO switch back
-        //         // queryId = 1615;
-        //         // //big query
-        //         // queryId = 1057;
-        //         // totalRecords = 45519;
-        //         // //full state
-        //         // queryId = 1058;
-        //         // totalRecords = 122645;
-        //         // crashReports = true;
-        //     }
-        // }
 
         this.getCrashesByQueryId(cnst.queryId);
 
@@ -441,29 +384,6 @@ class _CrashMap extends React.Component<{
                         <div className="legend-container">
                             <div id='legend-container-outer'>
                                 <Legend/>
-                                {/*<button style={{marginTop: '10px'}} onClick={() => {*/}
-                                    {/*(this.map.getTargetElement() as HTMLDivElement).focus();*/}
-
-                                    {/*let zoom = this.map.getView().getZoom();*/}
-                                    {/*this.map.getView().setZoom(zoom + 1);*/}
-                                    {/*this.map.getView().setZoom(zoom);*/}
-                                    {/*this.map.updateSize();*/}
-
-                                    {/*this.map.once('postcompose', (event) => {*/}
-                                        {/*let canvas: HTMLCanvasElement = (event['glContext'].canvas_ as HTMLCanvasElement);*/}
-
-                                        {/*if (navigator.msSaveBlob) {*/}
-                                            {/*navigator.msSaveBlob(canvas['msToBlob'](), 'map.png');*/}
-                                        {/*} else {*/}
-                                            {/*canvas.toBlob((blob) => {*/}
-                                                {/*fileSaver.saveAs(blob, 'map.png');*/}
-                                            {/*});*/}
-                                        {/*}*/}
-                                    {/*});*/}
-                                    {/*this.map.renderSync();*/}
-
-                                {/*}}>Save Image*/}
-                                {/*</button>*/}
                             </div>
                             <SelectionInfo/>
                         </div>
@@ -490,7 +410,6 @@ class _CrashMap extends React.Component<{
                     </div>
                 </div>
                 <div id="map">
-                    {/*<div id="crash-info"/>*/}
                     <Search/>
                     <Loading/>
                     <div id="toolbar">
@@ -541,10 +460,11 @@ let CrashMap = connect(
             setUnmapped: (l: { [s: string]: string[] }) => {
                 dispatch({type: act.SET_UNMAPPED, unmappedLookup: l})
             }
-
-
         }
     }
 )(_CrashMap);
 
-ReactDom.render(<Provider store={store.store}><CrashMap/></Provider>, document.getElementById('root'));
+ReactDom.render(
+    <Provider store={store.store}><CrashMap/></Provider>,
+    document.getElementById('root')
+);

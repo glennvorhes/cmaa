@@ -122,7 +122,7 @@ class _SelectionInfo extends React.Component<{ features: Feature[], map: Map, un
             this.colPresetList.push(pr.value);
         }
 
-        this.downloadImageButton = <button style={{marginLeft: '55px'}} onClick={() => {
+        this.downloadImageButton = <button style={{float: 'right'}} onClick={() => {
                 (this.props.map.getTargetElement() as HTMLDivElement).focus();
 
                 let zoom = this.props.map.getView().getZoom();
@@ -153,8 +153,8 @@ class _SelectionInfo extends React.Component<{ features: Feature[], map: Map, un
 
 
         let selectDivContent = <div>
-            <h4 style={{margin: '3px 0 0 0'}}>No crashes selected</h4>
-            <label htmlFor="download-unmapped">Include Unmapped</label>
+            <h4 style={{margin: '3px 0 0 0'}}>No crashes selected for CSV download</h4>
+            <label htmlFor="download-unmapped" style={{}}>Include Unmapped In CSV</label>
             <input id="download-unmapped" type="checkbox" checked={this.state.downloadUnmapped} onChange={
                 () => {
                     this.setState({downloadUnmapped: !this.state.downloadUnmapped})
@@ -262,7 +262,6 @@ class _SelectionInfo extends React.Component<{ features: Feature[], map: Map, un
                     {crashDownLoadLink}
                     {/*<a href={cnst.CRASH_REPORT_DOWNLOAD + crsh} download="download" className="crash-download"/>*/}
                 </div>);
-
             }
 
             let options = [];
@@ -278,22 +277,22 @@ class _SelectionInfo extends React.Component<{ features: Feature[], map: Map, un
                       method="post"
                       action={cnst.CRASH_TABLE_DOWNLOAD}
                       style={{display: 'inline-block'}}
-                      target="_blank"
+                      // target="_blank"
                 >
                     <input type="hidden" name="dataSource" value={this.dataSource}/>
                     <input type="hidden" name="columnList" value={this.state.selectedPreset}/>
                     <input type="hidden" name="docKeySelection" value={docNumList.join(',')}/>
-                    <input type="submit" value="Download Table"/>
+                    <input type="submit" value="Download CSV"/>
 
 
                 </form>
 
-                <select style={{width: '160px'}} value={this.state.selectedPreset} onChange={(e) => {
+                <select style={{float: 'right', maxWidth: '190px'}} value={this.state.selectedPreset} onChange={(e) => {
                     this.setState({selectedPreset: e.target.value})
                 }}>
                     {options}
                 </select><br/>
-                <label htmlFor="download-unmapped">Include Unmapped</label>
+                <label htmlFor="download-unmapped">Include Unmapped In CSV</label>
                 <input id="download-unmapped" type="checkbox" checked={this.state.downloadUnmapped} onChange={
                     () => {
                         this.setState({downloadUnmapped: !this.state.downloadUnmapped})

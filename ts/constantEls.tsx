@@ -14,6 +14,8 @@ export const header = <header>
         <h2>Wisconsin Traffic Operations and Safety Laboratory</h2>
         <h2>The WisTransPortal System</h2>
     </div>
+    <a style={{padding: '10px'}} href="mailto:crash-data@topslab.wisc.edu?subject=CMAA comment or question">Email with comments and questions</a>
+
     {/*The WisTransPortal crash database contains information on all reported crashes in Wisconsin from 1994*/}
     {/*through the current year.*/}
     {/*The&nbsp;<a*/}

@@ -12,18 +12,24 @@ import {
     clusterStyle, measureStyle
 } from './layerStyles';
 import {Popup} from "./popup";
-import {Circle as CircleStyle, Fill, Stroke, Style, Text} from "ol/style";
 
 let queryIdInput = window.parent.document.getElementById('queryId');
 let totalRecordsInput = window.parent.document.getElementById('totalRecords');
 let crashReportsInput = window.parent.document.getElementById('crashReports');
 
-export const allowCrashReportDownload = crashReportsInput && (crashReportsInput as HTMLInputElement).value === 'true';
-// export const allowCrashReportDownload = false;
-export const queryId = queryIdInput ? parseInt((queryIdInput as HTMLInputElement).value): 1023;
-export const totalRecords = totalRecordsInput ? parseInt((totalRecordsInput as HTMLInputElement).value) : 150000;
-// export const totalRecords = 60000;
+let defaultQueryId = 1023;
+// defaultQueryId = 1774;
+let queryId_ = queryIdInput ? parseInt((queryIdInput as HTMLInputElement).value): defaultQueryId;
 
+let allowCrashReportDownload_ = crashReportsInput && (crashReportsInput as HTMLInputElement).value === 'true';
+// allowCrashReportDownload_ = false;
+
+let totalRecords_ = totalRecordsInput ? parseInt((totalRecordsInput as HTMLInputElement).value) : 150000;
+// totalRecords_ = 60000;
+
+export const queryId = queryId_;
+export const allowCrashReportDownload = allowCrashReportDownload_;
+export const totalRecords = totalRecords_;
 
 export const GP_BY_QUERY_ID = 'https://transportal.cee.wisc.edu/applications/arcgis2/rest/services/crash/getCrashByQueryId/GPServer/GetCrashByQueryId/execute';
 export const GP_GET_CRASH_PROPS = 'https://transportal.cee.wisc.edu/applications/arcgis2/rest/services/crash/GetCrashProps/GPServer/GetCrashProps/execute';

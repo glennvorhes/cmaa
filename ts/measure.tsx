@@ -239,16 +239,34 @@ class _Measure extends React.Component<{ map: Map, activeTool: string, setActive
             this.pointerMoveHandler.call(this, e);
         });
         this.setState({enabled: false});
-        this.helpTooltipElement.classList.add('hidden-help-tooltip');
         this.props.setActiveTool(null);
+
+        cnst.drawVectorLayer.getSource().clear();
+
+        let staticTooltips = document.getElementsByClassName('tooltip-static');
+
+
+        for (let i = 0; i < staticTooltips.length; i++) {
+            let t = staticTooltips[i] as HTMLDivElement;
+            t.style.display = 'none';
+
+            // t.parentElement.removeChild(t);
+        }
+
+        this.helpTooltipElement.classList.add('hidden-help-tooltip');
+
+
     }
 
     render() {
-        let enabled = this.props.activeTool  === MEASURE_TOOL ||  this.props.activeTool === null;
+        let enabled = this.props.activeTool === MEASURE_TOOL || this.props.activeTool === null;
         let disabled = !enabled;
 
         return <input className="toolbar-button ruler" readOnly={true}
-                      style={{backgroundColor: this.state.enabled ? 'lightblue' : '', cursor: disabled ? 'not-allowed': ''}}
+                      style={{
+                          backgroundColor: this.state.enabled ? 'lightblue' : '',
+                          cursor: disabled ? 'not-allowed' : ''
+                      }}
                       onClick={() => {
                           this.enable()
                       }} disabled={disabled} title="Measure"/>

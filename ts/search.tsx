@@ -100,28 +100,17 @@ class _Search extends React.Component<{ map: Map }, {}> {
                 this.props.map.getView().setCenter([fExt[0], fExt[1]]);
                 this.props.map.getView().setZoom(10);
                 searchIndicator.getSource().addFeature(f);
-                // foundCrash = true;
 
                 this.clearIndicator(3000);
                 return;
             }
         }
 
-        // if (!foundCrash) {
-
         $.get('https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/findAddressCandidates',
             {
                 f: 'json',
                 SingleLine: searchInfo,
-                searchExtent: {
-                    xmin: -10354584,
-                    ymin: 5233180,
-                    xmax: -9656612,
-                    ymax: 5957887,
-                    spatialReference: {
-                        wkid: 102100
-                    }
-                },
+                searchExtent: '-92.9,42.4,-86.8,47.1',
                 outSR: 102100
             }, (d) => {
                 if (d['candidates'] && d['candidates']['length'] > 0) {

@@ -58,6 +58,8 @@ class SelectionControl extends React.Component<{
             this.props.deactivate();
         }
 
+        let disabledMessage = this.props.disabled ? ' - Disabled when measure tool is active' : '';
+
         return <input
             className="toolbar-button"
             style={{
@@ -65,7 +67,7 @@ class SelectionControl extends React.Component<{
                 backgroundColor: this.props.activeSelection === this.props.value ? 'lightblue' : '',
                 cursor: this.props.disabled ? 'not-allowed' : ''
             }}
-            title={this.props.title}
+            title={`${this.props.title}${disabledMessage}`}
             onClick={() => {
                 if (this.isActive) {
                     console.log('here');
@@ -594,15 +596,15 @@ class _Selection extends React.Component
                        cnst.selectionOneLayer.getSource().clear();
                        cnst.selectionLayer.getSource().clear();
                        this.props.setSelectedCrashes([]);
-                       cnst.drawVectorLayer.getSource().clear();
-
-                       let staticTooltips = document.getElementsByClassName('tooltip-static');
-
-                       for (let i = 0; i < staticTooltips.length; i++){
-                           let t = staticTooltips[i] as HTMLDivElement;
-
-                           t.parentElement.removeChild(t);
-                       }
+                       // cnst.drawVectorLayer.getSource().clear();
+                       //
+                       // let staticTooltips = document.getElementsByClassName('tooltip-static');
+                       //
+                       // for (let i = 0; i < staticTooltips.length; i++){
+                       //     let t = staticTooltips[i] as HTMLDivElement;
+                       //
+                       //     t.parentElement.removeChild(t);
+                       // }
                    }}
             />
             <SelectionMode selectionModeChange={(s: string) => {
