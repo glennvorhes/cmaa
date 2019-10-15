@@ -13,7 +13,7 @@ class _Loading extends React.Component<{ loading: boolean }, {}> {
 
         let messageSpan = <span/>;
 
-        if (totalRecords > 50000){
+        if (totalRecords > 100000){
             messageSpan = <span style={
                 {
                     display: 'block',
@@ -23,7 +23,7 @@ class _Loading extends React.Component<{ loading: boolean }, {}> {
                     maxWidth: '95px',
                     border: 'solid black 1px'
                 }
-            }>Loading may take up to 2 minutes</span>
+            }>Crash count exceeds 100,000.  Loading may take some time.</span>
         }
 
         return <div className="loading-gif-container" style={{display: show}}>

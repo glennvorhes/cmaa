@@ -1,6 +1,6 @@
 import React = require("react");
 import {connect} from "react-redux";
-import {iState} from "./store";
+import {iState, store} from "./store";
 // import {SelectionControl} from './selectionLayer';
 // import VectorLayer from "ol/layer/Vector";
 // import VectorSource from "ol/source/Vector";
@@ -14,6 +14,8 @@ import WKT from 'ol/format/WKT.js';
 
 import jsts = require("jsts");
 import {MEASURE_TOOL} from "./measure";
+import {STREET_VIEW} from "./streetView";
+import {SET_ACTIVE_TOOL, SET_IS_SELECTING} from "./actions";
 
 const SELECTION_MODE_NEW = 'New Selection';
 const SELECTION_MODE_ADD = "Add to Selection";
@@ -36,6 +38,10 @@ const crashLayers = [cnst.crashPointsK, cnst.crashPointsA, cnst.crashPointsB, cn
 //     map.addLayer(selectionLayer);
 // }
 
+// function cancel() {
+//     console.log('escape');
+// }
+
 class SelectionControl extends React.Component<{
     top: number,
     title: string,
@@ -50,6 +56,16 @@ class SelectionControl extends React.Component<{
     constructor(p, c) {
         super(p, c);
         this.isActive = false;
+
+        document.addEventListener('keyup', (e) => {
+            if (e.key === 'Escape' && this.props.value === this.props.activeSelection) {
+                this.isActive = false;
+                this.props.deactivate();
+
+                // store.dispatch({type: SET_ACTIVE_TOOL, tool: null});
+                // store.dispatch({type: SET_IS_SELECTING, isSelecting: false});
+            }
+        });
     }
 
     render() {
@@ -58,7 +74,7 @@ class SelectionControl extends React.Component<{
             this.props.deactivate();
         }
 
-        let disabledMessage = this.props.disabled ? ' - Disabled when measure tool is active' : '';
+        let disabledMessage = this.props.disabled ? ' - Disabled when other tools are active' : '';
 
         return <input
             className="toolbar-button"
@@ -157,7 +173,6 @@ function _update_selected_features(
 
             return selectionLayerSource.getFeatures();
 
-
         default:
             selectionExtentSource.clear();
             selectionLayerSource.clear();
@@ -176,13 +191,13 @@ class Box extends React.Component<iSelectControlWrap, {}> {
         this.draw = new Draw({type: 'Circle', geometryFunction: drw['createBox']()});
         // this.draw = new Draw({type: 'Circle'});
 
+
         this.draw.on('drawend', (e) => {
             this.props.setActive(null);
             let selectFeature = e['feature'] as Feature;
             let selectGeom = selectFeature.getGeometry();
 
             let newFeatures = [];
-
 
             for (let lyr of crashLayers) {
                 if (!lyr.getVisible()) {
@@ -204,19 +219,10 @@ class Box extends React.Component<iSelectControlWrap, {}> {
         };
 
         this.deactivate = () => {
-            // this.props.setActive('');
             if (this.props.map) {
                 this.props.map.removeInteraction(this.draw);
             }
         };
-        //
-        // (document.getElementsByTagName('body')[0] as HTMLBodyElement).onkeyup = (e) => {
-        //     console.log(this.props.activeSelection)
-        //     console.log(e.key);
-        //     if (this.props.activeSelection === SELECTION_DRAW_BOX && e.key === 'Escape') {
-        //         this.deactivate();
-        //     }
-        // }
     }
 
     render() {
@@ -312,12 +318,6 @@ class Line extends React.Component<iSelectControlWrap, {
                 this.props.map.removeInteraction(this.draw)
             }
         };
-
-        // (document.getElementsByTagName('body')[0] as HTMLBodyElement).onkeyup = (e) => {
-        //     if (this.props.activeSelection === SELECTION_DRAW_LINE && e.key === 'Escape') {
-        //         this.deactivate();
-        //     }
-        // }
     }
 
     render() {
@@ -427,12 +427,6 @@ class Poly extends React.Component<iSelectControlWrap, {}> {
                 this.props.map.removeInteraction(this.draw)
             }
         };
-
-        // (document.getElementsByTagName('body')[0] as HTMLBodyElement).onkeyup = (e) => {
-        //     if (this.props.activeSelection === SELECTION_DRAW_LINE && e.key === 'Escape') {
-        //         this.deactivate();
-        //     }
-        // }
     }
 
     render() {
@@ -565,19 +559,26 @@ class _Selection extends React.Component
         setActiveTool: (s: string) => any,
         activeTool: string
     },
-        { activeTool: string, selectionMode: string }> {
+        { selectionMode: string }> {
 
     constructor(p, c) {
         super(p, c);
 
-        this.state = {activeTool: null, selectionMode: SELECTION_MODE_NEW}
+        this.state = {selectionMode: SELECTION_MODE_NEW};
+
+        document.addEventListener('keyup', (e) => {
+            if (e.key === 'Escape' && this.props.activeTool && this.props.activeTool.indexOf('SELECTION') > -1) {
+                this.props.setIsSelecting(false);
+                this.props.setActiveTool(null);
+            }
+        });
     }
 
     setTool(s: string) {
         cnst.popup.closePopup();
         this.props.setIsSelecting(s !== null);
         this.props.setActiveTool(s);
-        this.setState({activeTool: s})
+        // this.setState({activeTool: s})
     }
 
     setFeatures(features: Feature[]) {
@@ -586,7 +587,8 @@ class _Selection extends React.Component
 
 
     render() {
-        let selectionDisabled = this.props.cluster || this.props.activeTool === MEASURE_TOOL;
+        let selectionDisabled = this.props.cluster || this.props.activeTool === MEASURE_TOOL ||
+            this.props.activeTool === STREET_VIEW;
 
         return <div>
             <input className="toolbar-button clear-selection"
@@ -596,22 +598,10 @@ class _Selection extends React.Component
                        cnst.selectionOneLayer.getSource().clear();
                        cnst.selectionLayer.getSource().clear();
                        this.props.setSelectedCrashes([]);
-                       // cnst.drawVectorLayer.getSource().clear();
-                       //
-                       // let staticTooltips = document.getElementsByClassName('tooltip-static');
-                       //
-                       // for (let i = 0; i < staticTooltips.length; i++){
-                       //     let t = staticTooltips[i] as HTMLDivElement;
-                       //
-                       //     t.parentElement.removeChild(t);
-                       // }
                    }}
             />
-            <SelectionMode selectionModeChange={(s: string) => {
-                this.setState({selectionMode: s})
-            }}/>
-
-            <Box map={this.props.map} activeTool={this.state.activeTool}
+            <Box map={this.props.map}
+                 activeTool={this.props.activeTool}
                  selectionMode={this.state.selectionMode}
                  setActive={(s) => {
                      this.setTool(s)
@@ -621,7 +611,8 @@ class _Selection extends React.Component
                  }}
                  disabled={selectionDisabled}
             />
-            <Line map={this.props.map} activeTool={this.state.activeTool}
+            <Line map={this.props.map}
+                  activeTool={this.props.activeTool}
                   selectionMode={this.state.selectionMode}
                   setActive={(s) => {
                       this.setTool(s)
@@ -631,7 +622,8 @@ class _Selection extends React.Component
                   }}
                   disabled={selectionDisabled}
             />
-            <Poly map={this.props.map} activeTool={this.state.activeTool}
+            <Poly map={this.props.map}
+                  activeTool={this.props.activeTool}
                   selectionMode={this.state.selectionMode}
                   setActive={(s) => {
                       this.setTool(s)
@@ -641,6 +633,9 @@ class _Selection extends React.Component
                   }}
                   disabled={selectionDisabled}
             />
+            <SelectionMode selectionModeChange={(s: string) => {
+                this.setState({selectionMode: s})
+            }}/>
         </div>
     }
 }
@@ -665,13 +660,13 @@ export const Selection = connect(
                     setTimeout(() => {
                         dispatch({type: act.SET_ACTIVE_TOOL, tool: null});
                         dispatch({type: act.SET_IS_SELECTING, isSelecting: selecting})
-                    }, 1000);
+                    }, 600);
                 }
             },
             setActiveTool: (s: string) => {
                 setTimeout(() => {
                     dispatch({type: act.SET_ACTIVE_TOOL, tool: s});
-                }, 500);
+                }, 250);
 
             }
 

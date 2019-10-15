@@ -78,7 +78,7 @@ class _Search extends React.Component<{ map: Map }, {}> {
             let fExt = f.getGeometry().getExtent();
 
 
-            if (this.props.map.getView().getZoom() < 8){
+            if (this.props.map.getView().getZoom() < 8) {
                 this.props.map.getView().setZoom(8);
             }
 
@@ -155,9 +155,12 @@ class _Search extends React.Component<{ map: Map }, {}> {
 
                 }
             }/>
-            <input type="button" id="search-button" value="" onClick={() => {
-                this.getLoc();
-            }}/>
+            <input type="button" id="search-button" value=""
+                   title="Search by location, document number, or coordinates"
+                   onClick={() => {
+                       this.getLoc();
+                   }
+                   }/>
         </div>
     }
 }
