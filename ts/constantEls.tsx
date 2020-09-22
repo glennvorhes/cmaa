@@ -115,8 +115,10 @@ export const aboutDiv = <div>
     </p>
     <p><b>CMAA Data Source</b></p>
     <p>
-        The WisTransPortal database includes geo-coded Wisconsin traffic crashes from 1998 to the
-        present day. In order for a crash to be displayed on the CMAA crash map, however, it must
+        The WisTransPortal contains a complete database of Wisconsin crash data from 1994 through the
+        current year.  Copies of police crash reports are available from 2000.
+        Geo-coded  crash records are available from 1998 to the present day.
+        In order for a crash to be displayed on the CMAA crash map, however, it must
         be geo-coded in the WisTransPortal database with latitude and longitude coordinates. Crashes
         that have not been geo-coded are counted in the total number of crashes returned for a
         particular query but will not be displayed on the map. Unmapped crashes will be listed in the

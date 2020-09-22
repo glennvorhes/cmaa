@@ -33,6 +33,12 @@ export const totalRecords = totalRecords_;
 
 export const GP_BY_QUERY_ID = 'https://transportal.cee.wisc.edu/applications/arcgis2/rest/services/crash/getCrashByQueryId/GPServer/GetCrashByQueryId/execute';
 export const GP_GET_CRASH_PROPS = 'https://transportal.cee.wisc.edu/applications/arcgis2/rest/services/crash/GetCrashProps/GPServer/GetCrashProps/execute';
+
+
+// export const GP_BY_QUERY_ID = 'https://transportal-tst.cee.wisc.edu/applications/arcgis3/rest/services/crash/getcrashbyqueryid/GPServer/GetCrashByQueryId/execute';
+// export const GP_GET_CRASH_PROPS = 'https://transportal-tst.cee.wisc.edu/applications/arcgis3/rest/services/crash/GetCrashProps/GPserver/GetCrashProps/execute';
+
+
 export const CRASH_REPORT_DOWNLOAD = 'https://transportal.cee.wisc.edu/applications/crash-reports/retrieveCrashReport.do?doctnmbr=';
 export const CRASH_TABLE_DOWNLOAD = 'https://transportal.cee.wisc.edu/testing/crash-data/retrieveCrashData.do';
 
