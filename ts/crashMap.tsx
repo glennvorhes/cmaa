@@ -39,13 +39,14 @@ store.store.subscribe(() => {
     console.log(s)
 });
 
-export interface iQueryResults {
-    K?: iResultInner;
-    A?: iResultInner;
-    B?: iResultInner;
-    C?: iResultInner;
-    O?: iResultInner;
-}
+
+// export interface iQueryResults {
+//     K?: iResultInner;
+//     A?: iResultInner;
+//     B?: iResultInner;
+//     C?: iResultInner;
+//     O?: iResultInner;
+// }
 
 class _CrashMap extends React.Component<{
     setQueryResults: (r: iQueryResults) => any,

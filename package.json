@@ -7,7 +7,7 @@
     "serve": "node_modules\\.bin\\parcel serve index_dev.html",
     "build-js": "node_modules\\.bin\\parcel build --public-url . -d build ts/crashMap.tsx",
     "build-css": "node_modules\\.bin\\parcel build --public-url . -d build css/crashMap.less",
-    "test-serve": "C:\\Python34\\python.exe -m http.server 5001"
+    "test-serve": "C:\\Python38\\python.exe -m http.server 5001"
   },
   "author": "Glenn Vorhes",
   "license": "ISC",
@@ -18,7 +18,6 @@
     "@types/ol": "^4.6.4",
     "@types/react": "^15.6.27",
     "@types/react-dom": "^0.14.23",
-    "@types/react-redux": "^4.4.38",
     "file-saver": "^2.0.2",
     "jquery": "^3.4.1",
     "jqueryui": "^1.11.1",
@@ -31,7 +30,7 @@
     "react-redux": "^5.0.3",
     "redux": "^3.6.0",
     "typescript": "^3.5.3",
-    "webmapsjs": "git+ssh://git@git.doit.wisc.edu/GAVORHES/webmapsjs#to-ol5"
+    "webmapsjs": "git+ssh://git@git.doit.wisc.edu/GAVORHES/webmapsjs#master"
   },
   "dependencies": {}
 }
