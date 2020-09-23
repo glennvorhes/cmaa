@@ -82,6 +82,14 @@ class _Measure extends React.Component<{ map: Map, activeTool: string, setActive
         this.initialized = false;
         this.sketch = null;
 
+        document.addEventListener('keyup', (e) => {
+            if (e.key === 'Escape' && this.props.activeTool === MEASURE_TOOL) {
+                this.disable();
+            }
+        });
+
+
+
         // this.source = new VectorSource();
         //
         // this.vector = new VectorLayer({
@@ -269,7 +277,8 @@ class _Measure extends React.Component<{ map: Map, activeTool: string, setActive
                       }}
                       onClick={() => {
                           this.enable()
-                      }} disabled={disabled} title="Measure"/>
+                      }} disabled={disabled}
+                      title={"Measure" + (disabled ? " - Disabled when other tools are active" : '')}/>
 
     }
 }

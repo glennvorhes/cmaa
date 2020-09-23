@@ -28,6 +28,7 @@ import Feature from 'ol/Feature';
 import {LayerToggle} from './layerToggle';
 import {Search} from './search';
 import {Measure} from "./measure";
+import {StreetView} from "./streetView";
 import * as fileSaver from 'file-saver';
 
 const esriJson = new EsriJSON();
@@ -425,6 +426,7 @@ class _CrashMap extends React.Component<{
                         <LayerToggle layerChecked={this.props.lyrChecked} clusterShown={(shown) => {
                             this.props.setCluster(shown);
                         }}/>
+                        <StreetView/>
                         <Selection/>
                         <Measure/>
                     </div>
