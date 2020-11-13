@@ -18,6 +18,7 @@
     "@types/ol": "^4.6.4",
     "@types/react": "^15.6.27",
     "@types/react-dom": "^0.14.23",
+    "babel-polyfill": "^6.26.0",
     "file-saver": "^2.0.2",
     "jquery": "^3.4.1",
     "jqueryui": "^1.11.1",
@@ -29,6 +30,7 @@
     "react-dom": "^16.8.6",
     "react-redux": "^5.0.3",
     "redux": "^3.6.0",
+    "symbol-es6": "^0.1.2",
     "typescript": "^3.5.3",
     "webmapsjs": "git+ssh://git@git.doit.wisc.edu/GAVORHES/webmapsjs#master"
   },

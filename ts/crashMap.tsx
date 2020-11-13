@@ -1,3 +1,5 @@
+import 'symbol-es6';
+
 import React = require('react');
 import ReactDom = require('react-dom');
 import $ = require("jquery");

@@ -8,5 +8,6 @@
     "inlineSources": true,
     "jsx": "react",
     "allowJs": true
-  }
+  },
+  "targets": { "ie": "11" }
 }
